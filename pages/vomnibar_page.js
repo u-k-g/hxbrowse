@@ -337,6 +337,11 @@ class VomnibarUI {
     for (const [i, el] of Object.entries(this.completionList.children)) {
       el.className = i == this.selection ? "selected" : "";
     }
+
+    // Keep keyboard navigation anchored to something visible. The completion list is its own
+    // scroll container, so "nearest" moves it only when the selected row crosses an edge.
+    const selectedElement = this.completionList.children[this.selection];
+    selectedElement?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
   }
 
   // Returns the user's action ("up", "down", "tab", etc, or null) based on their keypress. We

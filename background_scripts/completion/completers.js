@@ -122,12 +122,15 @@ export class Suggestion {
   </div>
 `;
     } else {
-      const actionHtml = this.description === "tab"
-        ? `<span class="completion-action">Switch to tab</span>
-           <span class="completion-arrow">${phosphorIcon("arrow-right")}</span>`
+      const isTab = this.description === "tab";
+      const actionHtml = isTab
+        ? `<span class="completion-end tab-action">
+             <span class="completion-action">Switch to tab</span>
+             <span class="completion-arrow">${phosphorIcon("arrow-right")}</span>
+           </span>`
         : "";
       this.html = `\
-<div class="top-half">
+<div class="top-half${isTab ? " tab-completion" : ""}">
    <span class="source ${insertTextClass}">${insertTextIndicator}</span><span class="source">${this.description}</span>
    <span class="title">${this.highlightQueryTerms(Utils.escapeHtml(this.title))}</span>${actionHtml}
  </div>

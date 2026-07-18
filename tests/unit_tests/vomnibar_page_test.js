@@ -105,6 +105,22 @@ context("vomnibar page", () => {
     assert.equal("modes", ui.completerName);
   });
 
+  should("scroll the selected completion into view", () => {
+    ui.renderCompletions([
+      { html: "<span>first</span>" },
+      { html: "<span>second</span>" },
+    ]);
+    let scrollOptions = null;
+    ui.completionList.children[1].scrollIntoView = (options) => scrollOptions = options;
+    ui.completions = [{}, {}];
+    ui.selection = 1;
+
+    ui.updateSelection();
+
+    assert.equal("selected", ui.completionList.children[1].className);
+    assert.equal({ block: "nearest", inline: "nearest" }, scrollOptions);
+  });
+
   should("keep find mode open when enter advances to the next match", async () => {
     await vomnibarPage.activate({ mode: "find", completer: "local" });
     ui.setQuery("needle");

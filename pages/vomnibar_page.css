@@ -191,6 +191,23 @@ ul {
   margin-left: 12px;
 }
 
+#vomnibar li .tab-completion .title {
+  padding-right: 140px;
+}
+
+#vomnibar li .tab-action {
+  margin: 0;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#vomnibar li .tab-action .completion-action,
+#vomnibar li .tab-action .completion-arrow {
+  margin-left: 0;
+}
+
 #vomnibar li .completion-arrow {
   align-items: center;
   color: var(--command-bar-dim);

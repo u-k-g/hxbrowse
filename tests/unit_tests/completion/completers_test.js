@@ -509,6 +509,19 @@ context("suggestions", () => {
     assert.isTrue(suggestion.generateHtml({}).indexOf("title &lt;span&gt;") >= 0);
   });
 
+  should("group a tab action so it can be centered across the entire result", () => {
+    const suggestion = new Suggestion({
+      queryTerms: [],
+      description: "tab",
+      url: "https://example.com",
+      title: "Example",
+      relevancyFunction: returns(1),
+    });
+    const html = suggestion.generateHtml({});
+    assert.isTrue(html.includes('class="top-half tab-completion"'));
+    assert.isTrue(html.includes('class="completion-end tab-action"'));
+  });
+
   should("highlight query words", () => {
     const suggestion = new Suggestion({
       queryTerms: ["ninj", "words"],
