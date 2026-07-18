@@ -190,7 +190,7 @@ const checkEnabledAfterURLChange = forTrusted(function (_request) {
   // The URL changing feels like navigation to the user, so reset the scroller (see #3119).
   Scroller.reset();
   if (windowIsFocused()) {
-    checkIfEnabledForUrl();
+    checkIfEnabledForUrlSafely();
   }
 });
 
@@ -241,7 +241,7 @@ const installListeners = Utils.makeIdempotent(function () {
 // Whenever we get the focus, check if we should be enabled.
 const onFocus = forTrusted(function (event) {
   if (event.target === window) {
-    checkIfEnabledForUrl();
+    checkIfEnabledForUrlSafely();
   }
 });
 
@@ -273,6 +273,26 @@ const onUnload = Utils.makeIdempotent(() => {
   globalThis.removeEventListener("focus", onFocus, true);
   globalThis.removeEventListener("hashchange", checkEnabledAfterURLChange, true);
 });
+
+// Reloading or updating the extension invalidates content scripts which are already running in open
+// tabs. Those scripts cannot reconnect, so shut them down without reporting an unhandled promise
+// rejection. A page refresh installs the current content scripts.
+function extensionContextWasInvalidated(error) {
+  return extensionHasBeenUnloaded() ||
+    error?.message?.includes("Extension context invalidated");
+}
+
+function handleExtensionContextError(error) {
+  if (extensionContextWasInvalidated(error)) {
+    onUnload();
+  } else {
+    throw error;
+  }
+}
+
+function checkIfEnabledForUrlSafely() {
+  return checkIfEnabledForUrl().catch(handleExtensionContextError);
+}
 
 function setScrollPosition({ scrollX, scrollY }) {
   DomUtils.documentReady().then(() => {
@@ -489,19 +509,9 @@ const HelpDialog = {
 
 const testEnv = globalThis.window == null;
 if (!testEnv) {
-  const handleInitializationError = (error) => {
-    // Reloading or updating the extension invalidates content scripts which are already running in
-    // open tabs. Those scripts cannot reconnect, so shut them down without reporting an unhandled
-    // promise rejection. A page refresh installs the current content scripts.
-    if (extensionHasBeenUnloaded()) {
-      onUnload();
-    } else {
-      throw error;
-    }
-  };
   initWindowIsFocused();
-  initializePreDomReady().catch(handleInitializationError);
-  DomUtils.documentReady().then(initializeOnDomReady).catch(handleInitializationError);
+  initializePreDomReady().catch(handleExtensionContextError);
+  DomUtils.documentReady().then(initializeOnDomReady).catch(handleExtensionContextError);
 }
 
 Object.assign(globalThis, {
@@ -511,5 +521,6 @@ Object.assign(globalThis, {
   // These are exported for normal mode and link-hints mode.
   focusThisFrame,
   // Exported only for tests.
+  extensionContextWasInvalidated,
   installModes,
 });

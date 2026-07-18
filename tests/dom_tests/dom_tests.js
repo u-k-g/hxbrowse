@@ -568,6 +568,16 @@ context("Helix normal-mode command aliases", () => {
   });
 });
 
+context("Extension context errors", () => {
+  should("recognize an invalidated extension context", () => {
+    assert.isTrue(extensionContextWasInvalidated(new Error("Extension context invalidated.")));
+  });
+
+  should("not swallow unrelated errors", () => {
+    assert.isFalse(extensionContextWasInvalidated(new Error("Unexpected failure")));
+  });
+});
+
 context("Input focus", () => {
   setup(() => {
     initializeModeState();
