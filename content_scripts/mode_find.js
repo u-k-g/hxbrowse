@@ -117,11 +117,15 @@ class FindMode extends Mode {
       suppressAllKeyboardEvents: true,
     }));
 
-    HUD.showFindMode(this);
+    if (!options.commandBar) {
+      HUD.showFindMode(this);
+    }
   }
 
   exit(event) {
-    HUD.unfocusIfFocused();
+    if (!this.options.commandBar) {
+      HUD.unfocusIfFocused();
+    }
     super.exit();
     if (event) {
       FindMode.handleEscape();
@@ -364,7 +368,7 @@ class FindMode extends Mode {
     return FindMode.saveQuery();
   }
 
-  static findNext(backwards) {
+  static findNext(backwards, options = {}) {
     // Bail out if we don't have any query text.
     const nextQuery = FindMode.getQuery(backwards);
     if (!nextQuery) {
@@ -373,9 +377,16 @@ class FindMode extends Mode {
     }
 
     Marks.setPreviousPosition();
-    FindMode.query.hasResults = FindMode.execute(nextQuery, { backwards });
+    FindMode.query.hasResults = FindMode.execute(nextQuery, {
+      backwards,
+      postFindFocus: options.postFindFocus,
+    });
 
     if (FindMode.query.hasResults) {
+      if (options.postFindFocus) {
+        options.postFindFocus.focus();
+        return;
+      }
       focusFoundLink();
       return newPostFindMode();
     } else {

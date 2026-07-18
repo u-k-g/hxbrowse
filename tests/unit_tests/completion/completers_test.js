@@ -415,20 +415,50 @@ context("command completer", () => {
 });
 
 context("tab completer", () => {
-  const tabs = [
-    { url: "tab1.com", title: "tab1", id: 1 },
-    { url: "tab2.com", title: "tab2", id: 2 },
-  ];
-  let completer;
+  let tabs;
+  let tabsQuery;
+  let collapsedGroups;
 
   setup(() => {
-    stub(chrome.tabs, "query", () => tabs);
+    tabs = [
+      { url: "tab1.com", title: "tab1", id: 1 },
+      { url: "tab2.com", title: "tab2", id: 2 },
+    ];
+    tabsQuery = null;
+    collapsedGroups = [];
+    stub(chrome.tabs, "query", (query) => {
+      tabsQuery = query;
+      return tabs;
+    });
+    stub(chrome.tabGroups, "query", () => collapsedGroups);
     completer = new TabCompleter();
   });
+  let completer;
 
-  should("return tabs by recency when query is empty", async () => {
+  should("return current-window tabs in tab-strip order when query is empty", async () => {
+    tabs = [
+      { url: "tab3.com", title: "tab3", id: 3, index: 2 },
+      { url: "tab1.com", title: "tab1", id: 1, index: 0 },
+      { url: "tab2.com", title: "tab2", id: 2, index: 1 },
+    ];
     const results = await filterCompleter(completer, []);
-    assert.equal(["tab1.com", "tab2.com"], results.map((tab) => tab.url));
+    assert.equal(["tab1.com", "tab2.com", "tab3.com"], results.map((tab) => tab.url));
+    assert.equal({ currentWindow: true }, tabsQuery);
+  });
+
+  should("hide collapsed-group tabs until a query is entered", async () => {
+    tabs = [
+      { url: "visible.com", title: "visible", id: 1, index: 0, groupId: -1 },
+      { url: "hidden.com", title: "hidden", id: 2, index: 1, groupId: 42 },
+    ];
+    collapsedGroups = [{ id: 42, collapsed: true }];
+
+    const emptyResults = await filterCompleter(completer, []);
+    const searchResults = await filterCompleter(completer, ["hidden"]);
+
+    assert.equal(["visible.com"], emptyResults.map((tab) => tab.url));
+    assert.equal(["hidden.com"], searchResults.map((tab) => tab.url));
+    assert.equal({}, tabsQuery);
   });
 
   should("return matching tabs", async () => {

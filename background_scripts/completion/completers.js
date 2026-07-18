@@ -17,6 +17,7 @@ import * as userSearchEngines from "../user_search_engines.js";
 import * as ranking from "./ranking.js";
 import { allCommands } from "../all_commands.js";
 import { Commands, RegistryEntry } from "../commands.js";
+import { icon as phosphorIcon } from "../../lib/phosphor_icons.js";
 import { RegexpCache } from "./ranking.js";
 
 // Set this to true to render relevancy when debugging the ranking scores.
@@ -116,14 +117,19 @@ export class Suggestion {
       // currently never shown alongside other suggestion types.
       this.html = `\
   <div class="top-half">
-    <span class="title">${this.highlightQueryTerms(this.title)}</span>${keybindings}${relevancyHtml}
+    <span class="title">${this.highlightQueryTerms(this.title)}</span>
+    <span class="completion-end">${keybindings}</span>${relevancyHtml}
   </div>
 `;
     } else {
+      const actionHtml = this.description === "tab"
+        ? `<span class="completion-action">Switch to tab</span>
+           <span class="completion-arrow">${phosphorIcon("arrow-right")}</span>`
+        : "";
       this.html = `\
 <div class="top-half">
    <span class="source ${insertTextClass}">${insertTextIndicator}</span><span class="source">${this.description}</span>
-   <span class="title">${this.highlightQueryTerms(Utils.escapeHtml(this.title))}</span>
+   <span class="title">${this.highlightQueryTerms(Utils.escapeHtml(this.title))}</span>${actionHtml}
  </div>
  <div class="bottom-half">
   <span class="source no-insert-text">${insertTextIndicator}</span>${faviconHtml}<span class="url">${
@@ -587,16 +593,28 @@ export class DomainCompleter {
   }
 }
 
-// Searches through all open tabs, matching on title and URL.
-// If the query is empty, then return a list of open tabs, sorted by recency.
+// Searches through all open tabs, matching on title and URL. With an empty query, mirror the
+// current window's tab strip: preserve tab-index order and omit tabs hidden in collapsed groups.
+// Once the user types, search every tab, including tabs in collapsed groups and other windows.
 export class TabCompleter {
   async filter({ queryTerms }) {
-    await bgUtils.tabRecency.init();
-    // We search all tabs, not just those in the current window.
-    const tabs = await chrome.tabs.query({});
-    const results = tabs.filter((tab) => ranking.matches(queryTerms, tab.url, tab.title));
+    const hasQuery = queryTerms.length > 0;
+    const tabs = await chrome.tabs.query(hasQuery ? {} : { currentWindow: true });
+    let results = tabs.filter((tab) => ranking.matches(queryTerms, tab.url, tab.title));
+
+    if (!hasQuery) {
+      const collapsedGroupIds = new Set();
+      if (chrome.tabGroups?.query) {
+        const collapsedGroups = await chrome.tabGroups.query({ collapsed: true });
+        for (const group of collapsedGroups) collapsedGroupIds.add(group.id);
+      }
+      results = results
+        .filter((tab) => !collapsedGroupIds.has(tab.groupId))
+        .sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+    }
+
     const suggestions = results
-      .map((tab) => {
+      .map((tab, index) => {
         const suggestion = new Suggestion({
           queryTerms,
           description: "tab",
@@ -605,7 +623,9 @@ export class TabCompleter {
           tabId: tab.id,
           deDuplicate: false,
         });
-        suggestion.relevancy = this.computeRelevancy(suggestion);
+        suggestion.relevancy = hasQuery
+          ? this.computeRelevancy(suggestion)
+          : 1 - (index / (results.length + 1));
         return suggestion;
       })
       .sort((a, b) => b.relevancy - a.relevancy);
@@ -622,11 +642,7 @@ export class TabCompleter {
   }
 
   computeRelevancy(suggestion) {
-    if (suggestion.queryTerms.length > 0) {
-      return ranking.wordRelevancy(suggestion.queryTerms, suggestion.url, suggestion.title);
-    } else {
-      return bgUtils.tabRecency.recencyScore(suggestion.tabId);
-    }
+    return ranking.wordRelevancy(suggestion.queryTerms, suggestion.url, suggestion.title);
   }
 }
 
@@ -740,11 +756,12 @@ export class MultiCompleter {
     const query = request.query;
     const queryTerms = request.queryTerms;
 
-    // The only UX where we support showing results when there are no query terms is via
-    // Vomnibar.activateTabSelection, where we show the list of open tabs by recency.
+    // Tab selection always shows results for an empty query. Other completers can explicitly opt
+    // into empty-query results with seenTabToOpenCompletionList; standalone history uses this to
+    // show its entries by recency.
     const isTabCompleter = this.completers.length == 1 &&
       this.completers[0] instanceof TabCompleter;
-    if (queryTerms.length == 0 && !isTabCompleter) {
+    if (queryTerms.length == 0 && !isTabCompleter && !request.seenTabToOpenCompletionList) {
       return [];
     }
 

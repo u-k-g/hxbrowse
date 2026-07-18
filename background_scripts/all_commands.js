@@ -316,6 +316,46 @@ const allCommands = [
   //
 
   {
+    name: "Vomnibar.activateModeSelection",
+    desc: "Open the command bar",
+    group: "vomnibar",
+    topFrame: true,
+    noRepeat: true,
+  },
+
+  {
+    name: "Vomnibar.activateFind",
+    desc: "Find text using the command bar",
+    group: "vomnibar",
+    topFrame: true,
+    noRepeat: true,
+  },
+
+  {
+    name: "Vomnibar.activateHistory",
+    desc: "Search history using the command bar",
+    group: "vomnibar",
+    topFrame: true,
+    noRepeat: true,
+  },
+
+  {
+    name: "Vomnibar.activateMarks",
+    desc: "Jump to a page mark using the command bar",
+    group: "vomnibar",
+    topFrame: true,
+    noRepeat: true,
+  },
+
+  {
+    name: "Vomnibar.activateKeybindings",
+    desc: "Search commands and keybindings",
+    group: "vomnibar",
+    topFrame: true,
+    noRepeat: true,
+  },
+
+  {
     name: "Vomnibar.activate",
     desc: "Open URL, bookmark or history entry",
     options: {

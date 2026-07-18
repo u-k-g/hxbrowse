@@ -31,7 +31,13 @@ class NormalMode extends KeyHandlerMode {
   }
 
   commandHandler({ command: registryEntry, count }) {
-    if (registryEntry.command === "Vomnibar.activateCommandSelection") {
+    if (
+      [
+        "Vomnibar.activateCommandSelection",
+        "Vomnibar.activateKeybindings",
+        "Vomnibar.activateModeSelection",
+      ].includes(registryEntry.command)
+    ) {
       // Store the raw count so the Vomnibar can propagate it to the selected command.
       registryEntry.options.prefixCount = count;
     }
@@ -374,6 +380,11 @@ const NormalModeCommands = {
   "LinkHints.activateModeToCopyLinkUrl": LinkHints.activateModeToCopyLinkUrl.bind(LinkHints),
 
   "Vomnibar.activate": Vomnibar.activate.bind(Vomnibar),
+  "Vomnibar.activateModeSelection": Vomnibar.activateModeSelection.bind(Vomnibar),
+  "Vomnibar.activateFind": Vomnibar.activateFind.bind(Vomnibar),
+  "Vomnibar.activateHistory": Vomnibar.activateHistory.bind(Vomnibar),
+  "Vomnibar.activateMarks": Vomnibar.activateMarks.bind(Vomnibar),
+  "Vomnibar.activateKeybindings": Vomnibar.activateKeybindings.bind(Vomnibar),
   "Vomnibar.activateInNewTab": Vomnibar.activateInNewTab.bind(Vomnibar),
   "Vomnibar.activateTabSelection": Vomnibar.activateTabSelection.bind(Vomnibar),
   "Vomnibar.activateBookmarks": Vomnibar.activateBookmarks.bind(Vomnibar),

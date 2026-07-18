@@ -245,6 +245,16 @@ context("Validate commands and options data structures", () => {
     assert.equal(vimKeyMappings, defaultKeyMappings);
   });
 
+  should("route Helix picker keys through the unified command bar", () => {
+    assert.equal("Vomnibar.activateModeSelection", helixKeyMappings[":"]);
+    assert.equal("Vomnibar.activateFind", helixKeyMappings["<space>/"]);
+    assert.equal("Vomnibar.activateMarks", helixKeyMappings["<space>'"]);
+    assert.equal("Marks.activateCreateMode", helixKeyMappings["<space>m"]);
+    assert.equal("Vomnibar.activateKeybindings", helixKeyMappings["<space>h"]);
+    assert.equal("Vomnibar.activate", helixKeyMappings["<c-w>n"]);
+    assert.isFalse(Object.hasOwn(helixKeyMappings, "<c-t>"));
+  });
+
   should("parse every default keybinding profile without validation errors", () => {
     for (const mappings of [vimKeyMappings, helixKeyMappings]) {
       const config = Object.entries(mappings).map(([key, command]) => `map ${key} ${command}`)

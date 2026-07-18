@@ -268,7 +268,7 @@ async function initializeOnDomReady() {
   if (Settings.get("openVomnibarOnNewTabPage")) {
     await Utils.populateBrowserInfo();
     DomUtils.injectUserCss();
-    Vomnibar.activate(0, {});
+    Vomnibar.activateNewTab(0);
   }
 }
 

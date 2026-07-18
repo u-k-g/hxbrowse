@@ -44,10 +44,87 @@ const Marks = {
   // marks. The "swap" command option inverts global and local marks.
   isGlobalMark(event, keyChar) {
     let shiftKey = event.shiftKey;
-    if (this.currentRegistryEntry.options.swap) {
+    if (this.currentRegistryEntry?.options.swap) {
       shiftKey = !shiftKey;
     }
     return shiftKey && !this.previousPositionRegisters.includes(keyChar);
+  },
+
+  createMark(keyChar, shiftKey = false) {
+    if (this.isGlobalMark({ shiftKey }, keyChar)) {
+      // We record the current scroll position, but only if this is the top frame within the tab.
+      // Otherwise, the background page fetches it from the top frame.
+      let scrollX, scrollY;
+      if (DomUtils.isTopFrame()) {
+        [scrollX, scrollY] = [globalThis.scrollX, globalThis.scrollY];
+      }
+      chrome.runtime.sendMessage({
+        handler: "createMark",
+        markName: keyChar,
+        scrollX,
+        scrollY,
+      }, () => this.showMessage("Created global mark", keyChar));
+    } else {
+      localStorage[this.getLocationKey(keyChar)] = this.getMarkString();
+      this.showMessage("Created local mark", keyChar);
+    }
+  },
+
+  gotoMark(keyChar, shiftKey = false) {
+    if (this.isGlobalMark({ shiftKey }, keyChar)) {
+      const key = `vimiumGlobalMark|${keyChar}`;
+      chrome.storage.local.get(key, function (items) {
+        if (key in items) {
+          chrome.runtime.sendMessage({ handler: "gotoMark", markName: keyChar });
+          HUD.show(`Jumped to global mark '${keyChar}'`, 1000);
+        } else {
+          HUD.show(`Global mark not set '${keyChar}'`, 1000);
+        }
+      });
+    } else {
+      const markString = this.localRegisters[keyChar] != null
+        ? this.localRegisters[keyChar]
+        : localStorage[this.getLocationKey(keyChar)];
+      if (markString != null) {
+        this.setPreviousPosition();
+        const position = JSON.parse(markString);
+        if (position.hash && (position.scrollX === 0) && (position.scrollY === 0)) {
+          globalThis.location.hash = position.hash;
+        } else {
+          globalThis.scrollTo(position.scrollX, position.scrollY);
+        }
+        this.showMessage("Jumped to local mark", keyChar);
+      } else {
+        this.showMessage("Local mark not set", keyChar);
+      }
+    }
+  },
+
+  async getMarksForCurrentPage() {
+    const baseUrl = globalThis.location.href.split("#")[0];
+    const localPrefix = `vimiumMark|${baseUrl}|`;
+    const marks = [];
+
+    for (let index = 0; index < localStorage.length; index++) {
+      const storageKey = localStorage.key(index);
+      if (storageKey?.startsWith(localPrefix)) {
+        marks.push({ key: storageKey.slice(localPrefix.length), scope: "local" });
+      }
+    }
+    for (const key of Object.keys(this.localRegisters)) {
+      if (!marks.some((mark) => mark.key === key && mark.scope === "local")) {
+        marks.push({ key, scope: "local" });
+      }
+    }
+
+    const storedMarks = await chrome.storage.local.get(null);
+    for (const [storageKey, mark] of Object.entries(storedMarks)) {
+      if (storageKey.startsWith("vimiumGlobalMark|") && mark?.url === baseUrl) {
+        marks.push({ key: storageKey.slice("vimiumGlobalMark|".length), scope: "global" });
+      }
+    }
+
+    return marks.sort((a, b) => a.key.localeCompare(b.key) || a.scope.localeCompare(b.scope));
   },
 
   activateCreateMode(_count, { registryEntry }) {
@@ -62,24 +139,7 @@ const Marks = {
         if (KeyboardUtils.isPrintable(event)) {
           const keyChar = KeyboardUtils.getKeyChar(event);
           this.exit(() => {
-            if (this.isGlobalMark(event, keyChar)) {
-              // We record the current scroll position, but only if this is the top frame within the
-              // tab. Otherwise, we'll fetch the scroll position of the top frame from the
-              // background page later.
-              let scrollX, scrollY;
-              if (DomUtils.isTopFrame()) {
-                [scrollX, scrollY] = [globalThis.scrollX, globalThis.scrollY];
-              }
-              chrome.runtime.sendMessage({
-                handler: "createMark",
-                markName: keyChar,
-                scrollX,
-                scrollY,
-              }, () => this.showMessage("Created global mark", keyChar));
-            } else {
-              localStorage[this.getLocationKey(keyChar)] = this.getMarkString();
-              this.showMessage("Created local mark", keyChar);
-            }
+            this.createMark(keyChar, event.shiftKey);
           });
           return handlerStack.suppressEvent;
         }
@@ -99,34 +159,7 @@ const Marks = {
         if (KeyboardUtils.isPrintable(event)) {
           this.exit(() => {
             const keyChar = KeyboardUtils.getKeyChar(event);
-            if (this.isGlobalMark(event, keyChar)) {
-              // This key must match @getLocationKey() in the back end.
-              const key = `vimiumGlobalMark|${keyChar}`;
-              chrome.storage.local.get(key, function (items) {
-                if (key in items) {
-                  chrome.runtime.sendMessage({ handler: "gotoMark", markName: keyChar });
-                  HUD.show(`Jumped to global mark '${keyChar}'`, 1000);
-                } else {
-                  HUD.show(`Global mark not set '${keyChar}'`, 1000);
-                }
-              });
-            } else {
-              const markString = this.localRegisters[keyChar] != null
-                ? this.localRegisters[keyChar]
-                : localStorage[this.getLocationKey(keyChar)];
-              if (markString != null) {
-                this.setPreviousPosition();
-                const position = JSON.parse(markString);
-                if (position.hash && (position.scrollX === 0) && (position.scrollY === 0)) {
-                  globalThis.location.hash = position.hash;
-                } else {
-                  globalThis.scrollTo(position.scrollX, position.scrollY);
-                }
-                this.showMessage("Jumped to local mark", keyChar);
-              } else {
-                this.showMessage("Local mark not set", keyChar);
-              }
-            }
+            this.gotoMark(keyChar, event.shiftKey);
           });
           return handlerStack.suppressEvent;
         }

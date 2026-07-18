@@ -50,6 +50,46 @@ context("vomnibar page", () => {
     assert.equal("", ui.input.value);
   });
 
+  should("open without an active mode and search command-bar modes", async () => {
+    await vomnibarPage.activate({ mode: "", completer: "modes" });
+    ui.setQuery("copy link");
+    await ui.update();
+
+    assert.equal("", ui.mode);
+    assert.isTrue(ui.modeIndicator.hidden);
+    assert.equal(1, ui.completions.length);
+    assert.equal("link:copy", ui.completions[0].commandBarMode);
+  });
+
+  should("enter a selected command-bar mode without closing the bar", async () => {
+    await vomnibarPage.activate({ mode: "", completer: "modes" });
+    ui.setQuery("find");
+    await ui.update();
+    await ui.onKeyEvent(newKeyEvent({ type: "keypress", key: "Enter" }));
+
+    assert.equal("find", ui.mode);
+    assert.equal("local", ui.completerName);
+    assert.equal("find", ui.modeIndicator.textContent);
+    assert.isFalse(ui.modeIndicator.hidden);
+  });
+
+  should("return from a mode to the mode selector with backspace on an empty query", async () => {
+    await vomnibarPage.activate({ mode: "find", completer: "local" });
+    await ui.onKeyEvent(newKeyEvent({ key: "Backspace" }));
+
+    assert.equal("", ui.mode);
+    assert.equal("modes", ui.completerName);
+  });
+
+  should("keep find mode open when enter advances to the next match", async () => {
+    await vomnibarPage.activate({ mode: "find", completer: "local" });
+    ui.setQuery("needle");
+    await ui.onKeyEvent(newKeyEvent({ type: "keypress", key: "Enter" }));
+
+    assert.equal("find", ui.mode);
+    assert.equal("needle", ui.input.value);
+  });
+
   should("edit a completion's URL when ctrl-enter is pressed", async () => {
     stub(chrome.runtime, "sendMessage", async (message) => {
       if (message.handler == "filterCompletions") {
@@ -64,7 +104,7 @@ context("vomnibar page", () => {
     assert.equal("http://hello.com", ui.input.value);
   });
 
-  should("open a URL-like query when enter is pressed", async () => {
+  should("open a URL-like search-mode query in a new tab", async () => {
     ui.setQuery("www.example.com");
     let handler = null;
     let url = null;
@@ -74,8 +114,29 @@ context("vomnibar page", () => {
     });
     await ui.onKeyEvent(newKeyEvent({ type: "keypress", key: "Enter" }));
     ui.onHidden();
-    assert.equal("openUrlInCurrentTab", handler);
+    assert.equal("openUrlInNewTab", handler);
     assert.equal("www.example.com", url);
+  });
+
+  should("open a URL from new-tab URL mode in the current tab", async () => {
+    await vomnibarPage.activate({
+      mode: "url",
+      completer: "omni",
+      currentUrl: "",
+      newTab: false,
+    });
+    assert.equal("url", ui.mode);
+    assert.equal("", ui.input.value);
+
+    ui.setQuery("www.example.com");
+    let handler = null;
+    stub(chrome.runtime, "sendMessage", async (message) => {
+      handler = message.handler;
+    });
+    await ui.onKeyEvent(newKeyEvent({ type: "keypress", key: "Enter" }));
+    ui.onHidden();
+
+    assert.equal("openUrlInCurrentTab", handler);
   });
 
   should("search for a non-URL query when enter is pressed", async () => {
@@ -108,7 +169,7 @@ context("vomnibar page", () => {
       // Return a never-resolving promise for filterCompletions to simulate the race condition where
       // the user hits Enter before the background page responds with completions.
       if (message.handler === "filterCompletions") return new Promise(() => {});
-      if (message.handler === "openUrlInCurrentTab") capturedUrl = message.url;
+      if (message.handler === "openUrlInNewTab") capturedUrl = message.url;
     });
 
     ui.setQuery("e hello");
@@ -120,6 +181,25 @@ context("vomnibar page", () => {
     ui.onHidden();
 
     assert.equal("https://www.example.com/search?q=hello", capturedUrl);
+  });
+
+  should("offer only one search mode and one URL-edit mode", async () => {
+    await vomnibarPage.activate({ mode: "", completer: "modes" });
+    ui.setQuery("url");
+    await ui.update();
+    const urlModes = ui.completions.map((completion) => completion.commandBarMode)
+      .filter((mode) => ["url", "search"].includes(mode));
+    assert.equal(["search", "url"], urlModes);
+  });
+
+  should("keep direct mark creation out of the mode selector", async () => {
+    await vomnibarPage.activate({ mode: "", completer: "modes" });
+    ui.setQuery("mark");
+    await ui.update();
+
+    assert.isFalse(
+      ui.completions.some((completion) => completion.commandBarMode === "mark:create"),
+    );
   });
 
   should("create command suggestions with correct HTML for key bindings", async () => {

@@ -163,6 +163,13 @@ globalThis.chrome = {
     update(_id, _properties) {},
   },
 
+  tabGroups: {
+    TAB_GROUP_ID_NONE: -1,
+    query() {
+      return [];
+    },
+  },
+
   webNavigation: {
     onHistoryStateUpdated: {
       addListener() {},

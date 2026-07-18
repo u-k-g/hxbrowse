@@ -229,13 +229,13 @@ iframe.vomnibar-frame {
 
   display: block;
   position: fixed;
-  width: calc(80% + 20px); /* same adjustment as in pages/vomnibar_page.js */
-  min-width: 400px;
+  width: min(900px, calc(100vw - 44px));
+  min-width: 360px;
   height: calc(100% - 70px);
   top: 70px;
   left: 50%;
-  /* TODO(philc): Why are we doing this negative margin, rather than just using right: 20% ? */
-  margin: 0 0 0 -40%;
+  margin: 0;
+  transform: translateX(-50%);
   border: none;
   font-family: sans-serif;
   z-index: 2147483647;

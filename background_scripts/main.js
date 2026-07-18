@@ -67,6 +67,7 @@ const completers = {
   ]),
   bookmarks: new MultiCompleter([completionSources.bookmarks]),
   commands: new MultiCompleter([completionSources.commands]),
+  history: new MultiCompleter([completionSources.history]),
   tabs: new MultiCompleter([completionSources.tabs]),
 };
 
@@ -724,6 +725,7 @@ const sendRequestHandlers = {
 
   async filterCompletions(request) {
     const completer = completers[request.completerName];
+    if (!completer) return [];
     let response = await completer.filter(request);
 
     // NOTE(smblott): response contains `relevancyFunction` (function) properties which cause
@@ -737,12 +739,12 @@ const sendRequestHandlers = {
 
   refreshCompletions(request) {
     const completer = completers[request.completerName];
-    completer.refresh();
+    completer?.refresh();
   },
 
   cancelCompletions(request) {
     const completer = completers[request.completerName];
-    completer.cancel();
+    completer?.cancel();
   },
 };
 

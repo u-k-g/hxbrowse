@@ -15,6 +15,9 @@ function getPathsFromManifest(manifest) {
   if (manifest.background.service_worker) files.push(manifest.background.service_worker);
   if (manifest.background.scripts) files = files.concat(manifest.background.scripts);
   files.push(manifest.options_ui.page, manifest.action.default_popup);
+  if (manifest.chrome_url_overrides) {
+    files = files.concat(Object.values(manifest.chrome_url_overrides));
+  }
 
   const actionIcon = manifest.action.default_icon;
   files = files.concat(typeof actionIcon == "string" ? [actionIcon] : Object.values(actionIcon));

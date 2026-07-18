@@ -17,8 +17,9 @@ export function createFirefoxManifest(manifest) {
   manifest = globalThis.structuredClone(manifest);
 
   manifest.permissions = manifest.permissions
-    // Firefox needs these permissions for clipboard commands, but does not support favicon.
-    .filter((permission) => permission != "favicon")
+    // Firefox needs these permissions for clipboard commands. The minimum supported Firefox
+    // version does not expose Chrome's favicon or tabGroups APIs; both call sites degrade cleanly.
+    .filter((permission) => !["favicon", "tabGroups"].includes(permission))
     .concat(["clipboardRead", "clipboardWrite"]);
 
   // Firefox uses background scripts rather than a Manifest V3 service worker.

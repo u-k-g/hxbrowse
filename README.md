@@ -40,7 +40,9 @@ selected.
     Space h       show all active bindings
     :             open the command palette
     Ctrl-w h/l    go to the previous/next tab
-    Ctrl-w n/q/u  create/close/restore a tab
+    Ctrl-w n      open the command bar
+    Ctrl-w q/u    close/restore a tab
+    Ctrl-t        open the command bar (same as Ctrl-w n)
 
 ## Vimium Classic Keyboard Bindings
 

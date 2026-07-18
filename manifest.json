@@ -20,11 +20,15 @@
     "browser_style": false,
     "open_in_tab": true
   },
+  "chrome_url_overrides": {
+    "newtab": "pages/new_tab.html"
+  },
   "host_permissions": [
     "<all_urls>"
   ],
   "permissions": [
     "tabs",
+    "tabGroups",
     "bookmarks",
     "history",
     "storage",

@@ -11,8 +11,142 @@ import "../lib/settings.js";
 import "../lib/keyboard_utils.js";
 import "../lib/dom_utils.js";
 import "../lib/handler_stack.js";
+import { icon as phosphorIcon } from "../lib/phosphor_icons.js";
 import * as UIComponentMessenger from "./ui_component_messenger.js";
 import * as userSearchEngines from "../background_scripts/user_search_engines.js";
+
+function renderKeybinding(keybinding) {
+  if (!keybinding) return "";
+  const bindings = Array.isArray(keybinding) ? keybinding : [keybinding];
+  return bindings.map((binding) =>
+    `<span class="mode-keybinding">${
+      binding.split(" ").map((key) => `<kbd>${Utils.escapeHtml(key)}</kbd>`).join("")
+    }</span>`
+  ).join("");
+}
+
+const commandBarModes = [
+  {
+    name: "find",
+    description: "Find text on the current page",
+    aliases: "page search",
+    completer: "local",
+    icon: "magnifying-glass",
+    keybinding: "Space /",
+  },
+  {
+    name: "search",
+    description: "Search the web or open a URL in a new tab",
+    aliases: "navigate url new tab",
+    completer: "omni",
+    newTab: true,
+    icon: "globe",
+    keybinding: ["Space S", "Ctrl-W n"],
+  },
+  {
+    name: "history",
+    description: "Search browsing history",
+    aliases: "recent pages",
+    completer: "history",
+    selectFirst: true,
+    icon: "clock-counter-clockwise",
+  },
+  {
+    name: "tabs",
+    description: "Fuzzy-search open tabs",
+    aliases: "active open tab picker buffers",
+    completer: "tabs",
+    selectFirst: true,
+    icon: "browsers",
+    keybinding: "Space b",
+  },
+  {
+    name: "bookmarks",
+    description: "Search bookmarks",
+    aliases: "favorites",
+    completer: "bookmarks",
+    selectFirst: true,
+    icon: "bookmark-simple",
+    keybinding: "Space B",
+  },
+  {
+    name: "url",
+    description: "Edit the current URL",
+    aliases: "address location current",
+    completer: "omni",
+    useCurrentUrl: true,
+    icon: "pencil-simple",
+    keybinding: "Space e",
+  },
+  {
+    name: "commands",
+    description: "Search and run extension commands",
+    aliases: "palette actions",
+    completer: "commands",
+    selectFirst: true,
+    icon: "command",
+  },
+  {
+    name: "keybindings",
+    description: "Search commands and their keybindings",
+    aliases: "keys help shortcuts",
+    completer: "commands",
+    selectFirst: true,
+    icon: "keyboard",
+    keybinding: "Space h",
+  },
+  {
+    name: "marks",
+    description: "Show and jump to marks on this page",
+    aliases: "goto jump",
+    completer: "local",
+    selectFirst: true,
+    icon: "map-pin",
+    keybinding: "Space '",
+  },
+  {
+    name: "link:current",
+    description: "Select a link to open in the current tab",
+    aliases: "hint click",
+    action: true,
+    icon: "link",
+    keybinding: "Space f",
+  },
+  {
+    name: "link:new",
+    description: "Select a link to open in a new tab",
+    aliases: "hint background",
+    action: true,
+    icon: "link",
+    keybinding: "Space F",
+  },
+  {
+    name: "link:multi",
+    description: "Select multiple links to open in new tabs",
+    aliases: "hint queue many",
+    action: true,
+    icon: "link",
+    keybinding: "Space a",
+  },
+  {
+    name: "link:download",
+    description: "Select a link to download",
+    aliases: "hint save",
+    action: true,
+    icon: "link",
+    keybinding: "Space d",
+  },
+  {
+    name: "link:copy",
+    description: "Select a link and copy its URL",
+    aliases: "hint yank clipboard",
+    action: true,
+    icon: "link",
+    keybinding: "Space y",
+  },
+];
+
+const commandBarModesByName = Object.fromEntries(commandBarModes.map((mode) => [mode.name, mode]));
 
 // An instance of VomnibarUI. Exported for use by tests.
 export let ui;
@@ -30,10 +164,12 @@ export async function activate(options) {
   const defaults = {
     completer: "omni",
     query: "",
-    newTab: false,
+    newTab: true,
     selectFirst: false,
     keyword: null,
     prefixCount: 1,
+    mode: "search",
+    currentUrl: "",
   };
 
   options = Object.assign(defaults, options);
@@ -41,12 +177,14 @@ export async function activate(options) {
   if (ui == null) {
     ui = new VomnibarUI();
   }
-  ui.setCompleterName(options.completer);
-  ui.refreshCompletions();
-  ui.setInitialSelectionValue(options.selectFirst ? 0 : -1);
-  ui.setForceNewTab(options.newTab);
-  ui.setQuery(options.query);
+  ui.currentUrl = options.currentUrl;
   ui.setPrefixCount(options.prefixCount);
+  ui.setMode(options.mode, {
+    completer: options.completer,
+    newTab: options.newTab,
+    query: options.query,
+    selectFirst: options.selectFirst,
+  });
   ui.setActiveUserSearchEngine(userSearchEngines.keywordToEngine[options.keyword]);
   // Use await here for vomnibar_test.js, so that this page doesn't get unloaded while a test is
   // running.
@@ -80,7 +218,37 @@ class VomnibarUI {
     this.forceNewTab = forceNewTab;
   }
 
-  // name: one of [omni, bookmarks, commands, tabs].
+  setMode(name, options = {}) {
+    const mode = commandBarModesByName[name];
+    this.mode = name;
+    this.setInitialSelectionValue(
+      (options.selectFirst ?? mode?.selectFirst ?? name === "") ? 0 : -1,
+    );
+    this.setForceNewTab(options.newTab ?? mode?.newTab ?? false);
+    this.setCompleterName(options.completer ?? mode?.completer ?? "modes");
+    const query = mode?.useCurrentUrl ? this.currentUrl : options.query ?? "";
+    this.setQuery(query);
+
+    this.modeIndicator.textContent = name;
+    this.modeIndicator.hidden = name.length === 0;
+    this.statusIndicator.hidden = true;
+    this.input.placeholder = name.length === 0 ? "Search command-bar modes" : name;
+    UIComponentMessenger.postMessage({ name: "commandBarModeChanged", mode: name });
+  }
+
+  enterMode(name) {
+    const mode = commandBarModesByName[name];
+    if (!mode) return;
+    if (mode.action) {
+      UIComponentMessenger.postMessage({ name: "commandBarAction", action: name });
+      return;
+    }
+    this.setMode(name);
+    this.refreshCompletions();
+    this.update();
+  }
+
+  // name: one of [omni, bookmarks, commands, history, tabs, modes, local].
   setCompleterName(name) {
     this.completerName = name;
     const capitalize = (s) => s[0].toUpperCase() + s.slice(1);
@@ -118,6 +286,7 @@ class VomnibarUI {
   }
 
   onHidden() {
+    UIComponentMessenger.postMessage({ name: "commandBarFinishMode", commit: false });
     this.onHiddenCallback?.();
     this.onHiddenCallback = null;
     this.reset();
@@ -132,6 +301,7 @@ class VomnibarUI {
     this.selection = this.initialSelectionValue;
     this.seenTabToOpenCompletionList = false;
     this.lastRequestId = null;
+    this.marks = [];
   }
 
   updateSelection() {
@@ -195,12 +365,27 @@ class VomnibarUI {
   }
 
   async onKeyEvent(event) {
+    if (
+      event.type === "keydown" && this.mode === "marks" &&
+      event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey
+    ) {
+      UIComponentMessenger.postMessage({
+        name: "commandBarMark",
+        key: event.key,
+        shiftKey: event.shiftKey,
+      });
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      return;
+    }
+
     const action = this.actionFromKeyEvent(event);
     if (!action) {
       return;
     }
 
     if (action === "dismiss") {
+      UIComponentMessenger.postMessage({ name: "commandBarFinishMode", commit: false });
       this.hide();
     } else if (["tab", "down"].includes(action)) {
       if (
@@ -239,6 +424,13 @@ class VomnibarUI {
         this.input.scrollLeft = this.input.scrollWidth;
       }
     } else if (action === "delete") {
+      if (this.mode !== "" && this.input.value.length === 0) {
+        this.setMode("");
+        await this.update();
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        return;
+      }
       if (this.isUserSearchEngineActive() && (this.input.selectionEnd === 0)) {
         // Normally, with custom search engines, the keyword (e.g. the "w" of "w query terms") is
         // suppressed. If the cursor is at the start of the input, then reinstate the keyword (the
@@ -272,6 +464,28 @@ class VomnibarUI {
     // the background page finishes.
     const waitingOnCompletions = this.completions.length == 0;
     const completion = this.completions[this.selection];
+
+    if (this.mode === "") {
+      if (completion?.commandBarMode) {
+        this.enterMode(completion.commandBarMode);
+      }
+      return;
+    }
+
+    if (this.mode === "find") {
+      UIComponentMessenger.postMessage({ name: "commandBarFindNext" });
+      return;
+    }
+
+    if (this.mode === "marks" && completion?.mark) {
+      UIComponentMessenger.postMessage({
+        name: "commandBarMark",
+        key: completion.mark.key,
+        shiftKey: completion.mark.scope === "global",
+        create: false,
+      });
+      return;
+    }
 
     const openInNewTab = this.forceNewTab || event.shiftKey || event.ctrlKey || event.altKey ||
       event.metaKey;
@@ -349,6 +563,53 @@ class VomnibarUI {
   }
 
   async updateCompletions() {
+    if (this.completerName === "modes") {
+      const queryTerms = this.input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      this.completions = commandBarModes.filter((mode) => {
+        const haystack = `${mode.name} ${mode.description} ${mode.aliases}`.toLowerCase();
+        return queryTerms.every((term) => haystack.includes(term));
+      }).map((mode) => ({
+        commandBarMode: mode.name,
+        html: `<div class="completion-row mode-result">
+          <span class="result-icon">${phosphorIcon(mode.icon)}</span>
+          <span class="completion-copy">
+            <span class="mode-name">${Utils.escapeHtml(mode.name)}</span>
+            <span class="mode-description">${Utils.escapeHtml(mode.description)}</span>
+          </span>
+          <span class="completion-end">${renderKeybinding(mode.keybinding)}</span>
+        </div>`,
+      }));
+      this.selection = this.completions.length > 0 ? 0 : -1;
+      this.renderCompletions(this.completions);
+      this.updateSelection();
+      return;
+    }
+
+    if (this.completerName === "local") {
+      if (this.mode === "marks") {
+        const query = this.input.value.toLowerCase();
+        this.completions = this.marks.filter((mark) =>
+          mark.key.toLowerCase().includes(query) || mark.scope.includes(query)
+        ).map((mark) => ({
+          mark,
+          html: `<div class="completion-row mark-result">
+            <span class="result-icon">${phosphorIcon("map-pin")}</span>
+            <span class="completion-copy">
+              <span class="mark-key">${Utils.escapeHtml(mark.key)}</span>
+              <span class="mark-scope">${mark.scope} mark</span>
+            </span>
+          </div>`,
+        }));
+        this.selection = this.completions.length > 0 ? 0 : -1;
+      } else {
+        this.completions = [];
+        this.selection = -1;
+      }
+      this.renderCompletions(this.completions);
+      this.updateSelection();
+      return;
+    }
+
     const requestId = Utils.createUniqueId();
     this.lastRequestId = requestId;
     const query = this.getInputValueAsQuery();
@@ -359,7 +620,8 @@ class VomnibarUI {
       completerName: this.completerName,
       queryTerms,
       query,
-      seenTabToOpenCompletionList: this.seenTabToOpenCompletionList,
+      seenTabToOpenCompletionList: this.seenTabToOpenCompletionList ||
+        this.completerName === "history",
     });
 
     // Ensure that no new filter requests have gone out while waiting for this result.
@@ -381,6 +643,7 @@ class VomnibarUI {
   }
 
   refreshCompletions() {
+    if (["modes", "local"].includes(this.completerName)) return;
     chrome.runtime.sendMessage({
       handler: "refreshCompletions",
       completerName: this.completerName,
@@ -388,6 +651,7 @@ class VomnibarUI {
   }
 
   cancelCompletions() {
+    if (["modes", "local"].includes(this.completerName)) return;
     // Let the background page's completer optionally abandon any pending query, because the user is
     // typing and another query will arrive soon.
     chrome.runtime.sendMessage({
@@ -399,6 +663,16 @@ class VomnibarUI {
   onInput() {
     this.seenTabToOpenCompletionList = false;
     this.cancelCompletions();
+
+    if (this.mode === "find") {
+      UIComponentMessenger.postMessage({ name: "commandBarFindQuery", query: this.input.value });
+      return;
+    }
+
+    if (["modes", "local"].includes(this.completerName)) {
+      this.update();
+      return;
+    }
 
     // For custom search engines, we suppress the leading prefix (e.g. the "w" of "w query terms")
     // within the vomnibar input.
@@ -460,6 +734,8 @@ class VomnibarUI {
     this.box = document.getElementById("vomnibar");
 
     this.input = this.box.querySelector("input");
+    this.modeIndicator = document.getElementById("command-bar-mode");
+    this.statusIndicator = document.getElementById("command-bar-status");
     this.input.addEventListener("input", this.onInput);
     this.input.addEventListener("keydown", this.onKeyEvent);
     this.input.addEventListener("keypress", this.onKeyEvent);
@@ -473,7 +749,10 @@ class VomnibarUI {
       return event.stopImmediatePropagation();
     });
     // A click anywhere else hides the vomnibar.
-    document.addEventListener("click", () => this.hide());
+    document.addEventListener("click", () => {
+      UIComponentMessenger.postMessage({ name: "commandBarFinishMode", commit: false });
+      this.hide();
+    });
   }
 }
 
@@ -486,6 +765,19 @@ function init() {
         break;
       case "hidden":
         ui?.onHidden();
+        break;
+      case "commandBarMarks":
+        if (ui?.mode === "marks") {
+          ui.marks = event.data.marks;
+          ui.update();
+        }
+        break;
+      case "commandBarFindMatches":
+        if (ui?.mode === "find") {
+          const count = event.data.matchCount;
+          ui.statusIndicator.textContent = `${count} match${count === 1 ? "" : "es"}`;
+          ui.statusIndicator.hidden = false;
+        }
         break;
       case "activate":
         const options = Object.assign({}, event.data);
