@@ -81,28 +81,31 @@ Here's the rationale behind this policy:
 
 ### Installing From Source
 
-Vimium is written in Javascript. To install Vimium from source:
+Vimium is written in TypeScript and compiled to browser-ready JavaScript. To install Vimium from
+source:
 
 **On Chrome/Chromium:**
 
-1. Navigate to `chrome://extensions`
-1. Toggle into Developer Mode
-1. Click on "Load Unpacked Extension..."
-1. Select the Vimium directory you've cloned from Github.
+1. Run `just build` in the Vimium directory.
+1. Navigate to `chrome://extensions`.
+1. Toggle into Developer Mode.
+1. Click on "Load Unpacked Extension...".
+1. Select `dist/vimium` inside the Vimium directory.
 
 **On Firefox:**
 
-Firefox needs a modified version of the manifest.json that's used for Chrome. To generate this, run
+Firefox needs a modified version of the manifest.json that's used for Chrome. To build the extension
+with that manifest, run
 
 `just write-firefox-manifest`
 
 After that:
 
-1. Open Firefox
-1. Enter "about:debugging" in the URL bar
-1. Click "This Firefox" on the left side
-1. Click "Load Temporary Add-on"
-1. Open the Vimium directory you've cloned from Github, and select any file inside.
+1. Open Firefox.
+1. Enter `about:debugging` in the URL bar.
+1. Click "This Firefox" on the left side.
+1. Click "Load Temporary Add-on".
+1. Select `dist/vimium/manifest.json` inside the Vimium directory.
 
 ### Running the tests
 
@@ -118,7 +121,7 @@ Run `just --list` to see the other development, packaging, and maintenance tasks
 
 The formatting, linting, and checking recipes pass arguments through to Deno. For example,
 `just fmt --check content_scripts`, `just lint --fix pages`, and
-`just check content_scripts/vimium_frontend.js` all work. Use `just test unit` or `just test dom` to
+`just check content_scripts/vimium_frontend.ts` all work. Use `just test unit` or `just test dom` to
 run one test suite. A suite can be followed by an optional test-name filter, such as
 `just test unit "Browser new-tab redirects"`.
 
@@ -126,9 +129,8 @@ run one test suite. A suite can be followed by an optional test-name filter, suc
 
 - Run `just fmt` at the root of the Vimium project to format your code.
 - We generally follow the recommendations from the
-  [Airbnb Javascript style guide](https://github.com/airbnb/javascript).
+  [Airbnb JavaScript style guide](https://github.com/airbnb/javascript).
 - We wrap lines at 100 characters.
 - When writing comments, uppercase the first letter of your sentence, and put a period at the end.
-- We're currently using JavaScript language features from ES2018 or earlier. If we desire to use
-  something introduced in a later version of JavaScript, we need to remember to update the minimum
-  Chrome and Firefox versions required.
+- The TypeScript compiler targets the minimum Chrome and Firefox versions declared by the build.
+  Update those targets together with the manifest's minimum browser versions.

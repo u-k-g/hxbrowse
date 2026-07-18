@@ -1,6 +1,6 @@
 set shell := ["bash", "-euo", "pipefail", "-c"]
 
-check_sources := "build_scripts/*.js background_scripts/*.js background_scripts/completion/*.js content_scripts/*.js lib/*.js pages/*.js tests/dom_tests/*.js tests/unit_tests/*.js tests/unit_tests/completion/*.js tests/vendor/*.js"
+check_sources := "types/*.d.ts build_scripts/*.ts background_scripts/*.ts background_scripts/completion/*.ts content_scripts/*.ts lib/*.ts pages/*.ts test_harnesses/*.ts tests/dom_tests/*.ts tests/unit_tests/*.ts tests/unit_tests/completion/*.ts tests/vendor/*.ts"
 
 # List available tasks.
 default:
@@ -8,7 +8,11 @@ default:
 
 # Download and parse the IANA top-level-domain list.
 fetch-tlds:
-  ./build_scripts/fetch_tlds.js
+  ./build_scripts/fetch_tlds.ts
+
+# Compile TypeScript into a Chrome-loadable unpacked extension in dist/vimium/.
+build:
+  ./build_scripts/build.ts
 
 # Format the repository, or pass paths/flags through to deno fmt.
 fmt *args:
@@ -18,9 +22,9 @@ fmt *args:
 lint *args:
   deno lint {{args}}
 
-# Type-check the repository, or only the paths passed as arguments.
+# Type-check the repository, passing any extra paths or flags through to Deno.
 check *args:
-  deno check {{ if args == "" { check_sources } else { args } }}
+  deno check --unstable-sloppy-imports {{args}} {{check_sources}}
 
 # Run all tests, or one suite: `just test [all|unit|dom] [test-name filter...]`.
 test suite="all" *args:
@@ -28,14 +32,14 @@ test suite="all" *args:
   set -euo pipefail
   case {{quote(suite)}} in
     all)
-      ./build_scripts/run_unit_tests.js {{args}}
-      ./build_scripts/run_dom_tests.js {{args}}
+      ./build_scripts/run_unit_tests.ts {{args}}
+      ./build_scripts/run_dom_tests.ts {{args}}
       ;;
     unit)
-      ./build_scripts/run_unit_tests.js {{args}}
+      ./build_scripts/run_unit_tests.ts {{args}}
       ;;
     dom)
-      ./build_scripts/run_dom_tests.js {{args}}
+      ./build_scripts/run_dom_tests.ts {{args}}
       ;;
     *)
       echo "Unknown test suite: {{suite}}" >&2
@@ -46,9 +50,9 @@ test suite="all" *args:
 
 # Build the static command listing and Chrome, Chrome Canary, and Firefox store archives in dist/.
 package:
-  ./build_scripts/write_command_listing_page.js
-  ./build_scripts/package.js
+  ./build_scripts/write_command_listing_page.ts
+  ./build_scripts/package.ts
 
-# Replace manifest.json with a Firefox-compatible development manifest.
+# Build dist/vimium with a Firefox-compatible development manifest.
 write-firefox-manifest:
-  ./build_scripts/write_firefox_manifest.js
+  ./build_scripts/write_firefox_manifest.ts
