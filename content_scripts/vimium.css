@@ -23,6 +23,7 @@
   --gruvbox-bg-1: #3c3836;
   --gruvbox-bg-2: #504945;
   --gruvbox-fg: #ebdbb2;
+  --gruvbox-white: #fbf1c7;
   --gruvbox-fg-muted: #a89984;
   --gruvbox-fg-dim: #928374;
   --gruvbox-yellow: #d79921;
@@ -206,12 +207,13 @@ iframe.vimium-hud-frame {
   overflow: hidden;
   display: block;
   position: fixed;
-  width: 20%;
-  min-width: 350px;
-  height: 58px;
-  bottom: -14px;
-  right: 20px;
-  margin: 0 0 0 -40%;
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  bottom: 0;
+  left: 0;
+  right: auto;
+  margin: 0;
   border: none;
   z-index: 2147483647;
   opacity: 0;

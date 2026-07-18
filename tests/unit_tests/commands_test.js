@@ -252,8 +252,9 @@ context("Validate commands and options data structures", () => {
     assert.equal("Marks.activateCreateMode", helixKeyMappings["<space>m"]);
     assert.equal("Vomnibar.activateKeybindings", helixKeyMappings["<space>h"]);
     assert.equal("Vomnibar.activateAll", helixKeyMappings["<space>t"]);
-    assert.equal("Vomnibar.activate", helixKeyMappings["<c-w>n"]);
+    assert.equal("createTab", helixKeyMappings["<c-w>n"]);
     assert.isFalse(Object.hasOwn(helixKeyMappings, "<c-t>"));
+    assert.isFalse(Object.hasOwn(helixKeyMappings, "<space>S"));
   });
 
   should("open Space-t directly in all mode", () => {

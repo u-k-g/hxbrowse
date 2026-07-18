@@ -24,10 +24,11 @@ import { allCommands } from "../../../background_scripts/all_commands.js";
 const hours = (n) => 1000 * 60 * 60 * n;
 
 // A convenience wrapper around completer.filter() so it can be called synchronously in tests.
-export async function filterCompleter(completer, queryTerms) {
+export async function filterCompleter(completer, queryTerms, options = {}) {
   return await completer.filter({
     queryTerms,
     query: queryTerms.join(" "),
+    ...options,
   });
 }
 
@@ -57,6 +58,11 @@ context("bookmark completer", () => {
     completer.refresh();
     const results = await filterCompleter(completer, ["does-not-match"]);
     assert.equal([], results.map((suggestion) => suggestion.url));
+  });
+
+  should("return bookmarks for an explicitly enabled empty query", async () => {
+    const results = await filterCompleter(completer, [], { showAllOnEmpty: true });
+    assert.equal([bookmark1.url, bookmark2.url], results.map((suggestion) => suggestion.url));
   });
 
   should("construct bookmark paths correctly", async () => {
@@ -353,6 +359,13 @@ context("multi completer", () => {
     assert.equal([], await filterCompleter(multiCompleter, []));
   });
 
+  should("allow a combined completer to populate an explicitly enabled empty query", async () => {
+    tabs[0].url = "https://tab1.com";
+    stub(chrome.runtime, "getURL", (path) => `chrome-extension://test${path}`);
+    const results = await filterCompleter(multiCompleter, [], { showAllOnEmpty: true });
+    assert.equal(["https://tab1.com"], results.map((suggestion) => suggestion.url));
+  });
+
   should("deduplicate suggestions with the same URL", async () => {
     const make = (url, relevancy) => new Suggestion({ url, relevancy, html: url });
     const fakeCompleter = {
@@ -411,6 +424,20 @@ context("command completer", () => {
       ["Set zoom", "Set zoom (value=1.1)", "Set zoom (value=1.2)", "Reset zoom"],
       suggestions.map((s) => s.title),
     );
+  });
+
+  should("show only bound commands in keybindings mode", async () => {
+    stub(chrome.storage.session, "get", async () => ({
+      commandToOptionsToKeys: {
+        "setZoom": { "value=1.1": ["z1"] },
+      },
+    }));
+    stub(Commands, "keyToRegistryEntry", { "z1": new RegistryEntry() });
+
+    const suggestions = await filterCompleter(commandCompleter, [], {
+      commandBarMode: "keybindings",
+    });
+    assert.equal(["Set zoom (value=1.1)"], suggestions.map((suggestion) => suggestion.title));
   });
 });
 
@@ -518,7 +545,7 @@ context("suggestions", () => {
       relevancyFunction: returns(1),
     });
     const html = suggestion.generateHtml({});
-    assert.isTrue(html.includes('class="top-half tab-completion"'));
+    assert.isTrue(html.includes('class="completion-row tab-completion"'));
     assert.isTrue(html.includes('class="completion-end tab-action"'));
   });
 

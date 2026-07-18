@@ -85,20 +85,36 @@ export class Suggestion {
     if (this.insertText && this.isCustomSearch) {
       this.title = this.insertText;
     }
-    let faviconHtml = "";
+    // The phosphor icon representing this suggestion's source, shown in the boxed icon well on the
+    // left of the row, in the style of the Arc command bar.
+    const sourceIcons = {
+      bookmark: "star",
+      history: "clock-counter-clockwise",
+      domain: "globe",
+    };
+    let iconHtml = "";
     if (this.description === "tab" && !bgUtils.isFirefox()) {
       const faviconUrl = new URL(chrome.runtime.getURL("/_favicon/"));
       faviconUrl.searchParams.set("pageUrl", this.url);
       faviconUrl.searchParams.set("size", "16");
-      faviconHtml = `<img class="icon" src="${faviconUrl.toString()}" />`;
+      iconHtml = `<img class="icon" src="${faviconUrl.toString()}" />`;
+    } else if (this.isCustomSearch) {
+      iconHtml = phosphorIcon("magnifying-glass");
+    } else {
+      iconHtml = phosphorIcon(sourceIcons[this.description] ?? "globe");
     }
     if (this.isCustomSearch) {
       this.html = `\
-<div class="top-half">
-   <span class="source ${insertTextClass}">${insertTextIndicator}</span><span class="source">${this.description}</span>
-   <span class="title">${this.highlightQueryTerms(Utils.escapeHtml(this.title))}</span>
-   ${relevancyHtml}
- </div>\
+<div class="completion-row">
+   <span class="result-icon">${iconHtml}</span>
+   <span class="completion-copy">
+     <span class="top-half">
+       <span class="source ${insertTextClass}">${insertTextIndicator}</span><span class="source">${this.description}</span>
+       <span class="title">${this.highlightQueryTerms(Utils.escapeHtml(this.title))}</span>
+       ${relevancyHtml}
+     </span>
+   </span>
+</div>\
 `;
     } else if (this.command) {
       // Key mappings containing key modifiers are represented in the form of '<modifier-key>'
@@ -116,8 +132,13 @@ export class Suggestion {
       // Don't show the source label for command suggestions. It's unnecessary because commands are
       // currently never shown alongside other suggestion types.
       this.html = `\
-  <div class="top-half">
-    <span class="title">${this.highlightQueryTerms(this.title)}</span>
+  <div class="completion-row">
+    <span class="result-icon">${phosphorIcon("command")}</span>
+    <span class="completion-copy">
+      <span class="top-half">
+        <span class="title">${this.highlightQueryTerms(this.title)}</span>
+      </span>
+    </span>
     <span class="completion-end">${keybindings}</span>${relevancyHtml}
   </div>
 `;
@@ -130,15 +151,19 @@ export class Suggestion {
            </span>`
         : "";
       this.html = `\
-<div class="top-half${isTab ? " tab-completion" : ""}">
-   <span class="source ${insertTextClass}">${insertTextIndicator}</span><span class="source">${this.description}</span>
-   <span class="title">${this.highlightQueryTerms(Utils.escapeHtml(this.title))}</span>${actionHtml}
- </div>
- <div class="bottom-half">
-  <span class="source no-insert-text">${insertTextIndicator}</span>${faviconHtml}<span class="url">${
-        this.highlightQueryTerms(Utils.escapeHtml(this.shortenUrl()))
-      }</span>
-  ${relevancyHtml}
+<div class="completion-row${isTab ? " tab-completion" : ""}">
+   <span class="result-icon">${iconHtml}</span>
+   <span class="completion-copy">
+     <span class="top-half">
+       <span class="source ${insertTextClass}">${insertTextIndicator}</span><span class="source">${this.description}</span>
+       <span class="title">${this.highlightQueryTerms(Utils.escapeHtml(this.title))}</span>
+     </span>
+     <span class="bottom-half">
+       <span class="url">${this.highlightQueryTerms(Utils.escapeHtml(this.shortenUrl()))}</span>
+       ${relevancyHtml}
+     </span>
+   </span>
+   ${actionHtml}
 </div>\
 `;
     }
@@ -294,7 +319,7 @@ const ignoredTopLevelBookmarks = {
 
 // this.bookmarks are loaded asynchronously when refresh() is called.
 export class BookmarkCompleter {
-  async filter({ queryTerms }) {
+  async filter({ queryTerms, showAllOnEmpty = false }) {
     if (!this.bookmarks) await this.refresh();
 
     // If the folder separator character is the first character in any query term, then use the
@@ -317,7 +342,7 @@ export class BookmarkCompleter {
         return ranking.matches(queryTerms, suggestionUrl, suggestionTitle);
       });
     } else {
-      results = [];
+      results = showAllOnEmpty ? this.bookmarks : [];
     }
     const suggestions = results.map((bookmark) => {
       return new Suggestion({
@@ -388,7 +413,7 @@ export class BookmarkCompleter {
 }
 
 export class CommandCompleter {
-  async filter({ queryTerms }) {
+  async filter({ queryTerms, commandBarMode }) {
     // Get the key mapping for a command.
     // Each entry contains the user-specified options and an array of possible mappings.
     // Example:
@@ -423,7 +448,7 @@ export class CommandCompleter {
 
       // If the default action is not bound, add the entry explicitly to the suggestions.
       // This makes unbound commands accessible from the Vomnibar.
-      if (!isDefaultBound) {
+      if (!isDefaultBound && commandBarMode !== "keybindings") {
         suggestions.push(
           new Suggestion({
             queryTerms,
@@ -764,7 +789,10 @@ export class MultiCompleter {
     // show its entries by recency.
     const isTabCompleter = this.completers.length == 1 &&
       this.completers[0] instanceof TabCompleter;
-    if (queryTerms.length == 0 && !isTabCompleter && !request.seenTabToOpenCompletionList) {
+    if (
+      queryTerms.length == 0 && !isTabCompleter && !request.seenTabToOpenCompletionList &&
+      !request.showAllOnEmpty
+    ) {
       return [];
     }
 

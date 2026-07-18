@@ -49,4 +49,23 @@ context("hud page", () => {
     await hudPage.onKeyEvent(newKeyEvent({ key: "Escape" }));
     assert.equal("hideFindMode", message.name);
   });
+
+  should("keep find mode open and advance the current query when enter is pressed", async () => {
+    let message;
+    const stubPort = {
+      postMessage: (event) => {
+        message = event;
+      },
+    };
+    await UIComponentMessenger.registerPortWithOwnerPage({
+      data: (await chrome.storage.session.get("vimiumSecret")).vimiumSecret,
+      ports: [stubPort],
+    });
+    hudPage.handlers.showFindMode();
+    await hudPage.onKeyEvent(newKeyEvent({ type: "keypress", key: "Enter" }));
+
+    assert.equal("findNext", message.name);
+    assert.isFalse(message.backwards);
+    assert.isTrue(document.querySelector("#hud-find-input") != null);
+  });
 });

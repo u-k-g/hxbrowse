@@ -65,8 +65,7 @@ context("vomnibar page", () => {
     await chrome.storage.session.set({
       commandToOptionsToKeys: {
         "Vomnibar.activateAll": { "": ["<space>t"] },
-        "Vomnibar.activate": { "": ["<c-w>n"] },
-        "Vomnibar.activateInNewTab": { "": ["<space>S"] },
+        "Vomnibar.activateTabSelection": { "": ["<space>b"] },
       },
     });
     await vomnibarPage.activate({ mode: "", completer: "modes" });
@@ -78,11 +77,13 @@ context("vomnibar page", () => {
       Array.from(ui.completionList.querySelectorAll("kbd")).map((element) => element.textContent),
     );
 
-    ui.setQuery("navigate");
+    ui.setQuery("tabs");
     await ui.update();
     assert.equal(
-      ["Space", "S", "Ctrl-W", "n"],
-      Array.from(ui.completionList.querySelectorAll("kbd")).map((element) => element.textContent),
+      ["Space", "b"],
+      Array.from(ui.completionList.firstElementChild.querySelectorAll("kbd")).map((element) =>
+        element.textContent
+      ),
     );
     await chrome.storage.session.remove("commandToOptionsToKeys");
   });
@@ -97,16 +98,14 @@ context("vomnibar page", () => {
     await Settings.set("showCommandBarModeDescriptions", false);
   });
 
-  should("enter a selected command-bar mode without closing the bar", async () => {
+  should("launch find as an action instead of opening a second centered input", async () => {
     await vomnibarPage.activate({ mode: "", completer: "modes" });
     ui.setQuery("find");
     await ui.update();
     await ui.onKeyEvent(newKeyEvent({ type: "keypress", key: "Enter" }));
 
-    assert.equal("find", ui.mode);
-    assert.equal("local", ui.completerName);
-    assert.equal("find", ui.modeIndicator.textContent);
-    assert.isFalse(ui.modeIndicator.hidden);
+    assert.equal("", ui.mode);
+    assert.equal("modes", ui.completerName);
   });
 
   should("offer an all mode backed by the combined omni completer", async () => {
@@ -145,15 +144,6 @@ context("vomnibar page", () => {
 
     assert.equal("selected", ui.completionList.children[1].className);
     assert.equal({ block: "nearest", inline: "nearest" }, scrollOptions);
-  });
-
-  should("keep find mode open when enter advances to the next match", async () => {
-    await vomnibarPage.activate({ mode: "find", completer: "local" });
-    ui.setQuery("needle");
-    await ui.onKeyEvent(newKeyEvent({ type: "keypress", key: "Enter" }));
-
-    assert.equal("find", ui.mode);
-    assert.equal("needle", ui.input.value);
   });
 
   should("edit a completion's URL when ctrl-enter is pressed", async () => {
@@ -255,7 +245,23 @@ context("vomnibar page", () => {
     await ui.update();
     const urlModes = ui.completions.map((completion) => completion.commandBarMode)
       .filter((mode) => ["url", "search"].includes(mode));
-    assert.equal(["search", "url"], urlModes);
+    assert.equal(["url", "search"], urlModes);
+  });
+
+  should("rank an exact mode-name match above matches in another mode's aliases", async () => {
+    await vomnibarPage.activate({ mode: "", completer: "modes" });
+    ui.setQuery("tabs");
+    await ui.update();
+
+    assert.equal("tabs", ui.completions[0].commandBarMode);
+    assert.equal(0, ui.selection);
+  });
+
+  should("collapse to the input row when there are no completions", () => {
+    ui.renderCompletions([]);
+
+    assert.equal("none", ui.completionList.style.display);
+    assert.isFalse(ui.box.classList.contains("has-completions"));
   });
 
   should("keep direct mark creation out of the mode selector", async () => {

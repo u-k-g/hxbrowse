@@ -43,14 +43,16 @@ export function onKeyEvent(event) {
 
   if (
     (KeyboardUtils.isBackspace(event) && (inputEl.textContent.length === 0)) ||
-    (event.key === "Enter") || KeyboardUtils.isEscape(event)
+    KeyboardUtils.isEscape(event)
   ) {
     inputEl.blur();
     UIComponentMessenger.postMessage({
       name: "hideFindMode",
-      exitEventIsEnter: event.key === "Enter",
+      exitEventIsEnter: false,
       exitEventIsEscape: KeyboardUtils.isEscape(event),
     });
+  } else if (event.key === "Enter") {
+    UIComponentMessenger.postMessage({ name: "findNext", backwards: event.shiftKey });
   } else if (event.key === "ArrowUp") {
     if (rawQuery = FindModeHistory.getQuery(findMode.historyIndex + 1)) {
       findMode.historyIndex += 1;
@@ -107,6 +109,7 @@ export const handlers = {
   showFindMode() {
     let executeQuery;
     const hudEl = document.querySelector("#hud");
+    hudEl.textContent = "";
     hudEl.classList.add("hud-find");
 
     const inputEl = document.createElement("span");
@@ -167,8 +170,8 @@ export const handlers = {
       document.querySelector("#hud-find-input").focus();
     }
     const countText = matchCount > 0
-      ? ` (${matchCount} Match${matchCount === 1 ? "" : "es"})`
-      : " (No matches)";
+      ? `${matchCount} match${matchCount === 1 ? "" : "es"}`
+      : "no matches";
     countEl.textContent = showMatchText ? countText : "";
   },
 

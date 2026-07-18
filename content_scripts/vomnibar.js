@@ -3,7 +3,6 @@
 //
 const Vomnibar = {
   vomnibarUI: null,
-  findMode: null,
   markRegistryEntry: null,
 
   // sourceFrameId here (and below) is the ID of the frame from which this request originates, which
@@ -55,8 +54,9 @@ const Vomnibar = {
     });
   },
 
-  activateFind(sourceFrameId) {
-    this.open(sourceFrameId, { completer: "local", mode: "find" });
+  activateFind(_sourceFrameId) {
+    Marks.setPreviousPosition();
+    return new FindMode();
   },
 
   activateHistory(sourceFrameId) {
@@ -117,7 +117,7 @@ const Vomnibar = {
     this.open(sourceFrameId, {
       completer: "omni",
       mode: "url",
-      selectFirst: false,
+      selectFirst: true,
       query: globalThis.location.href,
     });
   },
@@ -126,7 +126,7 @@ const Vomnibar = {
     this.open(sourceFrameId, {
       completer: "omni",
       mode: "url",
-      selectFirst: false,
+      selectFirst: true,
       query: globalThis.location.href,
       newTab: false,
     });
@@ -147,10 +147,6 @@ const Vomnibar = {
     switch (data.name) {
       case "commandBarModeChanged":
         return await this.prepareMode(data.mode);
-      case "commandBarFindQuery":
-        return this.updateFind(data.query);
-      case "commandBarFindNext":
-        return this.findNext();
       case "commandBarFinishMode":
         return this.finishMode(data.commit);
       case "commandBarMark":
@@ -168,52 +164,20 @@ const Vomnibar = {
   },
 
   async prepareMode(mode) {
-    this.finishMode(false);
-    if (mode === "find") {
-      Marks.setPreviousPosition();
-      this.findMode = new FindMode({ commandBar: true });
-    } else if (mode === "marks") {
+    if (mode === "marks") {
       const marks = await Marks.getMarksForCurrentPage();
       this.vomnibarUI.postMessage({ name: "commandBarMarks", marks });
     }
   },
 
-  updateFind(query) {
-    if (!this.findMode) return;
-    this.findMode.findInPlace(query, {
-      postFindFocus: this.vomnibarUI.iframeElement.contentWindow,
-    });
-    const matchCount = FindMode.query.parsedQuery.length > 0 ? FindMode.query.matchCount : 0;
-    this.vomnibarUI.postMessage({ name: "commandBarFindMatches", matchCount });
-  },
-
-  findNext() {
-    if (!this.findMode) return;
-    FindMode.findNext(false, {
-      postFindFocus: this.vomnibarUI.iframeElement.contentWindow,
-    });
-    const matchCount = FindMode.query.parsedQuery.length > 0 ? FindMode.query.matchCount : 0;
-    this.vomnibarUI.postMessage({ name: "commandBarFindMatches", matchCount });
-  },
-
-  finishMode(commit) {
-    if (!this.findMode) return;
-    this.findMode.checkReturnToViewPort();
-    globalThis.focus();
-    if (commit) {
-      FindMode.handleEnter();
-    }
-    this.findMode.exit();
-    if (!commit) {
-      FindMode.handleEscape();
-    } else if (FindMode.query.hasResults) {
-      newPostFindMode();
-    }
-    this.findMode = null;
-  },
+  finishMode() {},
 
   runAction(action) {
     const actions = {
+      "find": () => {
+        Marks.setPreviousPosition();
+        return new FindMode();
+      },
       "link:current": () => LinkHints.activateMode(1, {}),
       "link:new": () => LinkHints.activateModeToOpenInNewTab(1),
       "link:multi": () => LinkHints.activateModeWithQueue(),

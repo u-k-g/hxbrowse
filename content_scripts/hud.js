@@ -23,6 +23,7 @@ const HUD = {
   handleUIComponentMessage({ data }) {
     const handlers = {
       hideFindMode: this.hideFindMode,
+      findNext: this.findNext,
       search: this.search,
       unfocusIfFocused: this.unfocusIfFocused,
       pasteResponse: this.pasteResponse,
@@ -105,6 +106,27 @@ const HUD = {
     const matchCount = FindMode.query.parsedQuery.length > 0 ? FindMode.query.matchCount : 0;
     const showMatchText = FindMode.query.rawQuery.length > 0;
     this.hudUI.postMessage({ name: "updateMatchesCount", matchCount, showMatchText });
+  },
+
+  findNext({ backwards = false }) {
+    if (!this.findMode || !FindMode.query.rawQuery) return;
+
+    const nextQuery = FindMode.getNextQueryFromRegexMatches(backwards);
+    if (nextQuery) {
+      Marks.setPreviousPosition();
+      FindMode.query.hasResults = FindMode.execute(nextQuery, {
+        backwards,
+        postFindFocus: this.hudUI.iframeElement.contentWindow,
+      });
+      FindMode.saveQuery();
+    }
+
+    const matchCount = FindMode.query.parsedQuery.length > 0 ? FindMode.query.matchCount : 0;
+    this.hudUI.postMessage({
+      name: "updateMatchesCount",
+      matchCount,
+      showMatchText: FindMode.query.rawQuery.length > 0,
+    });
   },
 
   // Hide the HUD.

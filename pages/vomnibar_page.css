@@ -6,6 +6,7 @@
   --command-bar-border: #504945;
   --command-bar-border-soft: #3c3836;
   --command-bar-text: #ebdbb2;
+  --command-bar-bright: #fbf1c7;
   --command-bar-muted: #a89984;
   --command-bar-dim: #928374;
   --command-bar-accent: #fabd2f;
@@ -53,6 +54,10 @@ ul {
   padding: 13px 17px;
 }
 
+#vomnibar:not(.has-completions) #vomnibar-search-area {
+  border-bottom-color: transparent;
+}
+
 #command-bar-input-row {
   align-items: center;
   display: flex;
@@ -65,22 +70,22 @@ ul {
   display: block;
   fill: currentColor;
   flex: none;
-  height: 20px;
-  width: 20px;
+  height: 18px;
+  width: 18px;
 }
 
 .command-bar-search-icon {
   color: var(--command-bar-dim);
-  height: 22px;
+  height: 20px;
   margin-left: 3px;
-  width: 22px;
+  width: 20px;
 }
 
 #command-bar-mode {
-  background: #3c3836;
-  border: 1px solid #689d6a;
+  background: #98971a;
+  border: 1px solid #b8bb26;
   border-radius: 999px;
-  color: #b8bb26;
+  color: #1d2021;
   flex: none;
   font-size: 13px;
   font-weight: 700;
@@ -109,7 +114,7 @@ ul {
   background: transparent;
   border: 0;
   box-shadow: none;
-  color: var(--command-bar-text);
+  color: var(--command-bar-bright);
   flex: 1;
   font-family: inherit;
   font-size: 19px;
@@ -191,70 +196,73 @@ ul {
   margin-left: 12px;
 }
 
-#vomnibar li .tab-completion .title {
-  padding-right: 140px;
-}
-
-#vomnibar li .tab-action {
-  margin: 0;
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-#vomnibar li .tab-action .completion-action,
-#vomnibar li .tab-action .completion-arrow {
-  margin-left: 0;
-}
-
 #vomnibar li .completion-arrow {
   align-items: center;
+  background: var(--command-bar-row);
+  border: 1px solid var(--command-bar-border);
+  border-radius: 7px;
   color: var(--command-bar-dim);
   display: flex;
   flex: none;
-  height: 18px;
+  height: 26px;
   justify-content: center;
   margin-left: 8px;
-  width: 18px;
+  width: 26px;
 }
 
 #vomnibar li .completion-arrow svg {
   fill: currentColor;
-  height: 16px;
-  width: 16px;
+  height: 13px;
+  width: 13px;
 }
 
 #vomnibar li.selected .completion-action {
-  color: var(--command-bar-text);
+  color: var(--command-bar-bright);
 }
 
 #vomnibar li.selected .completion-arrow {
-  color: var(--command-bar-muted);
+  background: var(--command-bar-bright);
+  border-color: var(--command-bar-bright);
+  color: var(--command-bar-panel);
 }
 
 #vomnibar li .result-icon {
   align-items: center;
+  background: var(--command-bar-row);
+  border: 1px solid var(--command-bar-border-soft);
+  border-radius: 8px;
   color: var(--command-bar-dim);
   display: flex;
-  height: 20px;
+  flex: none;
+  height: 30px;
   justify-content: center;
-  width: 20px;
+  width: 30px;
 }
 
 #vomnibar li.selected .result-icon {
-  color: var(--command-bar-muted);
+  background: var(--command-bar-bright);
+  border-color: var(--command-bar-bright);
+  color: var(--command-bar-panel);
 }
 
 #vomnibar li .result-icon .phosphor-icon,
 #vomnibar li .result-icon .ph-icon {
-  height: 17px;
-  width: 17px;
+  height: 14px;
+  width: 14px;
+}
+
+#vomnibar li .result-icon .icon {
+  border-radius: 3px;
+  height: 16px;
+  margin: 0;
+  object-fit: contain;
+  padding: 0;
+  width: 16px;
 }
 
 #vomnibar li .mode-name,
 #vomnibar li .mark-key {
-  color: var(--command-bar-text);
+  color: var(--command-bar-bright);
   font-size: 14px;
   font-weight: 650;
 }
@@ -297,8 +305,9 @@ ul {
 
 #vomnibar li.selected kbd,
 #vomnibar li.selected .key {
-  background: #1d2021;
-  border-color: #928374;
+  background: var(--command-bar-bright);
+  border-color: var(--command-bar-bright);
+  color: var(--command-bar-panel);
 }
 
 #vomnibar li .top-half,
@@ -362,7 +371,7 @@ ul {
 
 #vomnibar li em,
 #vomnibar li .title {
-  color: var(--command-bar-text);
+  color: var(--command-bar-bright);
   font-style: normal;
   font-weight: 620;
   margin-left: 0;

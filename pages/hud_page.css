@@ -1,14 +1,14 @@
 #hud-container {
   display: block;
   position: fixed;
-  width: calc(100% - 20px);
-  bottom: 8px;
-  left: 8px;
+  width: 100%;
+  bottom: 0;
+  left: 0;
   background-color: var(--vimium-foreground-color);
   color: var(--vimium-foreground-text-color);
   text-align: left;
-  border-radius: 4px;
-  box-shadow: 0px 2px 10px rgb(29 32 33 / 85%);
+  border-radius: 0;
+  box-shadow: none;
   border: 1px solid var(--gruvbox-bg-2);
   z-index: 2147483647;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -16,26 +16,30 @@
 
 #search-area {
   display: block;
-  padding: 3px;
+  padding: 0;
   color: var(--vimium-foreground-text-color);
   border-radius: 4px 4px 0 0;
 }
 
 #hud {
+  align-items: center;
+  display: flex;
   font-size: 14px;
-  height: 30px;
+  font-weight: 600;
+  height: 40px;
   margin-bottom: 0;
-  padding: 2px 4px;
-  border-radius: 3px;
+  padding: 0 12px;
+  border-radius: 0;
   width: 100%;
   outline: none;
   box-sizing: border-box;
   line-height: 20px;
+  color: var(--gruvbox-white);
 }
 
 span#hud-find-input,
 span#hud-match-count {
-  display: inline;
+  display: block;
   outline: none;
   white-space: nowrap;
   overflow-y: hidden;
@@ -43,11 +47,14 @@ span#hud-match-count {
 
 span#hud-find-input:before {
   content: "/";
+  color: var(--gruvbox-yellow);
+  margin-right: 1px;
 }
 
 span#hud-match-count {
   color: var(--gruvbox-fg-muted);
   font-size: 12px;
+  margin-left: auto;
 }
 
 span#hud-find-input br {
@@ -68,6 +75,6 @@ span#hud-find-input * {
    * scheme. It's hard to make this effect visible in dark mode, so we don't use it. */
   #hud.hud-find {
     background-color: var(--gruvbox-bg);
-    border: 1px solid var(--gruvbox-bg-2);
+    border: 0;
   }
 }
