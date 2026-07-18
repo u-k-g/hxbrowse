@@ -101,6 +101,12 @@ function findSelectedHelper(backwards) {
   FindMode.findNext(backwards);
 }
 
+function scrollVertically(count, direction, fast) {
+  const unshifted = direction * Settings.get("scrollStepSize") * count;
+  const shifted = direction * Settings.get("fastScrollStepSize") * count;
+  Scroller.scrollBy("y", fast ? shifted : unshifted, 1, true, { shifted, unshifted });
+}
+
 const NormalModeCommands = {
   // Scrolling.
   scrollToBottom() {
@@ -118,16 +124,16 @@ const NormalModeCommands = {
     Scroller.scrollTo("x", "max");
   },
   scrollUp(count) {
-    Scroller.scrollBy("y", -1 * Settings.get("scrollStepSize") * count);
+    scrollVertically(count, -1, false);
   },
   scrollDown(count) {
-    Scroller.scrollBy("y", Settings.get("scrollStepSize") * count);
+    scrollVertically(count, 1, false);
   },
   scrollFastUp(count) {
-    Scroller.scrollBy("y", -1 * Settings.get("fastScrollStepSize") * count);
+    scrollVertically(count, -1, true);
   },
   scrollFastDown(count) {
-    Scroller.scrollBy("y", Settings.get("fastScrollStepSize") * count);
+    scrollVertically(count, 1, true);
   },
   scrollPageUp(count) {
     Scroller.scrollBy("y", "viewSize", (-1 / 2) * count);

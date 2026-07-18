@@ -70,7 +70,7 @@ ul {
 }
 
 .command-bar-search-icon {
-  color: var(--command-bar-muted);
+  color: var(--command-bar-dim);
   height: 22px;
   margin-left: 3px;
   width: 22px;
@@ -191,7 +191,7 @@ ul {
 
 #vomnibar li .completion-arrow {
   align-items: center;
-  color: var(--command-bar-muted);
+  color: var(--command-bar-dim);
   display: flex;
   flex: none;
   height: 18px;
@@ -206,14 +206,17 @@ ul {
   width: 16px;
 }
 
-#vomnibar li.selected .completion-action,
-#vomnibar li.selected .completion-arrow {
+#vomnibar li.selected .completion-action {
   color: var(--command-bar-text);
+}
+
+#vomnibar li.selected .completion-arrow {
+  color: var(--command-bar-muted);
 }
 
 #vomnibar li .result-icon {
   align-items: center;
-  color: var(--command-bar-text);
+  color: var(--command-bar-dim);
   display: flex;
   height: 20px;
   justify-content: center;
@@ -221,7 +224,7 @@ ul {
 }
 
 #vomnibar li.selected .result-icon {
-  color: var(--command-bar-text);
+  color: var(--command-bar-muted);
 }
 
 #vomnibar li .result-icon .phosphor-icon,

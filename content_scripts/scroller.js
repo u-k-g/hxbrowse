@@ -188,6 +188,7 @@ const CoreScroller = {
   init() {
     this.time = 0;
     this.lastEvent = this.keyDownKey = null;
+    this.shiftKey = false;
     this.installCancelEventListener();
   },
 
@@ -201,6 +202,9 @@ const CoreScroller = {
       _name: "scroller/track-key-status",
       keydown: (event) => {
         return handlerStack.alwaysContinueBubbling(() => {
+          this.shiftKey = Boolean(event.shiftKey);
+          // Modifier transitions must not replace or cancel the non-modifier key being held.
+          if (KeyboardUtils.isModifier(event)) return;
           this.keyDownKey = event.code;
           if (!event.repeat) this.time += 1;
           this.lastEvent = event;
@@ -208,6 +212,8 @@ const CoreScroller = {
       },
       keyup: (event) => {
         return handlerStack.alwaysContinueBubbling(() => {
+          this.shiftKey = Boolean(event.shiftKey);
+          if (KeyboardUtils.isModifier(event)) return;
           if (event.code === this.keyDownKey) {
             this.keyDownKey = null;
             this.time += 1;
@@ -216,7 +222,11 @@ const CoreScroller = {
       },
       blur: (event) => {
         return handlerStack.alwaysContinueBubbling(() => {
-          if (event.target === window) this.time += 1;
+          if (event.target === window) {
+            this.keyDownKey = null;
+            this.shiftKey = false;
+            this.time += 1;
+          }
         });
       },
     });
@@ -240,7 +250,7 @@ const CoreScroller = {
   calibrationBoundary: 150,
 
   // Scroll element by a relative amount (a number) in some direction.
-  scroll(element, direction, amount, continuous) {
+  scroll(element, direction, amount, continuous, keyHoldAmounts) {
     if (continuous == null) continuous = true;
     if (!amount) {
       return;
@@ -266,6 +276,12 @@ const CoreScroller = {
     // positive.
     const sign = getSign(amount);
     amount = Math.abs(amount);
+    if (keyHoldAmounts) {
+      keyHoldAmounts = {
+        shifted: Math.abs(keyHoldAmounts.shifted),
+        unshifted: Math.abs(keyHoldAmounts.unshifted),
+      };
+    }
 
     // Initial intended scroll duration (in ms). We allow a bit longer for longer scrolls.
     const duration = Math.max(100, 20 * Math.log(amount));
@@ -288,6 +304,11 @@ const CoreScroller = {
       const elapsed = timestamp - previousTimestamp;
       totalElapsed += elapsed;
       previousTimestamp = timestamp;
+      const currentAmount = this.getCurrentScrollAmount(
+        amount,
+        keyHoldAmounts,
+        myKeyIsStillDown(),
+      );
 
       // The constants in the duration calculation, above, are chosen to provide reasonable scroll
       // speeds for distinct keypresses. For continuous scrolls, some scrolls are too slow, and
@@ -297,18 +318,18 @@ const CoreScroller = {
         (this.minCalibration <= calibration && calibration <= this.maxCalibration)
       ) {
         // Speed up slow scrolls.
-        if ((1.05 * calibration * amount) < this.calibrationBoundary) {
+        if ((1.05 * calibration * currentAmount) < this.calibrationBoundary) {
           calibration *= 1.05;
         }
         // Slow down fast scrolls.
-        if (this.calibrationBoundary < (0.95 * calibration * amount)) {
+        if (this.calibrationBoundary < (0.95 * calibration * currentAmount)) {
           calibration *= 0.95;
         }
       }
 
       // Calculate the initial delta, rounding up to ensure progress. Then, adjust delta to account
       // for the current scroll state.
-      let delta = Math.ceil(amount * (elapsed / duration) * calibration);
+      let delta = Math.ceil(currentAmount * (elapsed / duration) * calibration);
       delta = myKeyIsStillDown() ? delta : Math.max(0, Math.min(delta, amount - totalDelta));
 
       if (delta && performScroll(element, direction, sign * delta)) {
@@ -329,6 +350,12 @@ const CoreScroller = {
 
     // Start scrolling.
     requestAnimationFrame(animate);
+  },
+
+  getCurrentScrollAmount(defaultAmount, keyHoldAmounts, isKeyHeld) {
+    const isHelixVerticalKey = ["KeyJ", "KeyK"].includes(this.keyDownKey);
+    if (!isKeyHeld || !isHelixVerticalKey || keyHoldAmounts == null) return defaultAmount;
+    return this.shiftKey ? keyHoldAmounts.shifted : keyHoldAmounts.unshifted;
   },
 };
 
@@ -359,7 +386,7 @@ const Scroller = {
   // scroll the active element in :direction by :amount * :factor.
   // :factor is needed because :amount can take on string values, which scrollBy converts to element
   // dimensions.
-  scrollBy(direction, amount, factor, continuous) {
+  scrollBy(direction, amount, factor, continuous, keyHoldAmounts) {
     // if this is called before domReady, just use the window scroll function
     if (factor == null) {
       factor = 1;
@@ -389,7 +416,17 @@ const Scroller = {
     if (!CoreScroller.wouldNotInitiateScroll()) {
       const element = findScrollableElement(activatedElement, direction, amount, factor);
       const elementAmount = factor * getDimension(element, direction, amount);
-      return CoreScroller.scroll(element, direction, elementAmount, continuous);
+      const elementKeyHoldAmounts = keyHoldAmounts == null ? null : {
+        shifted: factor * getDimension(element, direction, keyHoldAmounts.shifted),
+        unshifted: factor * getDimension(element, direction, keyHoldAmounts.unshifted),
+      };
+      return CoreScroller.scroll(
+        element,
+        direction,
+        elementAmount,
+        continuous,
+        elementKeyHoldAmounts,
+      );
     }
   },
 
@@ -468,3 +505,4 @@ const specialScrollingElementMap = {
 };
 
 globalThis.Scroller = Scroller;
+globalThis.CoreScroller = CoreScroller;

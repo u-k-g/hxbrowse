@@ -568,6 +568,43 @@ context("Helix normal-mode command aliases", () => {
   });
 });
 
+context("Smooth scroll modifier transitions", () => {
+  setup(() => initializeModeState());
+
+  should("switch held J/K scrolling between normal and fast speed as Shift changes", () => {
+    const amounts = { shifted: 100, unshifted: 60 };
+    sendKeyboardEvent("j", "keydown", {
+      code: "KeyJ",
+      repeat: false,
+      shiftKey: false,
+    });
+    const activeTime = CoreScroller.time;
+
+    assert.equal("KeyJ", CoreScroller.keyDownKey);
+    assert.equal(60, CoreScroller.getCurrentScrollAmount(60, amounts, true));
+
+    sendKeyboardEvent("Shift", "keydown", {
+      code: "ShiftLeft",
+      repeat: false,
+      shiftKey: true,
+    });
+    assert.equal(activeTime, CoreScroller.time);
+    assert.equal("KeyJ", CoreScroller.keyDownKey);
+    assert.equal(100, CoreScroller.getCurrentScrollAmount(60, amounts, true));
+
+    sendKeyboardEvent("Shift", "keyup", {
+      code: "ShiftLeft",
+      shiftKey: false,
+    });
+    assert.equal(activeTime, CoreScroller.time);
+    assert.equal("KeyJ", CoreScroller.keyDownKey);
+    assert.equal(60, CoreScroller.getCurrentScrollAmount(60, amounts, true));
+
+    sendKeyboardEvent("j", "keyup", { code: "KeyJ", shiftKey: false });
+    assert.equal(null, CoreScroller.keyDownKey);
+  });
+});
+
 context("Extension context errors", () => {
   should("recognize an invalidated extension context", () => {
     assert.isTrue(extensionContextWasInvalidated(new Error("Extension context invalidated.")));
