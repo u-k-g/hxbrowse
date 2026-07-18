@@ -395,6 +395,7 @@ eg
 eh
 email
 emerck
+emerson
 energy
 engineer
 engineering
@@ -817,6 +818,7 @@ memorial
 men
 menu
 meo
+merck
 merckmsd
 metlife
 mf
@@ -1414,6 +1416,7 @@ xin
 八卦
 .ישראל‎
 .موقع‎
+一号店
 বাংলা
 公益
 公司

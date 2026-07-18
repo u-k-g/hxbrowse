@@ -28,6 +28,58 @@ function getAvailablePort() {
   throw new Error(`No port is available in the range ${min}-${max}`);
 }
 
+async function findBrowserExecutable() {
+  const configuredPath = Deno.env.get("PUPPETEER_EXECUTABLE_PATH");
+  if (configuredPath != null) {
+    if (await fs.exists(configuredPath)) return configuredPath;
+    throw new Error(`PUPPETEER_EXECUTABLE_PATH does not exist: ${configuredPath}`);
+  }
+
+  // Prefer the version installed and managed by Puppeteer when it is available.
+  const puppeteerPath = puppeteer.executablePath();
+  if (await fs.exists(puppeteerPath)) return puppeteerPath;
+
+  // A contributor may already have Chrome or Chromium installed without having downloaded the
+  // exact revision pinned by Puppeteer. Use that browser for the DOM tests as a fallback.
+  const candidates = {
+    darwin: [
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
+      "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    ],
+    linux: [
+      "/usr/bin/google-chrome",
+      "/usr/bin/google-chrome-stable",
+      "/usr/bin/chromium",
+      "/usr/bin/chromium-browser",
+    ],
+    windows: [],
+  }[Deno.build.os] ?? [];
+
+  if (Deno.build.os == "windows") {
+    for (
+      const directory of [
+        Deno.env.get("PROGRAMFILES"),
+        Deno.env.get("PROGRAMFILES(X86)"),
+        Deno.env.get("LOCALAPPDATA"),
+      ]
+    ) {
+      if (directory != null) {
+        candidates.push(path.join(directory, "Google", "Chrome", "Application", "chrome.exe"));
+      }
+    }
+  }
+
+  for (const candidate of candidates) {
+    if (await fs.exists(candidate)) return candidate;
+  }
+
+  throw new Error(
+    "Could not find Chrome or Chromium. Install Chrome, set PUPPETEER_EXECUTABLE_PATH, or run " +
+      "`deno run -A npm:puppeteer@23.11.1 browsers install chrome`.",
+  );
+}
+
 function setupPuppeteerPageForTests(page) {
   // Resolve console arguments in order so batches of asynchronous messages remain readable.
   const messageQueue = [];
@@ -81,7 +133,7 @@ const httpServer = Deno.serve({ port }, async (request) => {
 let browser;
 let success = true;
 try {
-  browser = await puppeteer.launch();
+  browser = await puppeteer.launch({ executablePath: await findBrowserExecutable() });
   for (const file of ["dom_tests.html"]) {
     const page = await browser.newPage();
     console.log("Running", file);
