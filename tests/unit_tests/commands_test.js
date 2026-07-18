@@ -250,20 +250,21 @@ context("Validate commands and options data structures", () => {
     assert.equal("Vomnibar.activateFind", helixKeyMappings["<space>/"]);
     assert.equal("Vomnibar.activateMarks", helixKeyMappings["<space>'"]);
     assert.equal("Marks.activateCreateMode", helixKeyMappings["<space>m"]);
-    assert.equal("Vomnibar.activateKeybindings", helixKeyMappings["<space>h"]);
     assert.equal("Vomnibar.activateAll", helixKeyMappings["<space>t"]);
     assert.equal("createTab", helixKeyMappings["<c-w>n"]);
     assert.isFalse(Object.hasOwn(helixKeyMappings, "<c-t>"));
+    assert.isFalse(Object.hasOwn(helixKeyMappings, "<space>h"));
+    assert.isFalse(Object.hasOwn(helixKeyMappings, "<space>?"));
     assert.isFalse(Object.hasOwn(helixKeyMappings, "<space>S"));
   });
 
-  should("open Space-t directly in all mode", () => {
+  should("open Space-t directly without a selected mode", () => {
     let openOptions = null;
     stub(Vomnibar, "open", (_sourceFrameId, options) => openOptions = options);
 
     Vomnibar.activateAll(0);
 
-    assert.equal({ completer: "omni", mode: "all", newTab: true }, openOptions);
+    assert.equal({ completer: "omni", mode: "", newTab: true }, openOptions);
   });
 
   should("bind Helix J and K to configurable fast scrolling", () => {

@@ -41,7 +41,7 @@ const Vomnibar = {
     this.markRegistryEntry = { options: {} };
     this.open(sourceFrameId, {
       completer: "modes",
-      mode: "",
+      mode: "modes",
       prefixCount: registryEntry?.options?.prefixCount ?? 1,
     });
   },
@@ -49,7 +49,7 @@ const Vomnibar = {
   activateAll(sourceFrameId) {
     this.open(sourceFrameId, {
       completer: "omni",
-      mode: "all",
+      mode: "",
       newTab: true,
     });
   },
@@ -66,15 +66,6 @@ const Vomnibar = {
   activateMarks(sourceFrameId, registryEntry) {
     this.markRegistryEntry = registryEntry;
     this.open(sourceFrameId, { completer: "local", mode: "marks", selectFirst: true });
-  },
-
-  activateKeybindings(sourceFrameId, registryEntry) {
-    this.open(sourceFrameId, {
-      completer: "commands",
-      mode: "keybindings",
-      selectFirst: true,
-      prefixCount: registryEntry?.options?.prefixCount ?? 1,
-    });
   },
 
   activateTabSelection(sourceFrameId) {

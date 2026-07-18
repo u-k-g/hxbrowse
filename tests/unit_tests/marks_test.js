@@ -26,6 +26,28 @@ context("marks", () => {
     assert.equal("secret", savedMark.vimiumSecret);
   });
 
+  should("ignore a tab which closes while its scroll position is requested", async () => {
+    stub(globalThis.chrome.tabs, "sendMessage", () => {
+      throw new Error("No tab with id: 1648448648.");
+    });
+    await createMark({ markName: "a", scrollX: null, scrollY: null }, { id: 1648448648 });
+    const savedMark = await chrome.storage.local.get(marks.getLocationKey("a"));
+    assert.equal({}, savedMark);
+  });
+
+  should("surface unexpected errors while requesting a mark's scroll position", async () => {
+    stub(globalThis.chrome.tabs, "sendMessage", () => {
+      throw new Error("Unexpected failure");
+    });
+    let caughtError = null;
+    try {
+      await createMark({ markName: "a", scrollX: null, scrollY: null }, { id: 1 });
+    } catch (error) {
+      caughtError = error;
+    }
+    assert.equal("Unexpected failure", caughtError?.message);
+  });
+
   should("goto a mark when its tab exists", async () => {
     await createMark({ markName: "A" }, { id: 1 });
     const tab = { url: "http://example.com" };

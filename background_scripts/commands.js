@@ -565,8 +565,6 @@ const helixKeyMappings = {
   "<space>r": "reload",
   "<space>R": "reload hard",
   "<space>v": "toggleViewSource",
-  "<space>h": "Vomnibar.activateKeybindings",
-  "<space>?": "Vomnibar.activateKeybindings",
   ":": "Vomnibar.activateModeSelection",
 
   // Window mode: tabs are the browser equivalent of editor windows.

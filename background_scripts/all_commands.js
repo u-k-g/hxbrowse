@@ -329,7 +329,7 @@ const allCommands = [
 
   {
     name: "Vomnibar.activateModeSelection",
-    desc: "Open the command bar",
+    desc: "Open the command-bar mode selector",
     group: "vomnibar",
     topFrame: true,
     noRepeat: true,
@@ -337,7 +337,7 @@ const allCommands = [
 
   {
     name: "Vomnibar.activateAll",
-    desc: "Search the web, open tabs, history, and bookmarks",
+    desc: "Open the modeless command bar",
     group: "vomnibar",
     topFrame: true,
     noRepeat: true,
@@ -362,14 +362,6 @@ const allCommands = [
   {
     name: "Vomnibar.activateMarks",
     desc: "Jump to a page mark using the command bar",
-    group: "vomnibar",
-    topFrame: true,
-    noRepeat: true,
-  },
-
-  {
-    name: "Vomnibar.activateKeybindings",
-    desc: "Search commands and keybindings",
     group: "vomnibar",
     topFrame: true,
     noRepeat: true,

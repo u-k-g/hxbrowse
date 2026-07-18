@@ -365,7 +365,7 @@ context("multi completer", () => {
     assert.equal(["https://tab1.com"], results.map((suggestion) => suggestion.url));
   });
 
-  should("show only open tabs for an empty all-mode query", async () => {
+  should("show only open tabs for an empty modeless query", async () => {
     let competingCompleterWasCalled = false;
     const competingCompleter = {
       filter() {
@@ -373,16 +373,29 @@ context("multi completer", () => {
         return [];
       },
     };
-    const allCompleter = new MultiCompleter([tabCompleter, competingCompleter]);
+    const modelessCompleter = new MultiCompleter([tabCompleter, competingCompleter]);
     stub(chrome.runtime, "getURL", (path) => `chrome-extension://test${path}`);
 
-    const results = await filterCompleter(allCompleter, [], {
-      commandBarMode: "all",
+    const results = await filterCompleter(modelessCompleter, [], {
+      commandBarMode: "",
       showAllOnEmpty: true,
     });
 
     assert.isFalse(competingCompleterWasCalled);
     assert.equal(["https://tab1.com"], results.map((suggestion) => suggestion.url));
+  });
+
+  should("include extension commands in nonempty modeless queries", async () => {
+    stub(chrome.storage.session, "get", async () => ({ commandToOptionsToKeys: {} }));
+    const modelessCompleter = new MultiCompleter([tabCompleter, new CommandCompleter()]);
+
+    const results = await filterCompleter(modelessCompleter, ["reload"], {
+      commandBarMode: "",
+    });
+
+    assert.isTrue(
+      results.some((suggestion) => suggestion.command?.registryEntry.command === "reload"),
+    );
   });
 
   should("deduplicate suggestions with the same URL", async () => {
@@ -443,20 +456,6 @@ context("command completer", () => {
       ["Set zoom", "Set zoom (value=1.1)", "Set zoom (value=1.2)", "Reset zoom"],
       suggestions.map((s) => s.title),
     );
-  });
-
-  should("show only bound commands in keybindings mode", async () => {
-    stub(chrome.storage.session, "get", async () => ({
-      commandToOptionsToKeys: {
-        "setZoom": { "value=1.1": ["z1"] },
-      },
-    }));
-    stub(Commands, "keyToRegistryEntry", { "z1": new RegistryEntry() });
-
-    const suggestions = await filterCompleter(commandCompleter, [], {
-      commandBarMode: "keybindings",
-    });
-    assert.equal(["Set zoom (value=1.1)"], suggestions.map((suggestion) => suggestion.title));
   });
 });
 

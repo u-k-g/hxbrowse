@@ -88,7 +88,7 @@ export class Suggestion {
     // The phosphor icon representing this suggestion's source, shown in the boxed icon well on the
     // left of the row, in the style of the Arc command bar.
     const sourceIcons = {
-      bookmark: "folder-simple-star",
+      bookmark: "folder-open",
       history: "clock-counter-clockwise",
       domain: "globe",
     };
@@ -413,7 +413,7 @@ export class BookmarkCompleter {
 }
 
 export class CommandCompleter {
-  async filter({ queryTerms, commandBarMode }) {
+  async filter({ queryTerms }) {
     // Get the key mapping for a command.
     // Each entry contains the user-specified options and an array of possible mappings.
     // Example:
@@ -448,7 +448,7 @@ export class CommandCompleter {
 
       // If the default action is not bound, add the entry explicitly to the suggestions.
       // This makes unbound commands accessible from the Vomnibar.
-      if (!isDefaultBound && commandBarMode !== "keybindings") {
+      if (!isDefaultBound) {
         suggestions.push(
           new Suggestion({
             queryTerms,
@@ -800,7 +800,7 @@ export class MultiCompleter {
 
     // If the user's query matches one of their custom search engines, then use only that engine to
     // provide completions for their query.
-    const showOnlyTabs = request.commandBarMode === "all" && queryTerms.length === 0;
+    const showOnlyTabs = request.commandBarMode === "" && queryTerms.length === 0;
     const completers = queryMatchesUserSearchEngine
       ? [searchEngineCompleter]
       : showOnlyTabs

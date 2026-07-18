@@ -6,6 +6,10 @@ export function getLocationKey(markName) {
   return `vimiumGlobalMark|${markName}`;
 }
 
+function tabNoLongerExists(error) {
+  return error?.message?.includes("No tab with id");
+}
+
 // Get the part of a URL we use for matching here (that is, everything up to the first anchor).
 function getBaseUrl(url) {
   return url.split("#")[0];
@@ -30,9 +34,17 @@ export async function create(req, sender) {
   } else {
     // The front-end frame hasn't provided the scroll position (because it's not the top frame
     // within its tab). We need to ask the top frame what its scroll position is.
-    chrome.tabs.sendMessage(sender.tab.id, { handler: "getScrollPosition" }, (response) => {
-      saveMark(Object.assign(markInfo, { scrollX: response.scrollX, scrollY: response.scrollY }));
-    });
+    let response;
+    try {
+      response = await chrome.tabs.sendMessage(sender.tab.id, { handler: "getScrollPosition" });
+    } catch (error) {
+      // The tab can be closed while this request is in flight. This is a normal race and there is
+      // nowhere useful to save a mark for a tab which no longer exists.
+      if (tabNoLongerExists(error)) return;
+      throw error;
+    }
+    if (response == null) return;
+    saveMark(Object.assign(markInfo, { scrollX: response.scrollX, scrollY: response.scrollY }));
   }
 }
 

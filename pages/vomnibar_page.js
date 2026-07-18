@@ -59,16 +59,29 @@ function renderKeybindings(keybindings) {
   ).join("");
 }
 
+function renderModeCompletion(mode, keybindings) {
+  return {
+    commandBarMode: mode.name,
+    html: `<div class="completion-row mode-result">
+      <span class="result-icon">${phosphorIcon(mode.icon)}</span>
+      <span class="completion-copy">
+        <span class="mode-name">${Utils.escapeHtml(mode.name)}</span>
+        <span class="mode-description">${Utils.escapeHtml(mode.description)}</span>
+      </span>
+      <span class="completion-end">${renderKeybindings(keybindings)}</span>
+    </div>`,
+  };
+}
+
+const modeSelector = {
+  name: "modes",
+  description: "Choose a command-bar mode",
+  aliases: "mode selector scopes",
+  icon: "tornado",
+  bindingCommands: ["Vomnibar.activateModeSelection"],
+};
+
 const commandBarModes = [
-  {
-    name: "all",
-    description: "Search the web, open tabs, history, and bookmarks",
-    aliases: "everything omni universal tabs history bookmarks search url",
-    completer: "omni",
-    newTab: true,
-    icon: "tornado",
-    bindingCommands: ["Vomnibar.activateAll"],
-  },
   {
     name: "find",
     description: "Find text on the current page",
@@ -110,7 +123,7 @@ const commandBarModes = [
     aliases: "favorites",
     completer: "bookmarks",
     selectFirst: true,
-    icon: "folder-simple-star",
+    icon: "folder-open",
     bindingCommands: ["Vomnibar.activateBookmarks"],
   },
   {
@@ -130,15 +143,6 @@ const commandBarModes = [
     selectFirst: true,
     icon: "command",
     bindingCommands: ["Vomnibar.activateCommandSelection"],
-  },
-  {
-    name: "keybindings",
-    description: "Search commands and their keybindings",
-    aliases: "keys help shortcuts",
-    completer: "commands",
-    selectFirst: true,
-    icon: "keyboard",
-    bindingCommands: ["Vomnibar.activateKeybindings"],
   },
   {
     name: "marks",
@@ -281,23 +285,36 @@ class VomnibarUI {
 
   setMode(name, options = {}) {
     const mode = commandBarModesByName[name];
+    const isModeless = name.length === 0;
+    const isModeSelector = name === modeSelector.name;
     this.mode = name;
     this.setInitialSelectionValue(
       (options.selectFirst ?? mode?.selectFirst ?? true) ? 0 : -1,
     );
-    this.setForceNewTab(options.newTab ?? mode?.newTab ?? false);
-    this.setCompleterName(options.completer ?? mode?.completer ?? "modes");
+    this.setForceNewTab(options.newTab ?? mode?.newTab ?? isModeless);
+    this.setCompleterName(
+      options.completer ?? mode?.completer ?? (isModeless ? "omni" : "modes"),
+    );
     const query = mode?.useCurrentUrl ? this.currentUrl : options.query ?? "";
     this.setQuery(query);
 
     this.modeIndicator.textContent = name;
-    this.modeIndicator.hidden = name.length === 0;
+    this.modeIndicator.hidden = isModeless;
     this.statusIndicator.hidden = true;
-    this.input.placeholder = name.length === 0 ? "Search command-bar modes" : name;
+    this.input.placeholder = isModeless
+      ? "Search or enter URL"
+      : isModeSelector
+      ? "Search command-bar modes"
+      : name;
     UIComponentMessenger.postMessage({ name: "commandBarModeChanged", mode: name });
   }
 
   enterMode(name) {
+    if (name === modeSelector.name) {
+      this.setMode(name, { completer: "modes" });
+      this.update();
+      return;
+    }
     const mode = commandBarModesByName[name];
     if (!mode) return;
     if (mode.action) {
@@ -531,12 +548,18 @@ class VomnibarUI {
     const waitingOnCompletions = this.completions.length == 0;
     const completion = this.completions[this.selection];
 
-    if (this.mode === "") {
-      if (completion?.commandBarMode) {
-        this.enterMode(completion.commandBarMode);
-      }
+    // "modes" is the modeless command bar's built-in route to the selector. Handle it from the
+    // input itself too, so pressing Enter before asynchronous completions arrive still works.
+    if (this.mode === "" && query.toLowerCase() === modeSelector.name) {
+      this.enterMode(modeSelector.name);
       return;
     }
+
+    if (completion?.commandBarMode) {
+      this.enterMode(completion.commandBarMode);
+      return;
+    }
+    if (this.mode === modeSelector.name) return;
 
     if (this.mode === "marks" && completion?.mark) {
       UIComponentMessenger.postMessage({
@@ -648,17 +671,9 @@ class VomnibarUI {
         else if (queryTerms.every((term) => name.includes(term))) rank = 2;
         else if (queryTerms.every((term) => aliases.includes(term))) rank = 3;
         return { mode, index, rank };
-      }).filter(Boolean).sort((a, b) => a.rank - b.rank || a.index - b.index).map(({ mode }) => ({
-        commandBarMode: mode.name,
-        html: `<div class="completion-row mode-result">
-          <span class="result-icon">${phosphorIcon(mode.icon)}</span>
-          <span class="completion-copy">
-            <span class="mode-name">${Utils.escapeHtml(mode.name)}</span>
-            <span class="mode-description">${Utils.escapeHtml(mode.description)}</span>
-          </span>
-          <span class="completion-end">${renderKeybindings(this.getModeKeybindings(mode))}</span>
-        </div>`,
-      }));
+      }).filter(Boolean).sort((a, b) => a.rank - b.rank || a.index - b.index).map(({ mode }) =>
+        renderModeCompletion(mode, this.getModeKeybindings(mode))
+      );
       this.selection = this.completions.length > 0 ? 0 : -1;
       this.renderCompletions(this.completions);
       this.updateSelection();
@@ -703,7 +718,7 @@ class VomnibarUI {
       query,
       seenTabToOpenCompletionList: this.seenTabToOpenCompletionList ||
         this.completerName === "history",
-      showAllOnEmpty: ["all", "bookmarks", "commands", "keybindings"].includes(this.mode),
+      showAllOnEmpty: this.mode === "" || ["bookmarks", "commands"].includes(this.mode),
     });
 
     // Ensure that no new filter requests have gone out while waiting for this result.
@@ -711,8 +726,8 @@ class VomnibarUI {
 
     this.completions = results;
     const exactSearchQuery = this.input.value.trim();
-    if (this.mode === "all" && exactSearchQuery.length > 0 && !this.isUserSearchEngineActive()) {
-      this.completions = [{
+    if (this.mode === "" && exactSearchQuery.length > 0 && !this.isUserSearchEngineActive()) {
+      const searchCompletion = {
         defaultSearchQuery: exactSearchQuery,
         html: `<div class="completion-row">
           <span class="result-icon">${phosphorIcon("magnifying-glass")}</span>
@@ -723,7 +738,18 @@ class VomnibarUI {
             </span>
           </span>
         </div>`,
-      }, ...this.completions].slice(0, 10);
+      };
+      const modeSelectorMatches = modeSelector.name.includes(exactSearchQuery.toLowerCase());
+      const modeSelectorCompletion = renderModeCompletion(
+        modeSelector,
+        this.getModeKeybindings(modeSelector),
+      );
+      const leadingCompletions = exactSearchQuery.toLowerCase() === modeSelector.name
+        ? [modeSelectorCompletion, searchCompletion]
+        : modeSelectorMatches
+        ? [searchCompletion, modeSelectorCompletion]
+        : [searchCompletion];
+      this.completions = [...leadingCompletions, ...this.completions].slice(0, 10);
     }
     this.selection = this.completions[0]?.autoSelect ? 0 : this.initialSelectionValue;
     this.renderCompletions(this.completions);

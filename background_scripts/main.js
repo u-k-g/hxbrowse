@@ -63,6 +63,7 @@ const completers = {
     completionSources.history,
     completionSources.domains,
     completionSources.tabs,
+    completionSources.commands,
     completionSources.searchEngines,
   ]),
   bookmarks: new MultiCompleter([completionSources.bookmarks]),
@@ -76,6 +77,10 @@ const visibleTabsQueryArgs = { currentWindow: true };
 if (bgUtils.isFirefox()) {
   // Only Firefox supports hidden tabs.
   visibleTabsQueryArgs.hidden = false;
+}
+
+function tabNoLongerExists(error) {
+  return error?.message?.includes("No tab with id");
 }
 
 function onURLChange(details) {
@@ -192,7 +197,7 @@ async function selectSpecificTab(request) {
   } catch (error) {
     // Command-bar tab suggestions are snapshots. The tab can close between rendering a suggestion
     // and selecting it; that expected race should not become an unchecked runtime.lastError.
-    if (error?.message?.includes("No tab with id")) return false;
+    if (tabNoLongerExists(error)) return false;
     throw error;
   }
 }
@@ -776,7 +781,14 @@ const sendRequestHandlers = {
         };
       }
 
-      chrome.action.setIcon({ path: iconSet[whichIcon], tabId: sender.tab.id });
+      try {
+        await chrome.action.setIcon({ path: iconSet[whichIcon], tabId: sender.tab.id });
+      } catch (error) {
+        // initializeFrame can finish after its tab has been closed. The icon no longer matters in
+        // that case, and leaving the rejected API call unchecked creates a context-less extension
+        // error in Chrome.
+        if (!tabNoLongerExists(error)) throw error;
+      }
     }
 
     const response = Object.assign({

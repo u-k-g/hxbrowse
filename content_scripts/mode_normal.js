@@ -34,7 +34,6 @@ class NormalMode extends KeyHandlerMode {
     if (
       [
         "Vomnibar.activateCommandSelection",
-        "Vomnibar.activateKeybindings",
         "Vomnibar.activateModeSelection",
       ].includes(registryEntry.command)
     ) {
@@ -397,7 +396,6 @@ const NormalModeCommands = {
   "Vomnibar.activateFind": Vomnibar.activateFind.bind(Vomnibar),
   "Vomnibar.activateHistory": Vomnibar.activateHistory.bind(Vomnibar),
   "Vomnibar.activateMarks": Vomnibar.activateMarks.bind(Vomnibar),
-  "Vomnibar.activateKeybindings": Vomnibar.activateKeybindings.bind(Vomnibar),
   "Vomnibar.activateInNewTab": Vomnibar.activateInNewTab.bind(Vomnibar),
   "Vomnibar.activateTabSelection": Vomnibar.activateTabSelection.bind(Vomnibar),
   "Vomnibar.activateBookmarks": Vomnibar.activateBookmarks.bind(Vomnibar),
