@@ -181,12 +181,20 @@ function getTabIndex(tab, tabs) {
 // Selects the tab with the ID specified in request.id
 //
 async function selectSpecificTab(request) {
-  const tab = await chrome.tabs.get(request.id);
-  // Focus the tab's window. TODO(philc): Why are we null-checking chrome.windows here?
-  if (chrome.windows != null) {
-    await chrome.windows.update(tab.windowId, { focused: true });
+  try {
+    const tab = await chrome.tabs.get(request.id);
+    // Focus the tab's window. TODO(philc): Why are we null-checking chrome.windows here?
+    if (chrome.windows != null) {
+      await chrome.windows.update(tab.windowId, { focused: true });
+    }
+    await chrome.tabs.update(request.id, { active: true });
+    return true;
+  } catch (error) {
+    // Command-bar tab suggestions are snapshots. The tab can close between rendering a suggestion
+    // and selecting it; that expected race should not become an unchecked runtime.lastError.
+    if (error?.message?.includes("No tab with id")) return false;
+    throw error;
   }
-  await chrome.tabs.update(request.id, { active: true });
 }
 
 function moveTab({ count, tab, registryEntry }) {
@@ -291,15 +299,15 @@ async function selectNextRecentTab(currentTabId) {
     const id = recentTabCycle.tabIds[index];
     recentTabCycle.nextIndex = (index + 1) % recentTabCycle.tabIds.length;
     try {
-      await selectSpecificTab({ id });
-      return;
+      if (await selectSpecificTab({ id })) return;
     } catch {
-      // A tab may have closed during the active cycle. Remove it and continue with the next one.
-      recentTabCycle.tabIds.splice(index, 1);
-      recentTabCycle.nextIndex = recentTabCycle.tabIds.length === 0
-        ? 0
-        : index % recentTabCycle.tabIds.length;
+      // Keep trying the active cycle when a browser rejects a candidate for another transient
+      // tab/window race.
     }
+    recentTabCycle.tabIds.splice(index, 1);
+    recentTabCycle.nextIndex = recentTabCycle.tabIds.length === 0
+      ? 0
+      : index % recentTabCycle.tabIds.length;
   }
 }
 
@@ -996,6 +1004,7 @@ Object.assign(globalThis, {
   majorVersionHasIncreased,
   nextZoomLevel,
   resetRecentTabCycle,
+  selectSpecificTab,
 });
 
 // The chrome.runtime.onStartup and onInstalled events are not fired when disabling and then

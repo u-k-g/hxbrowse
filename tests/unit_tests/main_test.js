@@ -94,6 +94,30 @@ context("createTab command", () => {
   });
 });
 
+context("selectSpecificTab", () => {
+  should("ignore a tab which closed after its command-bar suggestion was rendered", async () => {
+    stub(chrome.tabs, "get", async () => {
+      throw new Error("No tab with id: 123.");
+    });
+
+    assert.isFalse(await selectSpecificTab({ id: 123 }));
+  });
+
+  should("preserve unexpected tab-selection failures", async () => {
+    stub(chrome.tabs, "get", async () => {
+      throw new Error("Unexpected failure");
+    });
+    let caughtError = null;
+    try {
+      await selectSpecificTab({ id: 123 });
+    } catch (error) {
+      caughtError = error;
+    }
+
+    assert.equal("Unexpected failure", caughtError?.message);
+  });
+});
+
 context("cycleRecentTabs command", () => {
   let now;
   let recencyOrder;
