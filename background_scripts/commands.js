@@ -539,6 +539,7 @@ const helixKeyMappings = {
   "y": "copyCurrentUrl",
   "p": "openCopiedUrlInCurrentTab",
   "P": "openCopiedUrlInNewTab",
+  "r": "cycleRecentTabs",
 
   // Search
   "/": "enterFindMode",

@@ -261,6 +261,11 @@ context("Validate commands and options data structures", () => {
     assert.equal(100, Settings.defaultOptions.fastScrollStepSize);
   });
 
+  should("bind Helix r to recent-tab cycling while keeping reload under Space", () => {
+    assert.equal("cycleRecentTabs", helixKeyMappings["r"]);
+    assert.equal("reload", helixKeyMappings["<space>r"]);
+  });
+
   should("parse every default keybinding profile without validation errors", () => {
     for (const mappings of [vimKeyMappings, helixKeyMappings]) {
       const config = Object.entries(mappings).map(([key, command]) => `map ${key} ${command}`)

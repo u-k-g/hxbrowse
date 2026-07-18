@@ -542,6 +542,14 @@ const allCommands = [
   },
 
   {
+    name: "cycleRecentTabs",
+    desc: "Cycle through the five most recently visited tabs",
+    group: "tabs",
+    background: true,
+    noRepeat: true,
+  },
+
+  {
     name: "firstTab",
     desc: "Go to the first tab",
     group: "tabs",

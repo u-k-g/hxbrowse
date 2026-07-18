@@ -245,6 +245,64 @@ function nextZoomLevel(currentZoom, steps) {
   }
 }
 
+const recentTabCycleTimeoutMs = 800;
+const recentTabCycleSize = 5;
+let recentTabCycle = null;
+
+function resetRecentTabCycle() {
+  recentTabCycle = null;
+}
+
+async function startRecentTabCycle(currentTabId, pressedAt) {
+  await bgUtils.tabRecency.init();
+  const openTabs = await chrome.tabs.query({});
+  const openTabIds = new Set(openTabs.map((tab) => tab.id));
+  const tabIds = bgUtils.tabRecency.getTabsByRecency()
+    .filter((tabId) => tabId !== currentTabId && openTabIds.has(tabId));
+
+  // Tabs which have not yet appeared in TabRecency are the least recent. Append them using the
+  // browser's last-accessed timestamp as a best-effort fallback.
+  const knownTabIds = new Set(tabIds);
+  const remainingTabIds = openTabs
+    .filter((tab) => tab.id !== currentTabId && !knownTabIds.has(tab.id))
+    .sort((a, b) => (b.lastAccessed ?? 0) - (a.lastAccessed ?? 0))
+    .map((tab) => tab.id);
+
+  recentTabCycle = {
+    lastPressedAt: pressedAt,
+    nextIndex: 0,
+    tabIds: tabIds.concat(remainingTabIds).slice(0, recentTabCycleSize),
+  };
+}
+
+async function selectNextRecentTab(currentTabId) {
+  const pressedAt = Date.now();
+  if (
+    recentTabCycle == null ||
+    pressedAt - recentTabCycle.lastPressedAt > recentTabCycleTimeoutMs
+  ) {
+    await startRecentTabCycle(currentTabId, pressedAt);
+  } else {
+    recentTabCycle.lastPressedAt = pressedAt;
+  }
+
+  while (recentTabCycle.tabIds.length > 0) {
+    const index = recentTabCycle.nextIndex % recentTabCycle.tabIds.length;
+    const id = recentTabCycle.tabIds[index];
+    recentTabCycle.nextIndex = (index + 1) % recentTabCycle.tabIds.length;
+    try {
+      await selectSpecificTab({ id });
+      return;
+    } catch {
+      // A tab may have closed during the active cycle. Remove it and continue with the next one.
+      recentTabCycle.tabIds.splice(index, 1);
+      recentTabCycle.nextIndex = recentTabCycle.tabIds.length === 0
+        ? 0
+        : index % recentTabCycle.tabIds.length;
+    }
+  }
+}
+
 // These are commands which are bound to keystrokes which must be handled by the background page.
 // They are mapped in commands.js.
 const BackgroundCommands = {
@@ -417,6 +475,10 @@ const BackgroundCommands = {
       const id = tabIds[(count - 1) % tabIds.length];
       selectSpecificTab({ id });
     }
+  },
+
+  async cycleRecentTabs({ tab }) {
+    await selectNextRecentTab(tab.id);
   },
 
   async reload({ count, tab, registryEntry }) {
@@ -933,6 +995,7 @@ Object.assign(globalThis, {
   BackgroundCommands,
   majorVersionHasIncreased,
   nextZoomLevel,
+  resetRecentTabCycle,
 });
 
 // The chrome.runtime.onStartup and onInstalled events are not fired when disabling and then

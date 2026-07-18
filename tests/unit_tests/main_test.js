@@ -2,6 +2,7 @@ import "./test_helper.js";
 import "../../lib/settings.js";
 import "../../background_scripts/main.js";
 import { RegistryEntry } from "../../background_scripts/commands.js";
+import * as bgUtils from "../../background_scripts/bg_utils.js";
 
 context("HintCoordinator", () => {
   should("prepareToActivateLinkHintsMode", async () => {
@@ -90,6 +91,49 @@ context("createTab command", () => {
   teardown(() => {
     tabCreated = null;
     Settings.clear();
+  });
+});
+
+context("cycleRecentTabs command", () => {
+  let now;
+  let recencyOrder;
+  let selectedTabIds;
+
+  setup(() => {
+    now = 1000;
+    recencyOrder = [1, 2, 3, 4, 5, 6, 7];
+    selectedTabIds = [];
+    resetRecentTabCycle();
+    stub(Date, "now", () => now);
+    stub(bgUtils.tabRecency, "init", async () => {});
+    stub(bgUtils.tabRecency, "getTabsByRecency", () => recencyOrder);
+    stub(
+      chrome.tabs,
+      "query",
+      async () => recencyOrder.map((id) => ({ id, lastAccessed: 100 - id })),
+    );
+    stub(chrome.tabs, "get", async (id) => ({ id, windowId: 1 }));
+    stub(chrome.windows, "update", async () => {});
+    stub(chrome.tabs, "update", async (id) => selectedTabIds.push(id));
+  });
+
+  should("cycle a fixed list of five recent tabs within 800ms", async () => {
+    await BackgroundCommands.cycleRecentTabs({ tab: { id: 1 } });
+    for (const currentTabId of [2, 3, 4, 5, 6]) {
+      now += 500;
+      await BackgroundCommands.cycleRecentTabs({ tab: { id: currentTabId } });
+    }
+
+    assert.equal([2, 3, 4, 5, 6, 2], selectedTabIds);
+  });
+
+  should("restart from the most recent non-current tab after 800ms", async () => {
+    await BackgroundCommands.cycleRecentTabs({ tab: { id: 1 } });
+    now += 801;
+    recencyOrder = [2, 6, 5, 4, 3, 1, 7];
+    await BackgroundCommands.cycleRecentTabs({ tab: { id: 2 } });
+
+    assert.equal([2, 6], selectedTabIds);
   });
 });
 
