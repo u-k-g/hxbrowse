@@ -217,9 +217,12 @@ iframe.commandBar-frame {
   position: fixed;
   width: min(900px, calc(100vw - 44px));
   min-width: 360px;
-  height: calc(100% - 70px);
-  top: 70px;
-  left: 50%;
+  /* JavaScript translates the center of the entire browser window into content-viewport
+   * coordinates. This accounts for Chromium's tabs, toolbar and vertical sidebar. The panel has an
+   * 8px inset inside this iframe, and completion rows grow downward without moving its top edge. */
+  height: calc(100vh - var(--suda-command-bar-top-y, 32vh) + 8px);
+  top: calc(var(--suda-command-bar-top-y, 32vh) - 8px);
+  left: var(--suda-command-bar-center-x, 50vw);
   margin: 0;
   transform: translateX(-50%);
   border: none;

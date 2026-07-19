@@ -143,7 +143,33 @@ const CommandBar = {
         "commandBar-frame",
         this.handleMessage.bind(this),
       );
+      globalThis.addEventListener("resize", () => this.positionInBrowserWindow());
     }
+  },
+
+  browserWindowCenterInViewport(outerSize, innerSize) {
+    const browserChromeSize = Math.max(0, outerSize - innerSize);
+    return Math.max(0, Math.min(innerSize, (outerSize / 2) - browserChromeSize));
+  },
+
+  positionInBrowserWindow() {
+    const centerY = this.browserWindowCenterInViewport(
+      globalThis.outerHeight,
+      globalThis.innerHeight,
+    );
+    const desiredCenterX = this.browserWindowCenterInViewport(
+      globalThis.outerWidth,
+      globalThis.innerWidth,
+    );
+    const commandBarWidth = Math.min(900, Math.max(360, globalThis.innerWidth - 44));
+    const centerX = Math.max(
+      commandBarWidth / 2,
+      Math.min(globalThis.innerWidth - (commandBarWidth / 2), desiredCenterX),
+    );
+    const top = Math.max(16, centerY - 220);
+    const style = this.commandBarUI?.iframeElement?.style;
+    style?.setProperty("--suda-command-bar-center-x", `${centerX}px`);
+    style?.setProperty("--suda-command-bar-top-y", `${top}px`);
   },
 
   async handleMessage({ data }) {
@@ -202,6 +228,7 @@ const CommandBar = {
   //     keyword: A keyword which will scope the search to a UserSearchEngine.
   open(sourceFrameId, commandBarShowOptions) {
     this.init();
+    this.positionInBrowserWindow();
     // The CommandBar cannot coexist with the help dialog (it causes focus issues).
     HelpDialog.abort();
     Utils.assertType(CommandBarShowOptions, commandBarShowOptions);

@@ -25,6 +25,16 @@ import "../../content_scripts/command_bar.js";
 
 await Commands.init();
 
+context("CommandBar browser-window positioning", () => {
+  should("translate an outer browser axis into viewport coordinates", () => {
+    assert.equal(350, CommandBar.browserWindowCenterInViewport(1000, 850));
+  });
+
+  should("use the viewport center when browser chrome is absent", () => {
+    assert.equal(450, CommandBar.browserWindowCenterInViewport(900, 900));
+  });
+});
+
 context("KeyMappingsParser", () => {
   const getErrors = (config) => KeyMappingsParser.parse(config).validationErrors;
 
