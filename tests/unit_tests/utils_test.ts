@@ -114,6 +114,33 @@ context("makeIdempotent", () => {
   });
 });
 
+context("callbackIgnoringClosedTab", () => {
+  teardown(() => {
+    chrome.runtime.lastError = undefined;
+  });
+
+  should("call the callback when there is no runtime error", () => {
+    let value;
+    Utils.callbackIgnoringClosedTab((result) => value = result)("ok");
+    assert.equal("ok", value);
+  });
+
+  should("consume a closed-tab runtime error without calling the callback", () => {
+    let called = false;
+    chrome.runtime.lastError = { message: "No tab with id: 1648448822." };
+    Utils.callbackIgnoringClosedTab(() => called = true)();
+    assert.equal(false, called);
+  });
+
+  should("preserve unrelated runtime errors", () => {
+    chrome.runtime.lastError = new Error("Unexpected failure");
+    assert.throwsError(
+      () => Utils.callbackIgnoringClosedTab(() => {})(),
+      "Error",
+    );
+  });
+});
+
 context("distinctCharacters", () => {
   should(
     "eliminate duplicate characters",

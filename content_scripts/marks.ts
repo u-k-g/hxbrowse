@@ -128,12 +128,15 @@ const Marks = {
       if (DomUtils.isTopFrame()) {
         [scrollX, scrollY] = [globalThis.scrollX, globalThis.scrollY];
       }
-      chrome.runtime.sendMessage({
-        handler: "createMark",
-        markName: keyChar,
-        scrollX,
-        scrollY,
-      }, () => this.showMessage("Created global mark", keyChar));
+      chrome.runtime.sendMessage(
+        {
+          handler: "createMark",
+          markName: keyChar,
+          scrollX,
+          scrollY,
+        },
+        Utils.callbackIgnoringClosedTab(() => this.showMessage("Created global mark", keyChar)),
+      );
     } else {
       localStorage[this.getLocationKey(keyChar)] = this.getMarkString();
       this.showMessage("Created local mark", keyChar);
