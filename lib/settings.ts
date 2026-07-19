@@ -15,7 +15,7 @@ const defaultOptions = {
   fastScrollStepSize: 800,
   smoothScroll: true,
   showCommandBarModeDescriptions: false,
-  disabledCommandBarModes: ["url", "link:new", "link:download"],
+  disabledCommandBarModes: ["url", "link:new"],
   disabledModelessCommandBarSources: ["history"],
   keyMappings: "# Insert your preferred key mappings here.",
   linkHintCharacters: "sadfjklewcmpgh",

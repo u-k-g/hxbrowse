@@ -535,12 +535,15 @@ const helixKeyMappings = {
 
   // Modes and selection-first actions
   "i": "enterInsertMode",
+  "a": "enterCaretMode",
   "v": "enterSelectMode",
   "x": "selectLine",
   "y": "copyCurrentUrl",
   "p": "openCopiedUrlInCurrentTab",
   "P": "openCopiedUrlInNewTab",
   "r": "cycleRecentTabs",
+  "u": "goBack",
+  "U": "goForward",
 
   // Search
   "/": "enterFindMode",
@@ -553,7 +556,6 @@ const helixKeyMappings = {
   "<space>f": "LinkHints.activateMode",
   "<space>F": "LinkHints.activateModeToOpenInNewTab",
   "<space>a": "LinkHints.activateModeWithQueue",
-  "<space>d": "LinkHints.activateModeToDownloadLink",
   "<space>y": "LinkHints.activateModeToCopyLinkUrl",
   "<space>t": "Vomnibar.activateAll",
   "<space>b": "Vomnibar.activateTabSelection",
@@ -573,7 +575,6 @@ const helixKeyMappings = {
   "<c-w>h": "previousTab",
   "<c-w>l": "nextTab",
   "<c-w>q": "removeTab",
-  "<c-w>o": "closeOtherTabs",
   "<c-w>n": "Vomnibar.activateInNewTab",
   "<c-w>d": "duplicateTab",
   "<c-w>u": "restoreTab",

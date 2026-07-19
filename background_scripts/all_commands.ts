@@ -180,6 +180,13 @@ const allCommands = [
   },
 
   {
+    name: "enterCaretMode",
+    desc: "Enter Helix-style caret mode",
+    group: "navigation",
+    noRepeat: true,
+  },
+
+  {
     name: "enterVisualLineMode",
     desc: "Enter visual line mode",
     group: "navigation",
@@ -240,13 +247,6 @@ const allCommands = [
     group: "navigation",
     advanced: true,
     noRepeat: true,
-  },
-
-  {
-    name: "LinkHints.activateModeToDownloadLink",
-    desc: "Download link url",
-    group: "navigation",
-    advanced: true,
   },
 
   {

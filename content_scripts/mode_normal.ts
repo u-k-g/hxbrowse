@@ -245,6 +245,12 @@ const NormalModeCommands = {
     return NormalModeCommands.enterVisualMode();
   },
 
+  enterCaretMode() {
+    const mode = new CaretMode();
+    mode.init({ userLaunchedMode: true });
+    return mode;
+  },
+
   enterVisualLineMode() {
     const mode = new VisualLineMode();
     mode.init({ userLaunchedMode: true });
@@ -394,7 +400,6 @@ const NormalModeCommands = {
     .bind(LinkHints),
   "LinkHints.activateModeWithQueue": LinkHints.activateModeWithQueue.bind(LinkHints),
   "LinkHints.activateModeToOpenIncognito": LinkHints.activateModeToOpenIncognito.bind(LinkHints),
-  "LinkHints.activateModeToDownloadLink": LinkHints.activateModeToDownloadLink.bind(LinkHints),
   "LinkHints.activateModeToCopyLinkUrl": LinkHints.activateModeToCopyLinkUrl.bind(LinkHints),
 
   "Vomnibar.activate": Vomnibar.activate.bind(Vomnibar),

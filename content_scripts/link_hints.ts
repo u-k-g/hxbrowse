@@ -113,11 +113,6 @@ const OPEN_INCOGNITO = {
     chrome.runtime.sendMessage({ handler: "openUrlInIncognito", url: link.href });
   },
 };
-const DOWNLOAD_LINK_URL = {
-  name: "download",
-  indicator: "Download link URL",
-  clickModifiers: { altKey: true, ctrlKey: false, metaKey: false },
-};
 const COPY_LINK_TEXT = {
   name: "copy-link-text",
   indicator: "Copy link text",
@@ -154,7 +149,6 @@ const availableModes = [
   OPEN_WITH_QUEUE,
   COPY_LINK_URL,
   OPEN_INCOGNITO,
-  DOWNLOAD_LINK_URL,
   COPY_LINK_TEXT,
   HOVER_LINK,
   FOCUS_LINK,
@@ -351,9 +345,6 @@ const LinkHints = {
   },
   activateModeToOpenIncognito(count) {
     this.activateMode(count, { mode: OPEN_INCOGNITO });
-  },
-  activateModeToDownloadLink(count) {
-    this.activateMode(count, { mode: DOWNLOAD_LINK_URL });
   },
 };
 

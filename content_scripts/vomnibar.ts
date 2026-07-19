@@ -173,7 +173,6 @@ const Vomnibar = {
       "link:current": () => LinkHints.activateMode(1, {}),
       "link:new": () => LinkHints.activateModeToOpenInNewTab(1),
       "link:multi": () => LinkHints.activateModeWithQueue(),
-      "link:download": () => LinkHints.activateModeToDownloadLink(1),
       "link:copy": () => LinkHints.activateModeToCopyLinkUrl(1),
     };
     actions[action]?.();

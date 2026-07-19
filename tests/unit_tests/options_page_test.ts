@@ -49,7 +49,7 @@ context("options page", () => {
     ).map((element) => element.value);
 
     assert.equal(
-      ["url", "link:new", "link:download"],
+      ["url", "link:new"],
       uncheckedModeValues,
     );
     assert.equal(["history"], uncheckedSourceValues);
@@ -68,7 +68,7 @@ context("options page", () => {
     await optionsPage.saveOptions();
 
     assert.equal(
-      ["marks", "link:new", "link:download"],
+      ["marks", "link:new"],
       Settings.get("disabledCommandBarModes"),
     );
     assert.equal(["bookmarks"], Settings.get("disabledModelessCommandBarSources"));

@@ -572,6 +572,16 @@ context("Filtered link hints", () => {
 });
 
 context("Helix normal-mode command aliases", () => {
+  should("enter caret mode directly", () => {
+    let initOptions = null;
+    stub(CaretMode.prototype, "init", (options) => initOptions = options);
+
+    const mode = NormalModeCommands.enterCaretMode();
+
+    assert.isTrue(mode instanceof CaretMode);
+    assert.equal({ userLaunchedMode: true }, initOptions);
+  });
+
   should("enter select mode when invoked without a receiver", () => {
     let calls = 0;
     stub(NormalModeCommands, "enterVisualMode", () => calls += 1);

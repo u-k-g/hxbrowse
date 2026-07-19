@@ -288,6 +288,23 @@ context("Validate commands and options data structures", () => {
     assert.equal("reload", helixKeyMappings["<space>r"]);
   });
 
+  should("bind Helix a directly to caret mode", () => {
+    assert.equal("enterCaretMode", helixKeyMappings["a"]);
+  });
+
+  should("leave Space-d unbound", () => {
+    assert.isFalse(Object.hasOwn(helixKeyMappings, "<space>d"));
+  });
+
+  should("bind u and U to browser history navigation", () => {
+    assert.equal("goBack", helixKeyMappings["u"]);
+    assert.equal("goForward", helixKeyMappings["U"]);
+  });
+
+  should("leave Ctrl-W o unbound", () => {
+    assert.isFalse(Object.hasOwn(helixKeyMappings, "<c-w>o"));
+  });
+
   should("parse every default keybinding profile without validation errors", () => {
     for (const mappings of [vimKeyMappings, helixKeyMappings]) {
       const config = Object.entries(mappings).map(([key, command]) => `map ${key} ${command}`)

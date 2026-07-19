@@ -179,14 +179,6 @@ const commandBarModes = [
     bindingCommands: ["LinkHints.activateModeWithQueue"],
   },
   {
-    name: "link:download",
-    description: "Select a link to download",
-    aliases: "hint save",
-    action: true,
-    icon: "link",
-    bindingCommands: ["LinkHints.activateModeToDownloadLink"],
-  },
-  {
     name: "link:copy",
     description: "Select a link and copy its URL",
     aliases: "hint yank clipboard",
