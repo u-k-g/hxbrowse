@@ -104,7 +104,7 @@ await writeDistManifest(firefoxManifest);
 await checkFilesFromManifestArePresent(firefoxManifest, distDirectory);
 await runCommand(
   "zip",
-  ["-r", "--filesync", `../firefox/suda-firefox-${version}.zip`, ".", "-x", "icons/*.png"],
+  ["-r", "--filesync", `../firefox/suda-firefox-${version}.zip`, "."],
   { cwd: distDirectory },
 );
 
