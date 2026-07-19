@@ -12,10 +12,12 @@ web. it favors a compact workflow inspired by the helix editor.
 
 - helix-style bindings enabled by default
 - keyboard-driven links, tabs, history, bookmarks and search
-- an integrated command bar and configurable key mappings
+- an Arc Browser-inspired command bar and configurable key mappings
 - gruvbox-inspired interface styling
 
-![suda icon](icons/icon1024.png)
+<p align="center">
+  <img src="icons/icon1024.png" width="192" alt="suda icon">
+</p>
 
 </details>
 
