@@ -53,3 +53,7 @@ const ThemeManager = {
 };
 
 globalThis.ThemeManager = ThemeManager;
+
+// Paint with the default palette immediately. Settings replaces this with the saved theme once
+// storage has loaded, but CSS should never need its own hardcoded fallback palette in the meantime.
+ThemeManager.apply(ThemeManager.defaultTheme);

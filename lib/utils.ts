@@ -247,6 +247,12 @@ const Utils = {
       (async function () {
         const result = await listenerFn(request, sender);
         sendResponse(result);
+        // sendResponse can race the sender tab being destroyed. Chrome reports that failure via
+        // runtime.lastError instead of throwing it, so it must be read here or Chrome emits an
+        // anonymous "Unchecked runtime.lastError" entry. There is nothing left to respond to when
+        // this happens; preserve every other response error.
+        const error = chrome.runtime.lastError;
+        if (error != null && !error.message?.includes("No tab with id")) throw error;
       })();
       return true; // Indicate that we will be calling sendResponse, asynchronously.
     });

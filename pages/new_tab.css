@@ -1,6 +1,6 @@
 :root {
   background: var(--suda-background-color);
-  color-scheme: dark;
+  color-scheme: var(--suda-color-scheme);
 }
 
 html,

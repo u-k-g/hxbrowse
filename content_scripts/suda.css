@@ -16,33 +16,7 @@
  */
 
 :root {
-  color-scheme: dark;
-  --suda-color-scheme: dark;
-  --gruvbox-bg-hard: #1d2021;
-  --gruvbox-bg: #282828;
-  --gruvbox-bg-soft: #32302f;
-  --gruvbox-bg-1: #3c3836;
-  --gruvbox-bg-2: #504945;
-  --gruvbox-fg: #ebdbb2;
-  --gruvbox-white: #fbf1c7;
-  --gruvbox-fg-muted: #a89984;
-  --gruvbox-fg-dim: #928374;
-  --gruvbox-yellow: #d79921;
-  --gruvbox-yellow-bright: #fabd2f;
-  --gruvbox-orange: #d65d0e;
-  --gruvbox-red: #cc241d;
-  --gruvbox-green: #98971a;
-  --gruvbox-aqua: #689d6a;
-  --gruvbox-blue: #458588;
-  --gruvbox-purple: #b16286;
-  --suda-background-color: var(--gruvbox-bg-hard);
-  --suda-background-text-color: var(--gruvbox-fg);
-  --suda-foreground-color: var(--gruvbox-bg);
-  --suda-foreground-text-color: var(--gruvbox-fg);
-  --suda-link-color: var(--gruvbox-yellow);
-  --suda-border-color: var(--gruvbox-bg-2);
-  --suda-muted-color: var(--gruvbox-fg-muted);
-  --suda-error-color: var(--gruvbox-red);
+  color-scheme: light dark;
 }
 
 .suda-reset,

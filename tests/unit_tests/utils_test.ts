@@ -141,6 +141,35 @@ context("callbackIgnoringClosedTab", () => {
   });
 });
 
+context("addChromeRuntimeOnMessageListener", () => {
+  let originalAddListener;
+
+  setup(() => {
+    originalAddListener = chrome.runtime.onMessage.addListener;
+  });
+
+  teardown(() => {
+    chrome.runtime.lastError = undefined;
+    chrome.runtime.onMessage.addListener = originalAddListener;
+  });
+
+  should("consume a missing-tab error raised while sending an asynchronous response", async () => {
+    let messageListener;
+    chrome.runtime.onMessage.addListener = (listener) => messageListener = listener;
+    Utils.addChromeRuntimeOnMessageListener(["test"], async () => "response");
+
+    const handled = messageListener(
+      { handler: "test" },
+      { tab: { id: 1648449387 } },
+      () => chrome.runtime.lastError = { message: "No tab with id: 1648449387." },
+    );
+
+    assert.equal(true, handled);
+    await Promise.resolve();
+    assert.equal("No tab with id: 1648449387.", chrome.runtime.lastError.message);
+  });
+});
+
 context("distinctCharacters", () => {
   should(
     "eliminate duplicate characters",

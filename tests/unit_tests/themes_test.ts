@@ -53,4 +53,11 @@ context("themes", () => {
     assert.equal("#f4f1ed", properties.get("--suda-background-color"));
     assert.equal("#6d5bd0", properties.get("--suda-link-color"));
   });
+
+  should("source the default palette from the theme catalog", () => {
+    const theme = ThemeManager.get(ThemeManager.defaultTheme);
+    assert.equal("gruvbox-dark-hard", theme.id);
+    assert.equal("#1d2021", theme.background);
+    assert.equal("#d79921", theme.accent);
+  });
 });
