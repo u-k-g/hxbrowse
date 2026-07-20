@@ -5,6 +5,31 @@ import "../../background_scripts/main.js";
 import { RegistryEntry } from "../../background_scripts/commands.js";
 import * as bgUtils from "../../background_scripts/bg_utils.js";
 
+context("extension command", () => {
+  should("suggest the native new-tab shortcut for the all-mode command bar", () => {
+    const command = chrome.runtime.getManifest().commands["open-command-bar"];
+    assert.equal("Ctrl+T", command.suggested_key.default);
+    assert.equal("Command+T", command.suggested_key.mac);
+  });
+
+  should("open the all-mode command bar in the active tab's top frame", async () => {
+    let sentMessage;
+    let sentOptions;
+    stub(chrome.tabs, "sendMessage", (tabId, message, options, callback) => {
+      sentMessage = { tabId, message };
+      sentOptions = options;
+      callback();
+    });
+
+    await handleExtensionCommand("open-command-bar", { id: 42 });
+
+    assert.equal(42, sentMessage.tabId);
+    assert.equal("runInTopFrame", sentMessage.message.handler);
+    assert.equal("CommandBar.activateAll", sentMessage.message.registryEntry.command);
+    assert.equal({ frameId: 0 }, sentOptions);
+  });
+});
+
 context("HintCoordinator", () => {
   should("prepareToActivateLinkHintsMode", async () => {
     let receivedMessages = [];

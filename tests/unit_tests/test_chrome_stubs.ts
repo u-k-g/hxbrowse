@@ -110,6 +110,14 @@ globalThis.chrome = {
     },
   },
 
+  commands: {
+    onCommand: {
+      addListener(func) {
+        this.func = func;
+      },
+    },
+  },
+
   scripting: {
     executeScript() {},
   },

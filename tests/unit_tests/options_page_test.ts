@@ -31,9 +31,10 @@ context("options page", () => {
     assert.equal("800", optionsPage.getOptionEl("fastScrollStepSize").value);
   });
 
-  should("use the Suda blank page and open its command bar by default", () => {
-    assert.isTrue(document.querySelector("#sudaNewTabPage").checked);
-    assert.isTrue(optionsPage.getOptionEl("openCommandBarOnNewTabPage").checked);
+  should("leave the browser's new-tab page untouched by default", () => {
+    assert.isTrue(document.querySelector("#browserNewTabPage").checked);
+    assert.isFalse(document.querySelector("#sudaNewTabPage").checked);
+    assert.isFalse(optionsPage.getOptionEl("openCommandBarOnNewTabPage").checked);
   });
 
   should("hide command-bar mode descriptions by default", () => {

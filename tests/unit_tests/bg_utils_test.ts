@@ -28,3 +28,38 @@ context("runTabOperation", () => {
     assert.equal("Unexpected failure", caughtError?.message);
   });
 });
+
+context("runTabCallbackOperation", () => {
+  teardown(() => chrome.runtime.lastError = undefined);
+
+  should("consume a callback-style missing-tab error", async () => {
+    const result = await bgUtils.runTabCallbackOperation((callback) => {
+      chrome.runtime.lastError = new Error("No tab with id: 1648449498.");
+      callback();
+    });
+    assert.equal(undefined, result);
+  });
+
+  should("consume a callback-style missing-receiver error", async () => {
+    const result = await bgUtils.runTabCallbackOperation((callback) => {
+      chrome.runtime.lastError = new Error(
+        "Could not establish connection. Receiving end does not exist.",
+      );
+      callback();
+    });
+    assert.equal(undefined, result);
+  });
+
+  should("preserve an unrelated callback-style error", async () => {
+    let caughtError;
+    try {
+      await bgUtils.runTabCallbackOperation((callback) => {
+        chrome.runtime.lastError = new Error("Unexpected failure");
+        callback();
+      });
+    } catch (error) {
+      caughtError = error;
+    }
+    assert.equal("Unexpected failure", caughtError.message);
+  });
+});

@@ -18,9 +18,6 @@
     "browser_style": false,
     "open_in_tab": true
   },
-  "chrome_url_overrides": {
-    "newtab": "pages/new_tab.html"
-  },
   "host_permissions": [
     "<all_urls>"
   ],
@@ -39,6 +36,15 @@
     "webNavigation",
     "search"
   ],
+  "commands": {
+    "open-command-bar": {
+      "suggested_key": {
+        "default": "Ctrl+T",
+        "mac": "Command+T"
+      },
+      "description": "Open Suda's all-mode command bar"
+    }
+  },
   "content_scripts": [
     {
       "matches": [

@@ -12,10 +12,7 @@ import "../background_scripts/completion/search_wrapper.js";
 import "../background_scripts/completion/completers.js";
 import "../background_scripts/tab_operations.js";
 import * as marks from "../background_scripts/marks.js";
-import {
-  getConfiguredNewTabUrl,
-  initializeNewTabRedirect,
-} from "../background_scripts/new_tab_redirect.js";
+import { getConfiguredNewTabUrl } from "../background_scripts/new_tab_redirect.js";
 
 import {
   BookmarkCompleter,
@@ -34,7 +31,26 @@ import {
 
 import * as TabOperations from "./tab_operations.js";
 
-initializeNewTabRedirect();
+export async function handleExtensionCommand(command, tab) {
+  if (command !== "open-command-bar" || tab?.id == null) return;
+  await bgUtils.runTabCallbackOperation((callback) =>
+    chrome.tabs.sendMessage(
+      tab.id,
+      {
+        handler: "runInTopFrame",
+        sourceFrameId: 0,
+        registryEntry: {
+          command: "CommandBar.activateAll",
+          options: {},
+        },
+      },
+      { frameId: 0 },
+      callback,
+    )
+  );
+}
+
+chrome.commands.onCommand.addListener(handleExtensionCommand);
 
 // Allow Suda's content scripts to access chrome.storage.session. Otherwise,
 // chrome.storage.session will be null in content scripts.
@@ -939,6 +955,7 @@ Object.assign(globalThis, {
   nextZoomLevel,
   resetRecentTabCycle,
   selectSpecificTab,
+  handleExtensionCommand,
 });
 
 // The chrome.runtime.onStartup and onInstalled events are not fired when disabling and then

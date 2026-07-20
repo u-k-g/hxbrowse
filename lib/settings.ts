@@ -78,9 +78,9 @@ w: https://www.wikipedia.org/w/index.php?title=Special:Search&search=%s Wikipedi
 # az: https://www.amazon.com/s/?field-keywords=%s
 # qw: https://www.qwant.com/?q=%s Qwant\
 `,
-  newTabDestination: newTabDestinations.sudaNewTabPage,
+  newTabDestination: newTabDestinations.browserNewTabPage,
   newTabCustomUrl: "",
-  openCommandBarOnNewTabPage: true,
+  openCommandBarOnNewTabPage: false,
   grabBackFocus: false,
   regexFindMode: false,
   waitForEnterForFilteredHints: true,
