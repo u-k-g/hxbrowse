@@ -6,6 +6,8 @@ import { RegistryEntry } from "../../background_scripts/commands.js";
 import * as bgUtils from "../../background_scripts/bg_utils.js";
 
 context("extension command", () => {
+  teardown(() => chrome.runtime.lastError = undefined);
+
   should("suggest the native new-tab shortcut for the all-mode command bar", () => {
     const command = chrome.runtime.getManifest().commands["open-command-bar"];
     assert.equal("Ctrl+T", command.suggested_key.default);
@@ -27,6 +29,26 @@ context("extension command", () => {
     assert.equal("runInTopFrame", sentMessage.message.handler);
     assert.equal("CommandBar.activateAll", sentMessage.message.registryEntry.command);
     assert.equal({ frameId: 0 }, sentOptions);
+  });
+
+  should("open a current-tab command bar fallback from a protected page", async () => {
+    let createdTab;
+    stub(chrome.runtime, "getURL", (path) => `chrome-extension://suda/${path}`);
+    stub(chrome.tabs, "sendMessage", (_tabId, _message, _options, callback) => {
+      chrome.runtime.lastError = new Error(
+        "Could not establish connection. Receiving end does not exist.",
+      );
+      callback();
+    });
+    stub(chrome.tabs, "create", (properties) => createdTab = properties);
+
+    await handleExtensionCommand("open-command-bar", { id: 42, index: 3, windowId: 7 });
+
+    assert.equal(true, createdTab.active);
+    assert.equal(4, createdTab.index);
+    assert.equal(42, createdTab.openerTabId);
+    assert.equal(7, createdTab.windowId);
+    assert.isTrue(createdTab.url.endsWith("pages/new_tab.html?sudaCommandBar=all"));
   });
 });
 

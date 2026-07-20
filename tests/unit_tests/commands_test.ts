@@ -278,6 +278,15 @@ context("Validate commands and options data structures", () => {
     assert.equal({ completer: "omni", mode: "", newTab: true }, openOptions);
   });
 
+  should("reuse the protected-page fallback tab for its selected result", () => {
+    let openOptions = null;
+    stub(CommandBar, "open", (_sourceFrameId, options) => openOptions = options);
+
+    CommandBar.activateAllInCurrentTab(0);
+
+    assert.equal({ completer: "omni", mode: "", newTab: false }, openOptions);
+  });
+
   should("open Ctrl-W n directly in search mode", () => {
     let openOptions = null;
     stub(CommandBar, "open", (_sourceFrameId, options) => openOptions = options);

@@ -33,20 +33,31 @@ import * as TabOperations from "./tab_operations.js";
 
 export async function handleExtensionCommand(command, tab) {
   if (command !== "open-command-bar" || tab?.id == null) return;
-  await bgUtils.runTabCallbackOperation((callback) =>
-    chrome.tabs.sendMessage(
-      tab.id,
-      {
-        handler: "runInTopFrame",
-        sourceFrameId: 0,
-        registryEntry: {
-          command: "CommandBar.activateAll",
-          options: {},
+  await bgUtils.runTabCallbackOperation(
+    (callback) =>
+      chrome.tabs.sendMessage(
+        tab.id,
+        {
+          handler: "runInTopFrame",
+          sourceFrameId: 0,
+          registryEntry: {
+            command: "CommandBar.activateAll",
+            options: {},
+          },
         },
-      },
-      { frameId: 0 },
-      callback,
-    )
+        { frameId: 0 },
+        callback,
+      ),
+    () => {
+      const createProperties = {
+        active: true,
+        openerTabId: tab.id,
+        url: chrome.runtime.getURL("pages/new_tab.html?sudaCommandBar=all"),
+      };
+      if (Number.isInteger(tab.index)) createProperties.index = tab.index + 1;
+      if (Number.isInteger(tab.windowId)) createProperties.windowId = tab.windowId;
+      return chrome.tabs.create(createProperties);
+    },
   );
 }
 

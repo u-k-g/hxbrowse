@@ -50,6 +50,20 @@ context("runTabCallbackOperation", () => {
     assert.equal(undefined, result);
   });
 
+  should("run a fallback for a missing receiver", async () => {
+    let fallbackCalled = false;
+    await bgUtils.runTabCallbackOperation(
+      (callback) => {
+        chrome.runtime.lastError = new Error(
+          "Could not establish connection. Receiving end does not exist.",
+        );
+        callback();
+      },
+      () => fallbackCalled = true,
+    );
+    assert.isTrue(fallbackCalled);
+  });
+
   should("preserve an unrelated callback-style error", async () => {
     let caughtError;
     try {

@@ -261,12 +261,17 @@ async function initializeOnDomReady() {
   // Tell the background page we're in the domReady state.
   await chrome.runtime.sendMessage({ handler: "domReady" });
 
-  const isSudaNewTabPage = document.location.href == Settings.sudaNewTabPageUrl;
+  const isSudaNewTabPage = document.location.href.startsWith(Settings.sudaNewTabPageUrl);
   if (!isSudaNewTabPage) return;
 
   // Show the CommandBar.
   await Settings.onLoaded();
-  if (Settings.get("openCommandBarOnNewTabPage")) {
+  const forcedAllMode = new URL(document.location.href).searchParams.get("sudaCommandBar") ===
+    "all";
+  if (forcedAllMode) {
+    DomUtils.injectUserCss();
+    CommandBar.activateAllInCurrentTab(0);
+  } else if (Settings.get("openCommandBarOnNewTabPage")) {
     DomUtils.injectUserCss();
     CommandBar.activateNewTab(0);
   }

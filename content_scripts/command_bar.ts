@@ -56,6 +56,14 @@ const CommandBar = {
     });
   },
 
+  activateAllInCurrentTab(sourceFrameId) {
+    this.open(sourceFrameId, {
+      completer: "omni",
+      mode: "",
+      newTab: false,
+    });
+  },
+
   activateFind(_sourceFrameId) {
     Marks.setPreviousPosition();
     return new FindMode();
