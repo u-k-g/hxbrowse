@@ -18,6 +18,7 @@ const defaultOptions = {
   fastScrollStepSize: 800,
   smoothScroll: true,
   showCommandBarModeDescriptions: false,
+  commandBarCenter: "window",
   disabledCommandBarModes: ["url"],
   disabledModelessCommandBarSources: ["history"],
   keyMappings: "# Insert your preferred key mappings here.",

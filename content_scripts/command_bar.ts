@@ -184,17 +184,17 @@ const CommandBar = {
     this.positionInBrowserWindow();
   },
 
-  calculateFrameGeometry(windowDimensions, zoomFactor) {
+  calculateFrameGeometry(windowDimensions, zoomFactor, centerMode = "window") {
     const viewportWidth = windowDimensions.innerWidth * zoomFactor;
     const viewportHeight = windowDimensions.innerHeight * zoomFactor;
+    const centerOnTab = centerMode === "tab";
     const centerY = this.browserWindowCenterInViewport(
       windowDimensions.outerHeight,
       viewportHeight,
     );
-    const desiredCenterX = this.browserWindowCenterInViewport(
-      windowDimensions.outerWidth,
-      viewportWidth,
-    );
+    const desiredCenterX = centerOnTab
+      ? viewportWidth / 2
+      : this.browserWindowCenterInViewport(windowDimensions.outerWidth, viewportWidth);
     const commandBarWidth = Math.min(780, Math.max(340, viewportWidth - 44));
     const centerX = Math.max(
       commandBarWidth / 2,
@@ -211,12 +211,16 @@ const CommandBar = {
   },
 
   positionInBrowserWindow() {
-    const geometry = this.calculateFrameGeometry({
-      innerHeight: globalThis.innerHeight,
-      innerWidth: globalThis.innerWidth,
-      outerHeight: globalThis.outerHeight,
-      outerWidth: globalThis.outerWidth,
-    }, this.zoomFactor);
+    const geometry = this.calculateFrameGeometry(
+      {
+        innerHeight: globalThis.innerHeight,
+        innerWidth: globalThis.innerWidth,
+        outerHeight: globalThis.outerHeight,
+        outerWidth: globalThis.outerWidth,
+      },
+      this.zoomFactor,
+      Settings.get("commandBarCenter"),
+    );
     const style = this.commandBarUI?.iframeElement?.style;
     style?.setProperty("--suda-command-bar-width", `${geometry.width}px`);
     style?.setProperty("--suda-command-bar-height", `${geometry.height}px`);

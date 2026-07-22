@@ -86,6 +86,15 @@ context("options page", () => {
     assert.isFalse(optionsPage.getOptionEl("showCommandBarModeDescriptions").checked);
   });
 
+  should("center the command bar on the browser window by default", async () => {
+    assert.isTrue(document.querySelector("#commandBarCenterWindow").checked);
+    assert.isFalse(document.querySelector("#commandBarCenterTab").checked);
+
+    document.querySelector("#commandBarCenterTab").checked = true;
+    await optionsPage.saveOptions();
+    assert.equal("tab", Settings.get("commandBarCenter"));
+  });
+
   should("use the configured command-bar mode and source defaults", () => {
     const uncheckedModeValues = Array.from(
       document.querySelectorAll('[name="disabledCommandBarModes"]:not(:checked)'),

@@ -7,6 +7,7 @@ import * as userSearchEngines from "../background_scripts/user_search_engines.js
 
 const options = {
   arcAccentColor: "string",
+  commandBarCenter: "option",
   disabledCommandBarModes: "inverted-set",
   disabledModelessCommandBarSources: "inverted-set",
   fastScrollStepSize: "number",
