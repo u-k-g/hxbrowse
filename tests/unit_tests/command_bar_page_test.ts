@@ -61,6 +61,20 @@ context("commandBar page", () => {
     assert.equal("", ui.input.value);
   });
 
+  should("hide when the command bar window loses focus", () => {
+    ui.setQuery("www.example.com");
+    window.dispatchEvent(new window.Event("blur"));
+    assert.equal("", ui.input.value);
+  });
+
+  should("preserve a pending completion callback while hiding", () => {
+    let callbackWasCalled = false;
+    ui.hide(() => callbackWasCalled = true);
+    window.dispatchEvent(new window.Event("blur"));
+    ui.onHidden();
+    assert.isTrue(callbackWasCalled);
+  });
+
   should("use the bold command-bar search icon", () => {
     const searchIcon = document.querySelector(".command-bar-search-icon");
     assert.equal("bold", searchIcon.dataset.phosphorWeight);

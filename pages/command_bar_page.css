@@ -115,10 +115,10 @@ ul {
 
 .command-bar-search-icon {
   color: var(--command-bar-bright);
-  height: 18px;
+  height: 14px;
   margin-left: 3px;
   opacity: 0.88;
-  width: 18px;
+  width: 14px;
 }
 
 #command-bar-mode {

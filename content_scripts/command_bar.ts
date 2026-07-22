@@ -152,6 +152,18 @@ const CommandBar = {
         this.handleMessage.bind(this),
       );
       globalThis.addEventListener("resize", () => this.positionInBrowserWindow());
+      globalThis.addEventListener(
+        "pointerdown",
+        forTrusted((event) => {
+          if (!this.commandBarUI?.showing) return true;
+          const eventPath = event.composedPath?.() ?? [];
+          if (!eventPath.includes(this.commandBarUI.iframeElement)) {
+            this.commandBarUI.postMessage({ name: "hide" });
+          }
+          return true;
+        }),
+        true,
+      );
     }
   },
 

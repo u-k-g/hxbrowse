@@ -260,6 +260,7 @@ class CommandBarUI {
     this.onKeyEvent = this.onKeyEvent.bind(this);
     this.onInput = this.onInput.bind(this);
     this.update = this.update.bind(this);
+    this.isHiding = false;
     this.onHiddenCallback = null;
     this.initDom();
     // The user's custom search engine, if they have prefixed their query with the keyword for one
@@ -370,6 +371,8 @@ class CommandBarUI {
   // This ensures that the commandBar is actually hidden before any new tab is created, and avoids
   // flicker after opening a link in a new tab then returning to the original tab. See #1485.
   hide(onHiddenCallback = null) {
+    if (this.isHiding) return;
+    this.isHiding = true;
     this.onHiddenCallback = onHiddenCallback;
     this.input.blur();
     this.reset();
@@ -385,6 +388,7 @@ class CommandBarUI {
     this.onHiddenCallback?.();
     this.onHiddenCallback = null;
     this.reset();
+    this.isHiding = false;
   }
 
   reset() {
@@ -925,6 +929,13 @@ class CommandBarUI {
     this.completionList.style.display = "none";
 
     window.addEventListener("focus", () => this.input.focus());
+    // Losing focus to the page, browser chrome, another tab, or another application dismisses the
+    // command bar. Clicks within this iframe do not blur its window.
+    window.addEventListener("blur", () => {
+      if (this.isHiding) return;
+      UIComponentMessenger.postMessage({ name: "commandBarFinishMode", commit: false });
+      this.hide();
+    });
     // A click in the commandBar itself refocuses the input.
     this.box.addEventListener("click", (event) => {
       this.input.focus();
