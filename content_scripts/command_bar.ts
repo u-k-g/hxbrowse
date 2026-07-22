@@ -169,12 +169,12 @@ const CommandBar = {
       globalThis.outerWidth,
       globalThis.innerWidth,
     );
-    const commandBarWidth = Math.min(900, Math.max(360, globalThis.innerWidth - 44));
+    const commandBarWidth = Math.min(780, Math.max(340, globalThis.innerWidth - 44));
     const centerX = Math.max(
       commandBarWidth / 2,
       Math.min(globalThis.innerWidth - (commandBarWidth / 2), desiredCenterX),
     );
-    const top = Math.max(16, centerY - 220);
+    const top = Math.max(16, centerY - 170);
     const style = this.commandBarUI?.iframeElement?.style;
     style?.setProperty("--suda-command-bar-center-x", `${centerX}px`);
     style?.setProperty("--suda-command-bar-top-y", `${top}px`);

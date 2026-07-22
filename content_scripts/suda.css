@@ -215,8 +215,8 @@ iframe.commandBar-frame {
 
   display: block;
   position: fixed;
-  width: min(900px, calc(100vw - 44px));
-  min-width: 360px;
+  width: min(780px, calc(100vw - 44px));
+  min-width: 340px;
   /* JavaScript translates the center of the entire browser window into content-viewport
    * coordinates. This accounts for Chromium's tabs, toolbar and vertical sidebar. The panel has an
    * 8px inset inside this iframe, and completion rows grow downward without moving its top edge. */

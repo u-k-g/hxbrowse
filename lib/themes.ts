@@ -29,6 +29,42 @@ const ThemeManager = {
     return `#${rgb.map((c) => Math.round(c).toString(16).padStart(2, "0")).join("")}`;
   },
 
+  rgbToHsl(rgb) {
+    const [r, g, b] = rgb.map((channel) => channel / 255);
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const delta = max - min;
+    const lightness = (max + min) / 2;
+    if (delta === 0) return [0, 0, lightness];
+
+    let hue = max === r
+      ? ((g - b) / delta) % 6
+      : max === g
+      ? ((b - r) / delta) + 2
+      : ((r - g) / delta) + 4;
+    hue = ((hue * 60) + 360) % 360;
+    const saturation = delta / (1 - Math.abs((2 * lightness) - 1));
+    return [hue, saturation, lightness];
+  },
+
+  hslToRgb([hue, saturation, lightness]) {
+    const chroma = (1 - Math.abs((2 * lightness) - 1)) * saturation;
+    const x = chroma * (1 - Math.abs(((hue / 60) % 2) - 1));
+    const offset = lightness - (chroma / 2);
+    const channels = hue < 60
+      ? [chroma, x, 0]
+      : hue < 120
+      ? [x, chroma, 0]
+      : hue < 180
+      ? [0, chroma, x]
+      : hue < 240
+      ? [0, x, chroma]
+      : hue < 300
+      ? [x, 0, chroma]
+      : [chroma, 0, x];
+    return channels.map((channel) => (channel + offset) * 255);
+  },
+
   // Mixes `hex` with `targetHex`; weight is the fraction of `hex` retained.
   mixHexColors(hex, targetHex, weight) {
     const a = this.hexToRgb(hex);
@@ -38,9 +74,14 @@ const ThemeManager = {
 
   // Picks a readable text color to place on top of a fill of color `hex`.
   contrastColorOn(hex) {
-    const [r, g, b] = this.hexToRgb(hex).map((channel) => channel / 255);
+    const [r, g, b] = this.hexToRgb(hex).map((channel) => {
+      channel /= 255;
+      return channel <= 0.04045 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4);
+    });
     const luminance = (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
-    return luminance > 0.55 ? "#1d1d1f" : "#ffffff";
+    const whiteContrast = 1.05 / (luminance + 0.05);
+    const darkContrast = (luminance + 0.05) / 0.055;
+    return whiteContrast >= darkContrast ? "#ffffff" : "#1d1d1f";
   },
 
   // The accent color for a theme, honoring the user's custom hex color for the Arc themes.
@@ -49,11 +90,22 @@ const ThemeManager = {
     return this.normalizeHexColor(accentColor) || theme.accent;
   },
 
+  // Arc retains the accent's hue but uses a darker, slightly calmer tone for filled selection
+  // surfaces. This keeps white result text readable even when the chosen accent is very bright.
+  accentSelectionFor(theme, accent) {
+    if (!this.arcThemes.has(theme.id)) return accent;
+    const [hue, saturation, lightness] = this.rgbToHsl(this.hexToRgb(accent));
+    const selectedSaturation = Math.min(saturation, 0.67);
+    const selectedLightness = Math.min(0.30, Math.max(0.24, lightness * 0.43));
+    return this.rgbToHex(this.hslToRgb([hue, selectedSaturation, selectedLightness]));
+  },
+
   apply(themeId, root = globalThis.document?.documentElement, accentColor = null) {
     const theme = this.get(themeId);
     if (!theme || !root) return;
 
     const accent = this.accentFor(theme, accentColor);
+    const accentSelection = this.accentSelectionFor(theme, accent);
     const properties = {
       "--gruvbox-bg-hard": theme.background,
       "--gruvbox-bg": theme.surface,
@@ -85,6 +137,8 @@ const ThemeManager = {
       "--suda-accent-color": accent,
       // Text/icons drawn on a solid accent fill, and accent-colored text drawn on the panel.
       "--suda-accent-contrast-color": this.contrastColorOn(accent),
+      "--suda-accent-selected-color": accentSelection,
+      "--suda-accent-selected-text-color": this.contrastColorOn(accentSelection),
       "--suda-accent-subtle-color": this.mixHexColors(accent, theme.background, 0.18),
       "--suda-accent-text-color": theme.mode === "dark"
         ? this.mixHexColors(accent, "#ffffff", 0.68)

@@ -2,8 +2,8 @@
   --command-bar-panel: var(--suda-background-color);
   --command-bar-input: var(--suda-background-color);
   --command-bar-row: color-mix(in srgb, var(--suda-foreground-color) 72%, transparent);
-  --command-bar-selected: var(--suda-accent-color);
-  --command-bar-selected-text: var(--suda-accent-contrast-color);
+  --command-bar-selected: var(--suda-accent-selected-color);
+  --command-bar-selected-text: var(--suda-accent-selected-text-color);
   --command-bar-border: var(--suda-border-color);
   --command-bar-border-soft: var(--gruvbox-bg-1);
   --command-bar-text: var(--suda-background-text-color);
@@ -18,18 +18,18 @@
 html[data-suda-theme="arc-dark"] {
   --command-bar-panel: color-mix(
     in srgb,
-    var(--suda-accent-subtle-color) 45%,
+    var(--suda-accent-subtle-color) 10%,
     var(--suda-background-color)
   );
   --command-bar-input: var(--command-bar-panel);
   --command-bar-border: color-mix(
     in srgb,
-    var(--suda-accent-color) 9%,
+    var(--suda-accent-color) 2%,
     var(--suda-border-color)
   );
   --command-bar-border-soft: color-mix(
     in srgb,
-    var(--suda-accent-color) 7%,
+    var(--suda-accent-color) 2%,
     var(--suda-border-color)
   );
 }
@@ -64,7 +64,7 @@ ul {
 #commandBar {
   background: var(--command-bar-panel);
   border: 1px solid var(--command-bar-border);
-  border-radius: 17px;
+  border-radius: 14px;
   box-shadow:
     0 22px 55px rgb(0 0 0 / 34%),
     inset 0 0 0 1px color-mix(in srgb, white 9%, transparent);
@@ -83,7 +83,7 @@ ul {
 #commandBar-search-area {
   background: var(--command-bar-input);
   border-bottom: 0;
-  padding: 15px 19px;
+  padding: 12px 19px;
   position: relative;
 }
 
@@ -100,8 +100,8 @@ ul {
 #command-bar-input-row {
   align-items: center;
   display: flex;
-  gap: 12px;
-  min-height: 38px;
+  gap: 10px;
+  min-height: 36px;
 }
 
 .phosphor-icon,
@@ -114,17 +114,18 @@ ul {
 }
 
 .command-bar-search-icon {
-  color: var(--command-bar-muted);
+  color: var(--command-bar-bright);
   height: 20px;
   margin-left: 3px;
+  opacity: 0.88;
   width: 20px;
 }
 
 #command-bar-mode {
-  background: color-mix(in srgb, var(--suda-accent-color) 22%, var(--command-bar-panel));
-  border: 1px solid color-mix(in srgb, var(--suda-accent-color) 38%, transparent);
+  background: var(--command-bar-selected);
+  border: 1px solid color-mix(in srgb, var(--command-bar-selected) 82%, white);
   border-radius: 999px;
-  color: var(--suda-accent-text-color);
+  color: var(--command-bar-selected-text);
   flex: none;
   font-size: 13px;
   font-weight: 700;
@@ -157,9 +158,9 @@ ul {
   color: var(--command-bar-bright);
   flex: 1;
   font-family: inherit;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
-  height: 38px;
+  height: 36px;
   letter-spacing: -0.01em;
   min-width: 0;
   outline: none;
@@ -180,23 +181,23 @@ ul {
 
 #commandBar ul {
   background: var(--command-bar-panel);
-  max-height: min(344px, calc(100vh - 96px));
+  max-height: min(272px, calc(100vh - 88px));
   overflow: hidden auto;
-  padding: 8px 10px 10px;
+  padding: 6px 9px 8px;
   scrollbar-color: var(--command-bar-border) transparent;
   scrollbar-width: thin;
 }
 
 #commandBar li {
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: 5px;
   color: var(--command-bar-text);
   display: list-item;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.25;
   margin: 2px 0;
-  min-height: 50px;
-  padding: 8px 12px;
+  min-height: 46px;
+  padding: 7px 10px;
   position: relative;
 }
 
@@ -209,8 +210,8 @@ ul {
 #commandBar li .completion-row {
   align-items: center;
   display: flex;
-  gap: 12px;
-  min-height: 32px;
+  gap: 8px;
+  min-height: 30px;
   width: 100%;
 }
 
@@ -244,9 +245,9 @@ ul {
 }
 
 #commandBar li .completion-action {
-  color: var(--command-bar-muted);
+  color: color-mix(in srgb, var(--command-bar-muted) 62%, var(--command-bar-panel));
   flex: none;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   margin-left: 12px;
 }
@@ -255,20 +256,20 @@ ul {
   align-items: center;
   background: var(--command-bar-row);
   border: 1px solid var(--command-bar-border);
-  border-radius: 8px;
+  border-radius: 5px;
   color: var(--command-bar-dim);
   display: flex;
   flex: none;
-  height: 28px;
+  height: 26px;
   justify-content: center;
   margin-left: 8px;
-  width: 28px;
+  width: 26px;
 }
 
 #commandBar li .completion-arrow svg {
   fill: currentColor;
-  height: 14px;
-  width: 14px;
+  height: 13px;
+  width: 13px;
 }
 
 #commandBar li.selected .completion-arrow {
@@ -285,9 +286,9 @@ ul {
   color: var(--command-bar-dim);
   display: flex;
   flex: none;
-  height: 32px;
+  height: 28px;
   justify-content: center;
-  width: 32px;
+  width: 28px;
 }
 
 #commandBar li.selected .result-icon {
@@ -312,7 +313,7 @@ ul {
 #commandBar li .mode-name,
 #commandBar li .mark-key {
   color: var(--command-bar-bright);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 650;
 }
 
@@ -409,7 +410,7 @@ ul {
 }
 
 #commandBar li .url {
-  color: var(--command-bar-muted);
+  color: color-mix(in srgb, var(--command-bar-muted) 72%, var(--command-bar-panel));
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -426,7 +427,7 @@ ul {
 #commandBar li .title {
   color: var(--command-bar-bright);
   font-style: normal;
-  font-weight: 620;
+  font-weight: 600;
   margin-left: 0;
 }
 
@@ -471,7 +472,7 @@ ul {
 
 @media (max-width: 620px) {
   #commandBar {
-    border-radius: 14px;
+    border-radius: 12px;
   }
 
   #commandBar-search-area {

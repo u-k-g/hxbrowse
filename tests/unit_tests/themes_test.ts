@@ -91,6 +91,8 @@ context("themes", () => {
     // The default mint accent is light, so text drawn on a solid accent fill must be dark.
     ThemeManager.apply("arc-dark", root, "#6CED96");
     assert.equal("#1d1d1f", properties.get("--suda-accent-contrast-color"));
+    assert.equal("#187c39", properties.get("--suda-accent-selected-color"));
+    assert.equal("#ffffff", properties.get("--suda-accent-selected-text-color"));
 
     // A dark accent gets white text on top of it.
     ThemeManager.apply("arc-dark", root, "#312e81");
