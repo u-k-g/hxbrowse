@@ -114,30 +114,26 @@ context("makeIdempotent", () => {
   });
 });
 
-context("callbackIgnoringClosedTab", () => {
-  teardown(() => {
-    chrome.runtime.lastError = undefined;
+context("promiseIgnoringClosedTab", () => {
+  should("preserve a successful promise result", async () => {
+    assert.equal("ok", await Utils.promiseIgnoringClosedTab(Promise.resolve("ok")));
   });
 
-  should("call the callback when there is no runtime error", () => {
-    let value;
-    Utils.callbackIgnoringClosedTab((result) => value = result)("ok");
-    assert.equal("ok", value);
-  });
-
-  should("consume a closed-tab runtime error without calling the callback", () => {
-    let called = false;
-    chrome.runtime.lastError = { message: "No tab with id: 1648448822." };
-    Utils.callbackIgnoringClosedTab(() => called = true)();
-    assert.equal(false, called);
-  });
-
-  should("preserve unrelated runtime errors", () => {
-    chrome.runtime.lastError = new Error("Unexpected failure");
-    assert.throwsError(
-      () => Utils.callbackIgnoringClosedTab(() => {})(),
-      "Error",
+  should("consume a closed-tab rejection", async () => {
+    const result = await Utils.promiseIgnoringClosedTab(
+      Promise.reject(new Error("No tab with id: 1648449760.")),
     );
+    assert.equal(undefined, result);
+  });
+
+  should("preserve unrelated rejections", async () => {
+    let caughtError;
+    try {
+      await Utils.promiseIgnoringClosedTab(Promise.reject(new Error("Unexpected failure")));
+    } catch (error) {
+      caughtError = error;
+    }
+    assert.equal("Unexpected failure", caughtError.message);
   });
 });
 

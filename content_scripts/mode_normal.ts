@@ -182,23 +182,27 @@ const NormalModeCommands = {
   },
 
   toggleViewSource() {
-    chrome.runtime.sendMessage(
-      { handler: "getCurrentTabUrl" },
-      Utils.callbackIgnoringClosedTab(function (url) {
+    Utils.promiseIgnoringClosedTab(
+      chrome.runtime.sendMessage({ handler: "getCurrentTabUrl" }),
+    ).then((url) => {
+      if (url != null) {
         if (url.substr(0, 12) === "view-source:") {
           url = url.substr(12, url.length - 12);
         } else {
           url = "view-source:" + url;
         }
-        chrome.runtime.sendMessage({ handler: "openUrlInNewTab", url });
-      }),
-    );
+        return Utils.promiseIgnoringClosedTab(
+          chrome.runtime.sendMessage({ handler: "openUrlInNewTab", url }),
+        );
+      }
+    });
   },
 
   copyCurrentUrl() {
-    chrome.runtime.sendMessage(
-      { handler: "getCurrentTabUrl" },
-      Utils.callbackIgnoringClosedTab(function (url) {
+    Utils.promiseIgnoringClosedTab(
+      chrome.runtime.sendMessage({ handler: "getCurrentTabUrl" }),
+    ).then((url) => {
+      if (url != null) {
         HUD.copyToClipboard(url);
         // This length is determined empirically based on a 350px width of the HUD. An alternate
         // solution is to have the HUD ellipsize based on its width.
@@ -207,8 +211,8 @@ const NormalModeCommands = {
           url = url.slice(0, maxLength - 2) + "...";
         }
         HUD.show(`Yanked ${url}`, 2000);
-      }),
-    );
+      }
+    });
   },
 
   openCopiedUrlInNewTab(count, request) {

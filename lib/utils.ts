@@ -211,17 +211,10 @@ const Utils = {
     }
   },
 
-  // Chrome reports callback-based API failures through runtime.lastError. If a tab disappears
-  // while a message is in flight, merely ignoring the callback leaves Chrome to report an
-  // "Unchecked runtime.lastError" with no useful source location. Read and consume that expected
-  // race, while preserving every unrelated error.
-  callbackIgnoringClosedTab(callback) {
-    return function (...args) {
-      const error = chrome.runtime.lastError;
-      if (error?.message?.includes("No tab with id")) return;
-      if (error != null) throw error;
-      return callback.apply(this, args);
-    };
+  promiseIgnoringClosedTab(promise) {
+    return promise.catch((error) => {
+      if (!error?.message?.includes("No tab with id")) throw error;
+    });
   },
 
   // This is a wrapper around chrome.runtime.onMessage.addListener.
