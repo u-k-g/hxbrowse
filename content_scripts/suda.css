@@ -33,7 +33,7 @@ tr.suda-reset {
   border: none;
   bottom: auto;
   box-shadow: none;
-  color: var(--gruvbox-fg);
+  color: var(--suda-text-color);
   cursor: auto;
   display: inline;
   float: none;
@@ -108,15 +108,15 @@ div.internal-suda-hint-marker {
   overflow: hidden;
   font-size: 11px;
   padding: 1px 3px 0px 3px;
-  background: var(--gruvbox-yellow);
-  border: solid 1px var(--gruvbox-yellow-bright);
+  background: var(--suda-accent-color);
+  border: solid 1px var(--suda-accent-color);
   border-radius: 3px;
-  box-shadow: 0px 3px 7px 0px color-mix(in srgb, var(--gruvbox-bg-hard) 70%, transparent);
+  box-shadow: 0px 3px 7px 0px color-mix(in srgb, var(--suda-canvas-color) 70%, transparent);
   z-index: 2147483647;
 }
 
 div.internal-suda-hint-marker span {
-  color: var(--gruvbox-bg-hard);
+  color: var(--suda-accent-contrast-color);
   font-family: Helvetica, Arial, sans-serif;
   font-weight: bold;
   font-size: 11px;
@@ -124,20 +124,20 @@ div.internal-suda-hint-marker span {
 }
 
 div.internal-suda-hint-marker > .matchingCharacter {
-  color: var(--gruvbox-fg);
+  color: var(--suda-accent-contrast-color);
 }
 
 div > .sudaActiveHintMarker span {
-  color: var(--gruvbox-bg-2) !important;
+  color: var(--suda-border-color) !important;
 }
 
 div.internal-suda-hint-marker.sudaSelectedHintMarker {
-  background: var(--gruvbox-green-bright);
-  border-color: var(--gruvbox-fg);
+  background: var(--suda-success-color);
+  border-color: var(--suda-text-color);
 }
 
 div.internal-suda-hint-marker.sudaSelectedHintMarker span {
-  color: var(--gruvbox-bg-hard) !important;
+  color: var(--suda-success-contrast-color) !important;
 }
 
 /* Input hints CSS */
@@ -145,18 +145,18 @@ div.internal-suda-hint-marker.sudaSelectedHintMarker span {
 div.internal-suda-input-hint {
   position: absolute;
   display: block;
-  background-color: color-mix(in srgb, var(--gruvbox-yellow) 28%, transparent);
-  border: solid 1px var(--gruvbox-yellow);
+  background-color: color-mix(in srgb, var(--suda-accent-color) 28%, transparent);
+  border: solid 1px var(--suda-accent-color);
   pointer-events: none;
 }
 
 div.internal-suda-selected-input-hint {
-  background-color: color-mix(in srgb, var(--gruvbox-red) 28%, transparent);
-  border: solid 1px var(--gruvbox-red) !important;
+  background-color: color-mix(in srgb, var(--suda-danger-color) 28%, transparent);
+  border: solid 1px var(--suda-danger-color) !important;
 }
 
 div.internal-suda-selected-input-hint span {
-  color: var(--gruvbox-fg) !important;
+  color: var(--suda-text-color) !important;
 }
 
 div.suda-highlighted-frame {
@@ -167,13 +167,13 @@ div.suda-highlighted-frame {
   height: 100%;
   padding: 0px;
   margin: 0px;
-  border: 5px solid var(--gruvbox-yellow);
+  border: 5px solid var(--suda-accent-color);
   box-sizing: border-box;
   pointer-events: none;
 }
 
 iframe.suda-help-dialog-frame {
-  background-color: color-mix(in srgb, var(--gruvbox-bg-hard) 72%, transparent);
+  background-color: color-mix(in srgb, var(--suda-canvas-color) 72%, transparent);
   padding: 0px;
   top: 0px;
   left: 0px;
@@ -204,8 +204,8 @@ iframe.suda-hud-frame {
 }
 
 body.suda-find-mode ::selection {
-  background: var(--gruvbox-orange);
-  color: var(--gruvbox-fg);
+  background: var(--suda-accent-selected-color);
+  color: var(--suda-accent-selected-text-color);
 }
 
 iframe.commandBar-frame {
@@ -231,7 +231,7 @@ iframe.commandBar-frame {
 }
 
 div.suda-flash {
-  box-shadow: 0px 0px 4px 2px var(--gruvbox-yellow);
+  box-shadow: 0px 0px 4px 2px var(--suda-accent-color);
   padding: 1px;
   background-color: transparent;
   position: absolute;
@@ -240,8 +240,8 @@ div.suda-flash {
 
 div.suda-mark-jump-flash {
   animation: suda-mark-jump-pulse 1050ms ease-out forwards;
-  background-color: color-mix(in srgb, var(--gruvbox-yellow-bright) 12%, transparent);
-  border: 2px solid var(--gruvbox-yellow-bright);
+  background-color: color-mix(in srgb, var(--suda-accent-color) 12%, transparent);
+  border: 2px solid var(--suda-accent-color);
   box-shadow: none;
   box-sizing: border-box;
   pointer-events: none;
@@ -285,14 +285,6 @@ iframe.suda-non-clickable {
 }
 
 @media all {
-  :root {
-    --suda-background-color: var(--gruvbox-bg-hard);
-    --suda-background-text-color: var(--gruvbox-fg);
-    --suda-foreground-color: var(--gruvbox-bg);
-    --suda-foreground-text-color: var(--gruvbox-fg);
-    --suda-link-color: var(--gruvbox-yellow);
-  }
-
   /* DarkReader is a popular dark mode browser extension. It can apply an invert filter to the whole
    * page to make the page dark, when used in Filter and Filter+ modes. We want to reverse/invert
    * that filter again for Suda's UI elements, because Suda is already dark mode aware. */
@@ -304,23 +296,23 @@ iframe.suda-non-clickable {
   /* Dark mode CSS for options page and exclusions */
 
   body.suda-body {
-    background-color: var(--suda-background-color);
-    color: var(--suda-background-text-color);
+    background-color: var(--suda-canvas-color);
+    color: var(--suda-text-color);
   }
 
   body.suda-body a,
   body.suda-body a:visited {
-    color: var(--suda-link-color);
+    color: var(--suda-accent-text-color);
   }
 
   body.suda-body textarea,
   body.suda-body input {
-    background-color: var(--suda-foreground-color);
-    border-color: var(--suda-foreground-color);
-    color: var(--suda-foreground-text-color);
+    background-color: var(--suda-surface-color);
+    border-color: var(--suda-surface-color);
+    color: var(--suda-text-color);
   }
 
   body.suda-body div.example {
-    color: var(--gruvbox-fg-muted);
+    color: var(--suda-muted-color);
   }
 }

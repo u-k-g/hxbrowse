@@ -106,7 +106,41 @@ const ThemeManager = {
 
     const accent = this.accentFor(theme, accentColor);
     const accentSelection = this.accentSelectionFor(theme, accent);
+    const accentContrast = this.contrastColorOn(accent);
+    const accentSelectedContrast = this.contrastColorOn(accentSelection);
+    const accentText = theme.mode === "dark"
+      ? this.mixHexColors(accent, "#ffffff", 0.68)
+      : this.mixHexColors(accent, "#000000", 0.55);
     const properties = {
+      // The semantic theme contract used by all built-in Suda UI.
+      "--suda-canvas-color": theme.background,
+      "--suda-surface-color": theme.surface,
+      "--suda-surface-subtle-color": this.mixHexColors(theme.surface, theme.background, 0.55),
+      "--suda-surface-hover-color": this.mixHexColors(accent, theme.surface, 0.10),
+      "--suda-text-color": theme.foreground,
+      "--suda-muted-color": theme.muted,
+      "--suda-border-color": theme.border,
+      "--suda-accent-color": accent,
+      "--suda-accent-contrast-color": accentContrast,
+      "--suda-accent-selected-color": accentSelection,
+      "--suda-accent-selected-text-color": accentSelectedContrast,
+      "--suda-accent-subtle-color": this.mixHexColors(accent, theme.background, 0.18),
+      "--suda-accent-text-color": accentText,
+      "--suda-danger-color": theme.danger,
+      "--suda-danger-subtle-color": this.mixHexColors(theme.danger, theme.background, 0.18),
+      "--suda-warning-color": theme.warning,
+      "--suda-success-color": theme.success,
+      "--suda-success-contrast-color": this.contrastColorOn(theme.success),
+      "--suda-color-scheme": theme.mode,
+
+      // Compatibility aliases for existing user CSS. Built-in styles use only the semantic tokens
+      // above; these aliases can be removed in a future breaking release.
+      "--suda-background-color": theme.background,
+      "--suda-background-text-color": theme.foreground,
+      "--suda-foreground-color": theme.surface,
+      "--suda-foreground-text-color": theme.foreground,
+      "--suda-link-color": accentText,
+      "--suda-error-color": theme.danger,
       "--gruvbox-bg-hard": theme.background,
       "--gruvbox-bg": theme.surface,
       "--gruvbox-bg-soft": theme.surface,
@@ -117,32 +151,14 @@ const ThemeManager = {
       "--gruvbox-fg-muted": theme.muted,
       "--gruvbox-fg-dim": theme.muted,
       "--gruvbox-yellow": accent,
-      "--gruvbox-yellow-bright": theme.yellow,
-      "--gruvbox-orange": theme.orange,
-      "--gruvbox-red": theme.red,
-      "--gruvbox-green": theme.green,
-      "--gruvbox-green-bright": theme.green,
+      "--gruvbox-yellow-bright": accent,
+      "--gruvbox-orange": theme.warning,
+      "--gruvbox-red": theme.danger,
+      "--gruvbox-green": theme.success,
+      "--gruvbox-green-bright": theme.success,
       "--gruvbox-aqua": accent,
       "--gruvbox-blue": accent,
       "--gruvbox-purple": accent,
-      "--suda-background-color": theme.background,
-      "--suda-background-text-color": theme.foreground,
-      "--suda-foreground-color": theme.surface,
-      "--suda-foreground-text-color": theme.foreground,
-      "--suda-link-color": accent,
-      "--suda-border-color": theme.border,
-      "--suda-muted-color": theme.muted,
-      "--suda-error-color": theme.red,
-      "--suda-color-scheme": theme.mode,
-      "--suda-accent-color": accent,
-      // Text/icons drawn on a solid accent fill, and accent-colored text drawn on the panel.
-      "--suda-accent-contrast-color": this.contrastColorOn(accent),
-      "--suda-accent-selected-color": accentSelection,
-      "--suda-accent-selected-text-color": this.contrastColorOn(accentSelection),
-      "--suda-accent-subtle-color": this.mixHexColors(accent, theme.background, 0.18),
-      "--suda-accent-text-color": theme.mode === "dark"
-        ? this.mixHexColors(accent, "#ffffff", 0.68)
-        : this.mixHexColors(accent, "#000000", 0.55),
     };
 
     root.dataset.sudaTheme = theme.id;

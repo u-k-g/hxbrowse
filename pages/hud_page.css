@@ -4,12 +4,12 @@
   width: 100%;
   bottom: 0;
   left: 0;
-  background-color: var(--suda-foreground-color);
-  color: var(--suda-foreground-text-color);
+  background-color: var(--suda-surface-color);
+  color: var(--suda-text-color);
   text-align: left;
   border-radius: 0;
   box-shadow: none;
-  border: 1px solid var(--gruvbox-bg-2);
+  border: 1px solid var(--suda-border-color);
   z-index: 2147483647;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -17,7 +17,7 @@
 #search-area {
   display: block;
   padding: 0;
-  color: var(--suda-foreground-text-color);
+  color: var(--suda-text-color);
   border-radius: 4px 4px 0 0;
 }
 
@@ -34,7 +34,7 @@
   outline: none;
   box-sizing: border-box;
   line-height: 20px;
-  color: var(--gruvbox-white);
+  color: var(--suda-text-color);
 }
 
 span#hud-find-input,
@@ -47,12 +47,12 @@ span#hud-match-count {
 
 span#hud-find-input:before {
   content: "/";
-  color: var(--gruvbox-yellow);
+  color: var(--suda-accent-text-color);
   margin-right: 1px;
 }
 
 span#hud-match-count {
-  color: var(--gruvbox-fg-muted);
+  color: var(--suda-muted-color);
   font-size: 12px;
   margin-left: auto;
 }
@@ -68,13 +68,13 @@ span#hud-find-input * {
 
 @media all {
   #hud-body {
-    background-color: var(--gruvbox-bg-hard);
+    background-color: var(--suda-canvas-color);
   }
 
   /* This creates a border around the area where you type, which is nice effect on the light color
    * scheme. It's hard to make this effect visible in dark mode, so we don't use it. */
   #hud.hud-find {
-    background-color: var(--gruvbox-bg);
+    background-color: var(--suda-surface-color);
     border: 0;
   }
 }

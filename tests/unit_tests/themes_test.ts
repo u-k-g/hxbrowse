@@ -36,6 +36,32 @@ context("themes", () => {
     }
   });
 
+  should("define every theme with the semantic UI color contract", () => {
+    const expectedKeys = [
+      "accent",
+      "background",
+      "border",
+      "danger",
+      "foreground",
+      "id",
+      "mode",
+      "muted",
+      "name",
+      "success",
+      "surface",
+      "warning",
+    ];
+    const colorKeys = expectedKeys.filter((key) => !["id", "mode", "name"].includes(key));
+
+    for (const theme of ThemeManager.themes) {
+      assert.equal(expectedKeys, Object.keys(theme).sort());
+      assert.isTrue(["dark", "light"].includes(theme.mode), theme.id);
+      for (const key of colorKeys) {
+        assert.isTrue(/^#[0-9a-f]{6}$/i.test(theme[key]), `${theme.id}.${key}`);
+      }
+    }
+  });
+
   should("apply semantic colors and light-dark browser controls", () => {
     const properties = new Map();
     const root = {
@@ -50,8 +76,13 @@ context("themes", () => {
 
     assert.equal("arc-light", root.dataset.sudaTheme);
     assert.equal("light", root.style.colorScheme);
-    assert.equal("#f4f1ed", properties.get("--suda-background-color"));
-    assert.equal("#6ced96", properties.get("--suda-link-color"));
+    assert.equal("#f4f1ed", properties.get("--suda-canvas-color"));
+    assert.equal("#ffffff", properties.get("--suda-surface-color"));
+    assert.equal("#27272a", properties.get("--suda-text-color"));
+    assert.equal("#6ced96", properties.get("--suda-accent-color"));
+    assert.equal("#e5484d", properties.get("--suda-danger-color"));
+    assert.equal("#f5a524", properties.get("--suda-warning-color"));
+    assert.equal("#30a46c", properties.get("--suda-success-color"));
   });
 
   should("apply a normalized custom accent only to Arc themes", () => {
@@ -66,10 +97,11 @@ context("themes", () => {
 
     ThemeManager.apply("arc-dark", root, "12ABef");
     assert.equal("#12abef", properties.get("--suda-accent-color"));
-    assert.equal("#12abef", properties.get("--suda-link-color"));
+    assert.equal("#f5a524", properties.get("--suda-warning-color"));
 
     ThemeManager.apply("gruvbox-dark-hard", root, "#12ABEF");
     assert.equal("#d79921", properties.get("--suda-accent-color"));
+    assert.equal("#fabd2f", properties.get("--suda-warning-color"));
   });
 
   should("reject malformed custom accent colors", () => {

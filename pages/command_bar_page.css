@@ -1,25 +1,25 @@
 :root {
-  --command-bar-panel: var(--suda-background-color);
-  --command-bar-input: var(--suda-background-color);
-  --command-bar-row: color-mix(in srgb, var(--suda-foreground-color) 72%, transparent);
+  --command-bar-panel: var(--suda-canvas-color);
+  --command-bar-input: var(--suda-canvas-color);
+  --command-bar-row: color-mix(in srgb, var(--suda-surface-color) 72%, transparent);
   --command-bar-selected: var(--suda-accent-selected-color);
   --command-bar-selected-text: var(--suda-accent-selected-text-color);
   --command-bar-border: var(--suda-border-color);
-  --command-bar-border-soft: var(--gruvbox-bg-1);
-  --command-bar-text: var(--suda-background-text-color);
-  --command-bar-bright: var(--gruvbox-white);
+  --command-bar-border-soft: var(--suda-surface-color);
+  --command-bar-text: var(--suda-text-color);
+  --command-bar-bright: var(--suda-text-color);
   --command-bar-muted: var(--suda-muted-color);
-  --command-bar-dim: var(--gruvbox-fg-dim);
+  --command-bar-dim: var(--suda-muted-color);
   --command-bar-accent: var(--suda-accent-text-color);
-  --command-bar-accent-muted: var(--suda-link-color);
-  --command-bar-mode: var(--gruvbox-aqua);
+  --command-bar-accent-muted: var(--suda-accent-text-color);
+  --command-bar-mode: var(--suda-accent-text-color);
 }
 
 html[data-suda-theme="arc-dark"] {
   --command-bar-panel: color-mix(
     in srgb,
     var(--suda-accent-subtle-color) 10%,
-    var(--suda-background-color)
+    var(--suda-canvas-color)
   );
   --command-bar-input: var(--command-bar-panel);
   --command-bar-border: color-mix(
@@ -38,7 +38,7 @@ html[data-suda-theme="arc-light"] {
   --command-bar-panel: color-mix(
     in srgb,
     var(--suda-accent-subtle-color) 18%,
-    var(--suda-background-color)
+    var(--suda-canvas-color)
   );
   --command-bar-input: var(--command-bar-panel);
 }
@@ -338,7 +338,7 @@ ul {
 
 #commandBar kbd,
 #commandBar li .key {
-  background: var(--suda-foreground-color);
+  background: var(--suda-surface-color);
   border: 1px solid var(--suda-border-color);
   border-bottom-color: var(--suda-muted-color);
   border-radius: 6px;

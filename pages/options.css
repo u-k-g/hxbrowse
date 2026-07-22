@@ -1,24 +1,24 @@
 /* This stylesheet is included in both options.html and action.html, so changes affect both. */
 :root {
   --closeButtonWidth: 25px;
-  --validationErrorColor: var(--gruvbox-red);
+  --validationErrorColor: var(--suda-danger-color);
 }
 
 body {
   font: 14px "DejaVu Sans", "Arial", sans-serif;
-  color: var(--gruvbox-fg);
-  background-color: var(--gruvbox-bg-hard);
-  scrollbar-color: var(--gruvbox-bg-2) var(--gruvbox-bg-hard);
+  color: var(--suda-text-color);
+  background-color: var(--suda-canvas-color);
+  scrollbar-color: var(--suda-border-color) var(--suda-canvas-color);
   margin: 0;
 }
 
 a,
 a:visited {
-  color: var(--gruvbox-yellow);
+  color: var(--suda-accent-text-color);
 }
 
 a:active {
-  color: var(--gruvbox-yellow-bright);
+  color: var(--suda-accent-text-color);
 }
 
 div#wrapper,
@@ -30,7 +30,7 @@ div#wrapper,
 header {
   font-size: 18px;
   font-weight: normal;
-  border-bottom: 1px solid var(--gruvbox-bg-2);
+  border-bottom: 1px solid var(--suda-border-color);
   padding: 20px 0 15px 0;
   width: 100%;
 }
@@ -58,19 +58,19 @@ input[type="radio"] {
 
 input[type="checkbox"],
 input[type="radio"] {
-  accent-color: var(--gruvbox-yellow);
+  accent-color: var(--suda-accent-color);
 }
 
 input[type="file"]::file-selector-button {
-  background: var(--gruvbox-bg-1);
-  border: 1px solid var(--gruvbox-bg-2);
+  background: var(--suda-surface-color);
+  border: 1px solid var(--suda-border-color);
   border-radius: 3px;
-  color: var(--gruvbox-fg);
+  color: var(--suda-text-color);
 }
 
 input[type="file"]::file-selector-button:hover {
-  border-color: var(--gruvbox-yellow);
-  color: var(--gruvbox-yellow-bright);
+  border-color: var(--suda-accent-color);
+  color: var(--suda-accent-text-color);
 }
 
 .boolean-label {
@@ -98,7 +98,7 @@ code,
 
 pre {
   margin: 5px;
-  border-left: 1px solid var(--gruvbox-bg-2);
+  border-left: 1px solid var(--suda-border-color);
   padding-left: 5px;
 }
 
@@ -144,7 +144,7 @@ h2 {
 .example {
   font-size: 12px;
   line-height: 16px;
-  color: var(--gruvbox-fg-muted);
+  color: var(--suda-muted-color);
   margin-left: 20px;
 }
 
@@ -156,7 +156,7 @@ h2 {
 
 #arc-accent-swatch {
   background: var(--suda-accent-color);
-  border: 1px solid color-mix(in srgb, var(--suda-accent-color) 55%, var(--gruvbox-bg-2));
+  border: 1px solid color-mix(in srgb, var(--suda-accent-color) 55%, var(--suda-border-color));
   border-radius: 50%;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, white 24%, transparent);
   display: block;
@@ -267,18 +267,18 @@ input#searchUrl {
 input[type="text"]:read-only,
 input[type="number"]:read-only,
 textarea:read-only {
-  background-color: var(--gruvbox-bg-soft);
-  color: var(--gruvbox-fg-dim);
+  background-color: var(--suda-surface-subtle-color);
+  color: var(--suda-muted-color);
   pointer-events: none;
   -webkit-user-select: none;
 }
 
 input[type="text"],
 textarea {
-  border: 1px solid var(--gruvbox-bg-2);
+  border: 1px solid var(--suda-border-color);
   border-radius: 2px;
-  color: var(--gruvbox-fg);
-  background-color: var(--gruvbox-bg);
+  color: var(--suda-text-color);
+  background-color: var(--suda-surface-color);
   font: inherit;
   padding: 3px;
 }
@@ -287,7 +287,7 @@ button:focus,
 input[type="text"]:focus,
 textarea:focus {
   -webkit-transition: border-color 200ms;
-  border-color: var(--gruvbox-yellow);
+  border-color: var(--suda-accent-color);
   outline: none;
 }
 
@@ -302,7 +302,7 @@ textarea:focus {
   /* Each exclusion rule is about 30px tall, so this allows 7 rules before scrolling. */
   max-height: 215px;
   border-radius: 2px;
-  color: var(--gruvbox-fg);
+  color: var(--suda-text-color);
   width: 100%;
 }
 
@@ -332,23 +332,23 @@ textarea:focus {
 }
 
 #exclusion-rules tr.validationError td:nth-of-type(1) input {
-  border-color: var(--gruvbox-orange);
+  border-color: var(--suda-danger-color);
 }
 
 #exclusion-rules .validationMessage {
   display: block;
-  color: var(--gruvbox-orange);
+  color: var(--suda-danger-color);
   margin-top: 2px;
   margin-left: 2px;
 }
 
 #exclusion-rules .remove {
   border: none;
-  color: var(--gruvbox-fg-muted);
+  color: var(--suda-muted-color);
 }
 
 #exclusion-rules .remove:hover {
-  color: var(--gruvbox-fg);
+  color: var(--suda-text-color);
 }
 
 input[name="pattern"],
@@ -361,7 +361,7 @@ input[name="passKeys"],
 
 .exclusion-header-text {
   padding-left: 3px;
-  color: var(--gruvbox-fg-muted);
+  color: var(--suda-muted-color);
 }
 
 #exclusion-add-button {
@@ -372,8 +372,8 @@ input[name="passKeys"],
 }
 
 footer {
-  background: var(--gruvbox-bg);
-  border-top: 1px solid var(--gruvbox-bg-2);
+  background: var(--suda-surface-color);
+  border-top: 1px solid var(--suda-border-color);
   position: fixed;
   bottom: 0px;
   left: 0;
@@ -412,22 +412,22 @@ input#upload-backup {
 
 @media all {
   button {
-    background: var(--gruvbox-bg-1);
-    border-color: var(--gruvbox-bg-2);
+    background: var(--suda-surface-color);
+    border-color: var(--suda-border-color);
     box-shadow: none;
-    color: var(--gruvbox-fg);
+    color: var(--suda-text-color);
     text-shadow: none;
   }
 
   button:hover {
-    background: var(--gruvbox-bg-2);
-    border-color: var(--gruvbox-yellow);
+    background: var(--suda-border-color);
+    border-color: var(--suda-accent-color);
     box-shadow: none;
-    color: var(--gruvbox-yellow-bright);
+    color: var(--suda-accent-text-color);
   }
 
   button:active {
-    background: var(--gruvbox-bg-hard);
+    background: var(--suda-canvas-color);
     box-shadow: none;
     text-shadow: none;
   }
@@ -435,35 +435,35 @@ input#upload-backup {
   button[disabled],
   button[disabled]:hover,
   button[disabled]:active {
-    background: var(--gruvbox-bg-soft);
-    border-color: var(--gruvbox-bg-1);
+    background: var(--suda-surface-subtle-color);
+    border-color: var(--suda-surface-color);
     box-shadow: none;
     text-shadow: none;
-    color: var(--gruvbox-fg-dim);
+    color: var(--suda-muted-color);
   }
 }
 
 @media all {
   header {
-    border-bottom: 1px solid var(--gruvbox-bg-2);
+    border-bottom: 1px solid var(--suda-border-color);
   }
 
   pre {
-    border-left: 1px solid var(--gruvbox-bg-2);
+    border-left: 1px solid var(--suda-border-color);
   }
 
   #exclusion-rules .remove {
     border: none;
-    color: var(--suda-foreground-text-color);
+    color: var(--suda-text-color);
   }
 
   #exclusion-rules .remove:hover {
-    color: var(--suda-link-color);
+    color: var(--suda-accent-text-color);
   }
 
   footer {
-    background-color: var(--suda-foreground-color);
-    border-color: var(--gruvbox-bg-2);
+    background-color: var(--suda-surface-color);
+    border-color: var(--suda-border-color);
   }
 
   /* Our dark mode style for buttons matches MacOS Mojave's dark mode style for HTML buttons. MacOS
@@ -471,10 +471,10 @@ input#upload-backup {
      other OSes, so to be cross-platform, we have to set these styles ourselves. */
   button {
     background: none;
-    background-color: var(--gruvbox-bg-1);
-    border-color: var(--gruvbox-bg-2);
+    background-color: var(--suda-surface-color);
+    border-color: var(--suda-border-color);
     border-width: 1px;
-    color: var(--suda-foreground-text-color);
+    color: var(--suda-text-color);
     text-shadow: none;
   }
   button:hover {}
@@ -483,8 +483,8 @@ input#upload-backup {
   button[disabled],
   button[disabled]:hover,
   button[disabled]:active {
-    color: var(--gruvbox-fg-dim);
-    border-color: var(--gruvbox-bg-1);
-    background-color: var(--gruvbox-bg-soft);
+    color: var(--suda-muted-color);
+    border-color: var(--suda-surface-color);
+    background-color: var(--suda-surface-subtle-color);
   }
 }

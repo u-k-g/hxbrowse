@@ -29,13 +29,13 @@ const defaultOptions = {
   userDefinedLinkHintCss: `\
 div > .sudaHintMarker {
 /* linkhint boxes */
-background: var(--gruvbox-yellow);
-border: 1px solid var(--gruvbox-yellow-bright);
+background: var(--suda-accent-color);
+border: 1px solid var(--suda-accent-color);
 }
 
 div > .sudaHintMarker span {
 /* linkhint text */
-color: var(--gruvbox-bg-hard);
+color: var(--suda-accent-contrast-color);
 font-weight: bold;
 font-size: 12px;
 }

@@ -11,10 +11,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#504945",
     "muted": "#a89984",
     "accent": "#d79921",
-    "red": "#cc241d",
-    "green": "#98971a",
-    "yellow": "#fabd2f",
-    "orange": "#d65d0e"
+    "danger": "#cc241d",
+    "success": "#98971a",
+    "warning": "#fabd2f"
   },
   {
     "id": "absolutely-dark",
@@ -26,10 +25,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#50504e",
     "muted": "#a6a59b",
     "accent": "#6a9bcc",
-    "red": "#d47563",
-    "green": "#9aca86",
-    "yellow": "#e8c96b",
-    "orange": "#f4a9a9"
+    "danger": "#d47563",
+    "success": "#9aca86",
+    "warning": "#e8c96b"
   },
   {
     "id": "absolutely-light",
@@ -41,10 +39,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#c7c7c3",
     "muted": "#51504d",
     "accent": "#184e95",
-    "red": "#a84b3a",
-    "green": "#2e7c4c",
-    "yellow": "#8a6220",
-    "orange": "#e34a4a"
+    "danger": "#a84b3a",
+    "success": "#2e7c4c",
+    "warning": "#8a6220"
   },
   {
     "id": "arc-dark",
@@ -56,10 +53,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#3a3a3e",
     "muted": "#a1a1aa",
     "accent": "#6ced96",
-    "red": "#e5484d",
-    "green": "#30a46c",
-    "yellow": "#f5a524",
-    "orange": "#f76b15"
+    "danger": "#e5484d",
+    "success": "#30a46c",
+    "warning": "#f5a524"
   },
   {
     "id": "arc-light",
@@ -71,10 +67,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#ded8d2",
     "muted": "#71717a",
     "accent": "#6ced96",
-    "red": "#e5484d",
-    "green": "#30a46c",
-    "yellow": "#f5a524",
-    "orange": "#f76b15"
+    "danger": "#e5484d",
+    "success": "#30a46c",
+    "warning": "#f5a524"
   },
   {
     "id": "ayu",
@@ -86,10 +81,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#333538",
     "muted": "#686868",
     "accent": "#53bdfa",
-    "red": "#ea6c73",
-    "green": "#7fd962",
-    "yellow": "#f9af4f",
-    "orange": "#f07178"
+    "danger": "#ea6c73",
+    "success": "#7fd962",
+    "warning": "#f9af4f"
   },
   {
     "id": "ayu-light",
@@ -101,10 +95,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#d6d8d9",
     "muted": "#686868",
     "accent": "#3199e1",
-    "red": "#ea6c6d",
-    "green": "#6cbf43",
-    "yellow": "#eca944",
-    "orange": "#f07171"
+    "danger": "#ea6c6d",
+    "success": "#6cbf43",
+    "warning": "#eca944"
   },
   {
     "id": "ayu-mirage",
@@ -116,10 +109,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#454950",
     "muted": "#686868",
     "accent": "#6dcbfa",
-    "red": "#ed8274",
-    "green": "#87d96c",
-    "yellow": "#facc6e",
-    "orange": "#f28779"
+    "danger": "#ed8274",
+    "success": "#87d96c",
+    "warning": "#facc6e"
   },
   {
     "id": "black-metal",
@@ -131,10 +123,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#2a2a2a",
     "muted": "#404040",
     "accent": "#888888",
-    "red": "#486e6f",
-    "green": "#dd9999",
-    "yellow": "#a06666",
-    "orange": "#486e6f"
+    "danger": "#486e6f",
+    "success": "#dd9999",
+    "warning": "#a06666"
   },
   {
     "id": "black-metal-bathory",
@@ -146,10 +137,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#2a2a2a",
     "muted": "#404040",
     "accent": "#888888",
-    "red": "#5f8787",
-    "green": "#fbcb97",
-    "yellow": "#e78a53",
-    "orange": "#5f8787"
+    "danger": "#5f8787",
+    "success": "#fbcb97",
+    "warning": "#e78a53"
   },
   {
     "id": "black-metal-burzum",
@@ -161,10 +151,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#2a2a2a",
     "muted": "#404040",
     "accent": "#888888",
-    "red": "#5f8787",
-    "green": "#ddeecc",
-    "yellow": "#99bbaa",
-    "orange": "#5f8787"
+    "danger": "#5f8787",
+    "success": "#ddeecc",
+    "warning": "#99bbaa"
   },
   {
     "id": "black-metal-dark-funeral",
@@ -176,10 +165,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#2a2a2a",
     "muted": "#404040",
     "accent": "#888888",
-    "red": "#5f8787",
-    "green": "#d0dfee",
-    "yellow": "#5f81a5",
-    "orange": "#5f8787"
+    "danger": "#5f8787",
+    "success": "#d0dfee",
+    "warning": "#5f81a5"
   },
   {
     "id": "black-metal-gorgoroth",
@@ -191,10 +179,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#2a2a2a",
     "muted": "#404040",
     "accent": "#888888",
-    "red": "#5f8787",
-    "green": "#9b8d7f",
-    "yellow": "#8c7f70",
-    "orange": "#5f8787"
+    "danger": "#5f8787",
+    "success": "#9b8d7f",
+    "warning": "#8c7f70"
   },
   {
     "id": "black-metal-immortal",
@@ -206,10 +193,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#2a2a2a",
     "muted": "#404040",
     "accent": "#888888",
-    "red": "#5f8787",
-    "green": "#7799bb",
-    "yellow": "#556677",
-    "orange": "#5f8787"
+    "danger": "#5f8787",
+    "success": "#7799bb",
+    "warning": "#556677"
   },
   {
     "id": "black-metal-khold",
@@ -221,10 +207,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#2a2a2a",
     "muted": "#404040",
     "accent": "#888888",
-    "red": "#5f8787",
-    "green": "#eceee3",
-    "yellow": "#974b46",
-    "orange": "#5f8787"
+    "danger": "#5f8787",
+    "success": "#eceee3",
+    "warning": "#974b46"
   },
   {
     "id": "black-metal-marduk",
@@ -236,10 +221,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#2a2a2a",
     "muted": "#404040",
     "accent": "#888888",
-    "red": "#5f8787",
-    "green": "#a5aaa7",
-    "yellow": "#626b67",
-    "orange": "#5f8787"
+    "danger": "#5f8787",
+    "success": "#a5aaa7",
+    "warning": "#626b67"
   },
   {
     "id": "black-metal-mayhem",
@@ -251,10 +235,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#2a2a2a",
     "muted": "#404040",
     "accent": "#888888",
-    "red": "#5f8787",
-    "green": "#f3ecd4",
-    "yellow": "#eecc6c",
-    "orange": "#5f8787"
+    "danger": "#5f8787",
+    "success": "#f3ecd4",
+    "warning": "#eecc6c"
   },
   {
     "id": "black-metal-nile",
@@ -266,10 +249,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#2a2a2a",
     "muted": "#404040",
     "accent": "#888888",
-    "red": "#5f8787",
-    "green": "#aa9988",
-    "yellow": "#777755",
-    "orange": "#5f8787"
+    "danger": "#5f8787",
+    "success": "#aa9988",
+    "warning": "#777755"
   },
   {
     "id": "black-metal-venom",
@@ -281,10 +263,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#2a2a2a",
     "muted": "#404040",
     "accent": "#888888",
-    "red": "#5f8787",
-    "green": "#f8f7f2",
-    "yellow": "#79241f",
-    "orange": "#5f8787"
+    "danger": "#5f8787",
+    "success": "#f8f7f2",
+    "warning": "#79241f"
   },
   {
     "id": "catppuccin-frappe",
@@ -296,10 +277,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#51566d",
     "muted": "#626880",
     "accent": "#8caaee",
-    "red": "#e78284",
-    "green": "#a6d189",
-    "yellow": "#e5c890",
-    "orange": "#eda0a2"
+    "danger": "#e78284",
+    "success": "#a6d189",
+    "warning": "#e5c890"
   },
   {
     "id": "catppuccin-latte",
@@ -311,10 +291,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#cbcdd6",
     "muted": "#acb0be",
     "accent": "#1e66f5",
-    "red": "#d20f39",
-    "green": "#40a02b",
-    "yellow": "#df8e1d",
-    "orange": "#e7103f"
+    "danger": "#d20f39",
+    "success": "#40a02b",
+    "warning": "#df8e1d"
   },
   {
     "id": "catppuccin-macchiato",
@@ -326,10 +305,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#494d63",
     "muted": "#5b6078",
     "accent": "#8aadf4",
-    "red": "#ed8796",
-    "green": "#a6da95",
-    "yellow": "#eed49f",
-    "orange": "#f2a7b2"
+    "danger": "#ed8796",
+    "success": "#a6da95",
+    "warning": "#eed49f"
   },
   {
     "id": "catppuccin-mocha",
@@ -341,10 +319,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#45465a",
     "muted": "#585b70",
     "accent": "#89b4fa",
-    "red": "#f38ba8",
-    "green": "#a6e3a1",
-    "yellow": "#f9e2af",
-    "orange": "#f7aec2"
+    "danger": "#f38ba8",
+    "success": "#a6e3a1",
+    "warning": "#f9e2af"
   },
   {
     "id": "everforest-dark-hard",
@@ -356,10 +333,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#464743",
     "muted": "#a6b0a0",
     "accent": "#7fbbb3",
-    "red": "#e67e80",
-    "green": "#a7c080",
-    "yellow": "#dbbc7f",
-    "orange": "#f85552"
+    "danger": "#e67e80",
+    "success": "#a7c080",
+    "warning": "#dbbc7f"
   },
   {
     "id": "everforest-dark-med",
@@ -371,10 +347,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#4a4c49",
     "muted": "#a6b0a0",
     "accent": "#7fbbb3",
-    "red": "#e67e80",
-    "green": "#a7c080",
-    "yellow": "#dbbc7f",
-    "orange": "#f85552"
+    "danger": "#e67e80",
+    "success": "#a7c080",
+    "warning": "#dbbc7f"
   },
   {
     "id": "everforest-dark-soft",
@@ -386,10 +361,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#4e5250",
     "muted": "#a6b0a0",
     "accent": "#7fbbb3",
-    "red": "#e67e80",
-    "green": "#a7c080",
-    "yellow": "#dbbc7f",
-    "orange": "#f85552"
+    "danger": "#e67e80",
+    "success": "#a7c080",
+    "warning": "#dbbc7f"
   },
   {
     "id": "everforest-light-hard",
@@ -401,10 +375,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#d1d2c7",
     "muted": "#a6b0a0",
     "accent": "#7fbbb3",
-    "red": "#e67e80",
-    "green": "#a7c080",
-    "yellow": "#dbbc7f",
-    "orange": "#f85552"
+    "danger": "#e67e80",
+    "success": "#a7c080",
+    "warning": "#dbbc7f"
   },
   {
     "id": "everforest-light-med",
@@ -416,10 +389,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#cfcfbe",
     "muted": "#a6b0a0",
     "accent": "#7fbbb3",
-    "red": "#e67e80",
-    "green": "#a7c080",
-    "yellow": "#dbbc7f",
-    "orange": "#f85552"
+    "danger": "#e67e80",
+    "success": "#a7c080",
+    "warning": "#dbbc7f"
   },
   {
     "id": "everforest-light-soft",
@@ -431,10 +403,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#c7c5b3",
     "muted": "#a6b0a0",
     "accent": "#7fbbb3",
-    "red": "#e67e80",
-    "green": "#a7c080",
-    "yellow": "#dbbc7f",
-    "orange": "#f85552"
+    "danger": "#e67e80",
+    "success": "#a7c080",
+    "warning": "#dbbc7f"
   },
   {
     "id": "gruvbox-dark",
@@ -446,10 +417,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#534f46",
     "muted": "#928374",
     "accent": "#458588",
-    "red": "#cc241d",
-    "green": "#98971a",
-    "yellow": "#d79921",
-    "orange": "#fb4934"
+    "danger": "#cc241d",
+    "success": "#98971a",
+    "warning": "#d79921"
   },
   {
     "id": "gruvbox-dark-soft",
@@ -461,10 +431,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#504945",
     "muted": "#a89984",
     "accent": "#d79921",
-    "red": "#cc241d",
-    "green": "#98971a",
-    "yellow": "#d79921",
-    "orange": "#d65d0e"
+    "danger": "#cc241d",
+    "success": "#98971a",
+    "warning": "#d79921"
   },
   {
     "id": "gruvbox-light",
@@ -476,10 +445,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#d1c8a7",
     "muted": "#928374",
     "accent": "#458588",
-    "red": "#cc241d",
-    "green": "#98971a",
-    "yellow": "#d79921",
-    "orange": "#9d0006"
+    "danger": "#cc241d",
+    "success": "#98971a",
+    "warning": "#d79921"
   },
   {
     "id": "gruvbox-light-hard",
@@ -491,10 +459,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#cfcbb4",
     "muted": "#928374",
     "accent": "#458588",
-    "red": "#cc241d",
-    "green": "#98971a",
-    "yellow": "#d79921",
-    "orange": "#9d0006"
+    "danger": "#cc241d",
+    "success": "#98971a",
+    "warning": "#d79921"
   },
   {
     "id": "gruvbox-light-soft",
@@ -506,10 +473,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#d5c4a1",
     "muted": "#7c6f64",
     "accent": "#b57614",
-    "red": "#cc241d",
-    "green": "#98971a",
-    "yellow": "#d79921",
-    "orange": "#d65d0e"
+    "danger": "#cc241d",
+    "success": "#98971a",
+    "warning": "#d79921"
   },
   {
     "id": "gruvbox-material",
@@ -521,10 +487,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#45433b",
     "muted": "#4c4c4c",
     "accent": "#6da3ec",
-    "red": "#ea6926",
-    "green": "#c1d041",
-    "yellow": "#eecf75",
-    "orange": "#d3573b"
+    "danger": "#ea6926",
+    "success": "#c1d041",
+    "warning": "#eecf75"
   },
   {
     "id": "gruvbox-material-dark",
@@ -536,10 +501,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#4e4941",
     "muted": "#7c6f64",
     "accent": "#7daea3",
-    "red": "#ea6962",
-    "green": "#a9b665",
-    "yellow": "#d8a657",
-    "orange": "#ea6962"
+    "danger": "#ea6962",
+    "success": "#a9b665",
+    "warning": "#d8a657"
   },
   {
     "id": "gruvbox-material-light",
@@ -551,10 +515,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#dacca7",
     "muted": "#a89984",
     "accent": "#45707a",
-    "red": "#c14a4a",
-    "green": "#6c782e",
-    "yellow": "#b47109",
-    "orange": "#c14a4a"
+    "danger": "#c14a4a",
+    "success": "#6c782e",
+    "warning": "#b47109"
   },
   {
     "id": "iceberg-dark",
@@ -566,10 +529,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#3d3f48",
     "muted": "#6b7089",
     "accent": "#84a0c6",
-    "red": "#e27878",
-    "green": "#b4be82",
-    "yellow": "#e2a478",
-    "orange": "#e98989"
+    "danger": "#e27878",
+    "success": "#b4be82",
+    "warning": "#e2a478"
   },
   {
     "id": "iceberg-light",
@@ -581,10 +543,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#c0c2c9",
     "muted": "#8389a3",
     "accent": "#2d539e",
-    "red": "#cc517a",
-    "green": "#668e3d",
-    "yellow": "#c57339",
-    "orange": "#cc3768"
+    "danger": "#cc517a",
+    "success": "#668e3d",
+    "warning": "#c57339"
   },
   {
     "id": "iterm2-solarized-dark",
@@ -596,10 +557,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#1d424b",
     "muted": "#002b36",
     "accent": "#268bd2",
-    "red": "#dc322f",
-    "green": "#859900",
-    "yellow": "#b58900",
-    "orange": "#cb4b16"
+    "danger": "#dc322f",
+    "success": "#859900",
+    "warning": "#b58900"
   },
   {
     "id": "iterm2-solarized-light",
@@ -611,10 +571,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#dcdbce",
     "muted": "#002b36",
     "accent": "#268bd2",
-    "red": "#dc322f",
-    "green": "#859900",
-    "yellow": "#b58900",
-    "orange": "#cb4b16"
+    "danger": "#dc322f",
+    "success": "#859900",
+    "warning": "#b58900"
   },
   {
     "id": "linear-dark",
@@ -626,10 +585,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#2a2a2c",
     "muted": "#9b9ca1",
     "accent": "#5e6ad2",
-    "red": "#e5484d",
-    "green": "#30a46c",
-    "yellow": "#f5a524",
-    "orange": "#f76b15"
+    "danger": "#e5484d",
+    "success": "#30a46c",
+    "warning": "#f5a524"
   },
   {
     "id": "linear-light",
@@ -641,10 +599,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#d8dae3",
     "muted": "#6b7075",
     "accent": "#475ba1",
-    "red": "#e5484d",
-    "green": "#30a46c",
-    "yellow": "#f5a524",
-    "orange": "#f76b15"
+    "danger": "#e5484d",
+    "success": "#30a46c",
+    "warning": "#f5a524"
   },
   {
     "id": "material",
@@ -656,10 +613,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#bebebe",
     "muted": "#424242",
     "accent": "#134eb2",
-    "red": "#b7141f",
-    "green": "#457b24",
-    "yellow": "#f6981e",
-    "orange": "#e83b3f"
+    "danger": "#b7141f",
+    "success": "#457b24",
+    "warning": "#f6981e"
   },
   {
     "id": "material-dark",
@@ -671,10 +627,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#4e4e4d",
     "muted": "#424242",
     "accent": "#134eb2",
-    "red": "#b7141f",
-    "green": "#457b24",
-    "yellow": "#f6981e",
-    "orange": "#e83b3f"
+    "danger": "#b7141f",
+    "success": "#457b24",
+    "warning": "#f6981e"
   },
   {
     "id": "material-darker",
@@ -686,10 +641,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#4e5252",
     "muted": "#545454",
     "accent": "#82aaff",
-    "red": "#ff5370",
-    "green": "#c3e88d",
-    "yellow": "#ffcb6b",
-    "orange": "#ff5370"
+    "danger": "#ff5370",
+    "success": "#c3e88d",
+    "warning": "#ffcb6b"
   },
   {
     "id": "material-design-colors",
@@ -701,10 +655,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#495155",
     "muted": "#a1b0b8",
     "accent": "#37b6ff",
-    "red": "#fc3841",
-    "green": "#5cf19e",
-    "yellow": "#fed032",
-    "orange": "#fc746d"
+    "danger": "#fc3841",
+    "success": "#5cf19e",
+    "warning": "#fed032"
   },
   {
     "id": "material-ocean",
@@ -716,10 +669,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#2b2e38",
     "muted": "#546e7a",
     "accent": "#82aaff",
-    "red": "#ff5370",
-    "green": "#c3e88d",
-    "yellow": "#ffcb6b",
-    "orange": "#ff5370"
+    "danger": "#ff5370",
+    "success": "#c3e88d",
+    "warning": "#ffcb6b"
   },
   {
     "id": "matte-black",
@@ -731,10 +683,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#383838",
     "muted": "#8a8a8d",
     "accent": "#e68e0d",
-    "red": "#d35f5f",
-    "green": "#ffc107",
-    "yellow": "#b91c1c",
-    "orange": "#891c1c"
+    "danger": "#d35f5f",
+    "success": "#ffc107",
+    "warning": "#b91c1c"
   },
   {
     "id": "nord",
@@ -746,10 +697,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#535965",
     "muted": "#4c566a",
     "accent": "#81a1c1",
-    "red": "#bf616a",
-    "green": "#a3be8c",
-    "yellow": "#ebcb8b",
-    "orange": "#bf616a"
+    "danger": "#bf616a",
+    "success": "#a3be8c",
+    "warning": "#ebcb8b"
   },
   {
     "id": "nord-light",
@@ -761,10 +711,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#c1c6cf",
     "muted": "#4c566a",
     "accent": "#81a1c1",
-    "red": "#bf616a",
-    "green": "#a3be8c",
-    "yellow": "#ebcb8b",
-    "orange": "#bf616a"
+    "danger": "#bf616a",
+    "success": "#a3be8c",
+    "warning": "#ebcb8b"
   },
   {
     "id": "nord-wave",
@@ -776,10 +725,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#494b4d",
     "muted": "#4c566a",
     "accent": "#81a1c1",
-    "red": "#bf616a",
-    "green": "#a3be8c",
-    "yellow": "#ebcb8b",
-    "orange": "#bf616a"
+    "danger": "#bf616a",
+    "success": "#a3be8c",
+    "warning": "#ebcb8b"
   },
   {
     "id": "notion-dark",
@@ -791,10 +739,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#3f3f3f",
     "muted": "#9b9a97",
     "accent": "#2eaadc",
-    "red": "#e5484d",
-    "green": "#30a46c",
-    "yellow": "#f5a524",
-    "orange": "#f76b15"
+    "danger": "#e5484d",
+    "success": "#30a46c",
+    "warning": "#f5a524"
   },
   {
     "id": "notion-light",
@@ -806,10 +753,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#e9e9e7",
     "muted": "#787774",
     "accent": "#2eaadc",
-    "red": "#e5484d",
-    "green": "#30a46c",
-    "yellow": "#f5a524",
-    "orange": "#f76b15"
+    "danger": "#e5484d",
+    "success": "#30a46c",
+    "warning": "#f5a524"
   },
   {
     "id": "oceanic-material",
@@ -821,10 +767,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#414a51",
     "muted": "#777777",
     "accent": "#1e80f0",
-    "red": "#ee2b2a",
-    "green": "#40a33f",
-    "yellow": "#ffea2e",
-    "orange": "#dc5c60"
+    "danger": "#ee2b2a",
+    "success": "#40a33f",
+    "warning": "#ffea2e"
   },
   {
     "id": "one-dark",
@@ -836,10 +781,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#3f444c",
     "muted": "#767676",
     "accent": "#61afef",
-    "red": "#e06c75",
-    "green": "#98c379",
-    "yellow": "#e5c07b",
-    "orange": "#e06c75"
+    "danger": "#e06c75",
+    "success": "#98c379",
+    "warning": "#e5c07b"
   },
   {
     "id": "one-light",
@@ -851,10 +795,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#cbcccd",
     "muted": "#000000",
     "accent": "#2f5af3",
-    "red": "#de3e35",
-    "green": "#3f953a",
-    "yellow": "#d2b67c",
-    "orange": "#de3e35"
+    "danger": "#de3e35",
+    "success": "#3f953a",
+    "warning": "#d2b67c"
   },
   {
     "id": "raycast-dark",
@@ -866,10 +809,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#4c4c4c",
     "muted": "#000000",
     "accent": "#56c2ff",
-    "red": "#ff5360",
-    "green": "#59d499",
-    "yellow": "#ffc531",
-    "orange": "#ff6363"
+    "danger": "#ff5360",
+    "success": "#59d499",
+    "warning": "#ffc531"
   },
   {
     "id": "raycast-light",
@@ -881,10 +823,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#c7c7c7",
     "muted": "#000000",
     "accent": "#138af2",
-    "red": "#b12424",
-    "green": "#006b4f",
-    "yellow": "#f8a300",
-    "orange": "#b12424"
+    "danger": "#b12424",
+    "success": "#006b4f",
+    "warning": "#f8a300"
   },
   {
     "id": "rose-pine",
@@ -896,10 +837,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#454352",
     "muted": "#6e6a86",
     "accent": "#9ccfd8",
-    "red": "#eb6f92",
-    "green": "#31748f",
-    "yellow": "#f6c177",
-    "orange": "#eb6f92"
+    "danger": "#eb6f92",
+    "success": "#31748f",
+    "warning": "#f6c177"
   },
   {
     "id": "rose-pine-dawn",
@@ -911,10 +851,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#d6d0d3",
     "muted": "#9893a5",
     "accent": "#56949f",
-    "red": "#b4637a",
-    "green": "#286983",
-    "yellow": "#ea9d34",
-    "orange": "#b4637a"
+    "danger": "#b4637a",
+    "success": "#286983",
+    "warning": "#ea9d34"
   },
   {
     "id": "rose-pine-moon",
@@ -926,10 +865,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#4d4b60",
     "muted": "#6e6a86",
     "accent": "#9ccfd8",
-    "red": "#eb6f92",
-    "green": "#3e8fb0",
-    "yellow": "#f6c177",
-    "orange": "#eb6f92"
+    "danger": "#eb6f92",
+    "success": "#3e8fb0",
+    "warning": "#f6c177"
   },
   {
     "id": "solarized-darcula",
@@ -941,10 +879,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#5e6162",
     "muted": "#25292a",
     "accent": "#2075c7",
-    "red": "#f24840",
-    "green": "#629655",
-    "yellow": "#b68800",
-    "orange": "#f24840"
+    "danger": "#f24840",
+    "success": "#629655",
+    "warning": "#b68800"
   },
   {
     "id": "solarized-dark-higher-contrast",
@@ -956,10 +893,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#224249",
     "muted": "#006488",
     "accent": "#2176c7",
-    "red": "#d11c24",
-    "green": "#6cbe6c",
-    "yellow": "#a57706",
-    "orange": "#f5163b"
+    "danger": "#d11c24",
+    "success": "#6cbe6c",
+    "warning": "#a57706"
   },
   {
     "id": "solarized-dark-patched",
@@ -971,10 +907,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#19343b",
     "muted": "#475b62",
     "accent": "#2176c7",
-    "red": "#d11c24",
-    "green": "#738a05",
-    "yellow": "#a57706",
-    "orange": "#bd3613"
+    "danger": "#d11c24",
+    "success": "#738a05",
+    "warning": "#a57706"
   },
   {
     "id": "solarized-osaka-night",
@@ -986,10 +921,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#3f4252",
     "muted": "#424866",
     "accent": "#82a1f1",
-    "red": "#e77d8f",
-    "green": "#a8cd76",
-    "yellow": "#d8b172",
-    "orange": "#e77d8f"
+    "danger": "#e77d8f",
+    "success": "#a8cd76",
+    "warning": "#d8b172"
   },
   {
     "id": "tokyonight",
@@ -1001,10 +935,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#3f4254",
     "muted": "#414868",
     "accent": "#7aa2f7",
-    "red": "#f7768e",
-    "green": "#9ece6a",
-    "yellow": "#e0af68",
-    "orange": "#f7768e"
+    "danger": "#f7768e",
+    "success": "#9ece6a",
+    "warning": "#e0af68"
   },
   {
     "id": "tokyonight-day",
@@ -1016,10 +949,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#bcc5de",
     "muted": "#a1a6c5",
     "accent": "#2e7de9",
-    "red": "#f52a65",
-    "green": "#587539",
-    "yellow": "#8c6c3e",
-    "orange": "#f52a65"
+    "danger": "#f52a65",
+    "success": "#587539",
+    "warning": "#8c6c3e"
   },
   {
     "id": "tokyonight-moon",
@@ -1031,10 +963,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#474b60",
     "muted": "#444a73",
     "accent": "#82aaff",
-    "red": "#ff757f",
-    "green": "#c3e88d",
-    "yellow": "#ffc777",
-    "orange": "#ff757f"
+    "danger": "#ff757f",
+    "success": "#c3e88d",
+    "warning": "#ffc777"
   },
   {
     "id": "tokyonight-night",
@@ -1046,10 +977,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#3f4254",
     "muted": "#414868",
     "accent": "#7aa2f7",
-    "red": "#f7768e",
-    "green": "#9ece6a",
-    "yellow": "#e0af68",
-    "orange": "#f7768e"
+    "danger": "#f7768e",
+    "success": "#9ece6a",
+    "warning": "#e0af68"
   },
   {
     "id": "tokyonight-storm",
@@ -1061,10 +991,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#464c64",
     "muted": "#414868",
     "accent": "#7aa2f7",
-    "red": "#f7768e",
-    "green": "#9ece6a",
-    "yellow": "#e0af68",
-    "orange": "#f7768e"
+    "danger": "#f7768e",
+    "success": "#9ece6a",
+    "warning": "#e0af68"
   },
   {
     "id": "true-black",
@@ -1076,10 +1005,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#282828",
     "muted": "#a3a3a3",
     "accent": "#ffffff",
-    "red": "#e5484d",
-    "green": "#30a46c",
-    "yellow": "#f5a524",
-    "orange": "#f76b15"
+    "danger": "#e5484d",
+    "success": "#30a46c",
+    "warning": "#f5a524"
   },
   {
     "id": "vesper",
@@ -1091,10 +1019,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#454545",
     "muted": "#7e7e7e",
     "accent": "#aca1cf",
-    "red": "#f5a191",
-    "green": "#90b99f",
-    "yellow": "#e6b99d",
-    "orange": "#ff8080"
+    "danger": "#f5a191",
+    "success": "#90b99f",
+    "warning": "#e6b99d"
   },
   {
     "id": "vs-code-plus-dark",
@@ -1106,10 +1033,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#3e3e42",
     "muted": "#9d9d9d",
     "accent": "#007acc",
-    "red": "#e5484d",
-    "green": "#30a46c",
-    "yellow": "#f5a524",
-    "orange": "#f76b15"
+    "danger": "#e5484d",
+    "success": "#30a46c",
+    "warning": "#f5a524"
   },
   {
     "id": "vs-code-plus-light",
@@ -1121,10 +1047,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#d4d4d4",
     "muted": "#717171",
     "accent": "#007acc",
-    "red": "#e5484d",
-    "green": "#30a46c",
-    "yellow": "#f5a524",
-    "orange": "#f76b15"
+    "danger": "#e5484d",
+    "success": "#30a46c",
+    "warning": "#f5a524"
   },
   {
     "id": "xcode-dark",
@@ -1136,10 +1061,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#515257",
     "muted": "#7f8c98",
     "accent": "#4eb0cc",
-    "red": "#ff8170",
-    "green": "#78c2b3",
-    "yellow": "#d9c97c",
-    "orange": "#ff8170"
+    "danger": "#ff8170",
+    "success": "#78c2b3",
+    "warning": "#d9c97c"
   },
   {
     "id": "xcode-dark-hc",
@@ -1151,10 +1075,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#505054",
     "muted": "#838991",
     "accent": "#4ec4e6",
-    "red": "#ff8a7a",
-    "green": "#83c9bc",
-    "yellow": "#d9c668",
-    "orange": "#ff8a7a"
+    "danger": "#ff8a7a",
+    "success": "#83c9bc",
+    "warning": "#d9c668"
   },
   {
     "id": "xcode-light",
@@ -1166,10 +1089,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#cfcfcf",
     "muted": "#8a99a6",
     "accent": "#0f68a0",
-    "red": "#d12f1b",
-    "green": "#3e8087",
-    "yellow": "#78492a",
-    "orange": "#d12f1b"
+    "danger": "#d12f1b",
+    "success": "#3e8087",
+    "warning": "#78492a"
   },
   {
     "id": "xcode-light-hc",
@@ -1181,10 +1103,9 @@ globalThis.SudaThemeCatalog = [
     "border": "#c7c7c7",
     "muted": "#8a99a6",
     "accent": "#0058a1",
-    "red": "#ad1805",
-    "green": "#355d61",
-    "yellow": "#78492a",
-    "orange": "#ad1805"
+    "danger": "#ad1805",
+    "success": "#355d61",
+    "warning": "#78492a"
   },
   {
     "id": "xcode-wwdc",
@@ -1196,9 +1117,8 @@ globalThis.SudaThemeCatalog = [
     "border": "#53555e",
     "muted": "#7f869e",
     "accent": "#8884c5",
-    "red": "#bb383a",
-    "green": "#94c66e",
-    "yellow": "#d28e5d",
-    "orange": "#bb383a"
+    "danger": "#bb383a",
+    "success": "#94c66e",
+    "warning": "#d28e5d"
   }
 ];
