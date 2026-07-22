@@ -2,16 +2,23 @@
 
 const ThemeManager = {
   defaultTheme: "arc-dark",
-  // The Arc themes let the user personalize their accent color with a custom hex code.
-  arcThemes: new Set(["arc-dark", "arc-light"]),
 
-  get themes() {
+  get themeSpecs() {
     return globalThis.SudaThemeCatalog || [];
   },
 
+  get themes() {
+    return this.themeSpecs.map((theme) => this.resolveTheme(theme));
+  },
+
+  getSpec(themeId) {
+    return this.themeSpecs.find((theme) => theme.id === themeId) ||
+      this.themeSpecs.find((theme) => theme.id === this.defaultTheme);
+  },
+
   get(themeId) {
-    return this.themes.find((theme) => theme.id === themeId) ||
-      this.themes.find((theme) => theme.id === this.defaultTheme);
+    const spec = this.getSpec(themeId);
+    return spec ? this.resolveTheme(spec) : null;
   },
 
   // Returns "#rrggbb" for a user-entered hex color, or null if it's malformed.
@@ -84,16 +91,66 @@ const ThemeManager = {
     return whiteContrast >= darkContrast ? "#ffffff" : "#1d1d1f";
   },
 
-  // The accent color for a theme, honoring the user's custom hex color for the Arc themes.
+  contrastRatio(firstHex, secondHex) {
+    const luminance = (hex) => {
+      const [r, g, b] = this.hexToRgb(hex).map((channel) => {
+        channel /= 255;
+        return channel <= 0.04045 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4);
+      });
+      return (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+    };
+    const values = [luminance(firstHex), luminance(secondHex)].sort((a, b) => b - a);
+    return (values[0] + 0.05) / (values[1] + 0.05);
+  },
+
+  ensureContrast(foreground, background, minimumRatio) {
+    if (this.contrastRatio(foreground, background) >= minimumRatio) return foreground;
+    const target = this.contrastColorOn(background) === "#ffffff" ? "#ffffff" : "#000000";
+    let passingColor = target;
+    let low = 0;
+    let high = 1;
+    // Find the smallest visual adjustment which meets the requested contrast ratio.
+    for (let i = 0; i < 12; i++) {
+      const retainedForeground = (low + high) / 2;
+      const candidate = this.mixHexColors(foreground, target, retainedForeground);
+      if (this.contrastRatio(candidate, background) >= minimumRatio) {
+        passingColor = candidate;
+        low = retainedForeground;
+      } else {
+        high = retainedForeground;
+      }
+    }
+    return passingColor;
+  },
+
+  // Terminal palettes provide strong base colors but do not define application surfaces. Derive
+  // those roles consistently instead of treating an arbitrary ANSI color as a panel background.
+  resolveTheme(spec) {
+    const foreground = this.ensureContrast(spec.foreground, spec.background, 4.5);
+    const surface = spec.surface ??
+      this.mixHexColors(foreground, spec.background, spec.surfaceWeight ?? 0.07);
+    const border = spec.border ??
+      this.mixHexColors(foreground, spec.background, spec.borderWeight ?? 0.18);
+    const mutedCandidate = spec.muted ??
+      this.mixHexColors(foreground, spec.background, spec.mutedWeight ?? 0.58);
+    const muted = this.ensureContrast(mutedCandidate, surface, 3);
+    return { ...spec, foreground, surface, border, muted };
+  },
+
+  isAccentCustomizable(themeOrId) {
+    const theme = typeof themeOrId === "string" ? this.get(themeOrId) : themeOrId;
+    return theme?.customizableAccent === true;
+  },
+
+  // Honor a custom accent only when the selected theme declares that capability.
   accentFor(theme, accentColor = null) {
-    if (!this.arcThemes.has(theme.id)) return theme.accent;
+    if (!this.isAccentCustomizable(theme)) return theme.accent;
     return this.normalizeHexColor(accentColor) || theme.accent;
   },
 
-  // Arc retains the accent's hue but uses a darker, slightly calmer tone for filled selection
-  // surfaces. This keeps white result text readable even when the chosen accent is very bright.
+  // Tonal-selection themes retain the accent hue while calming bright colors for filled rows.
   accentSelectionFor(theme, accent) {
-    if (!this.arcThemes.has(theme.id)) return accent;
+    if (!theme.tonalSelection) return accent;
     const [hue, saturation, lightness] = this.rgbToHsl(this.hexToRgb(accent));
     const selectedSaturation = Math.min(saturation, 0.67);
     const selectedLightness = Math.min(0.30, Math.max(0.24, lightness * 0.43));
@@ -111,12 +168,24 @@ const ThemeManager = {
     const accentText = theme.mode === "dark"
       ? this.mixHexColors(accent, "#ffffff", 0.68)
       : this.mixHexColors(accent, "#000000", 0.55);
+    const overlay = this.mixHexColors(
+      accent,
+      theme.background,
+      theme.overlayAccentWeight ?? 0,
+    );
+    const overlayBorder = this.mixHexColors(
+      accent,
+      theme.border,
+      theme.overlayBorderAccentWeight ?? 0,
+    );
     const properties = {
       // The semantic theme contract used by all built-in Suda UI.
       "--suda-canvas-color": theme.background,
       "--suda-surface-color": theme.surface,
       "--suda-surface-subtle-color": this.mixHexColors(theme.surface, theme.background, 0.55),
       "--suda-surface-hover-color": this.mixHexColors(accent, theme.surface, 0.10),
+      "--suda-overlay-color": overlay,
+      "--suda-overlay-border-color": overlayBorder,
       "--suda-text-color": theme.foreground,
       "--suda-muted-color": theme.muted,
       "--suda-border-color": theme.border,

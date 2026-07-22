@@ -148,13 +148,13 @@ h2 {
   margin-left: 20px;
 }
 
-#arc-accent-container {
+#accent-container {
   align-items: center;
   display: flex;
   gap: 8px;
 }
 
-#arc-accent-swatch {
+#accent-swatch {
   background: var(--suda-accent-color);
   border: 1px solid color-mix(in srgb, var(--suda-accent-color) 55%, var(--suda-border-color));
   border-radius: 50%;
@@ -164,7 +164,7 @@ h2 {
   width: 20px;
 }
 
-input[name="arcAccentColor"] {
+input[name="accentColor"] {
   font-family: Consolas, "Liberation Mono", Courier, monospace;
   text-transform: uppercase;
   width: 112px;
@@ -440,6 +440,582 @@ input#upload-backup {
     box-shadow: none;
     text-shadow: none;
     color: var(--suda-muted-color);
+  }
+}
+
+/*
+ * Options page
+ *
+ * The options page uses the same visual language as the command bar: a floating panel, compact
+ * translucent rows, soft borders, rounded controls, and an accent-colored primary action. Keep
+ * these rules scoped so options.css can continue to provide the base styles for action.html.
+ */
+:root {
+  --options-panel: var(--suda-canvas-color);
+  --options-row: color-mix(in srgb, var(--suda-surface-color) 72%, transparent);
+  --options-row-hover: color-mix(in srgb, var(--suda-surface-color) 88%, transparent);
+  --options-border: var(--suda-border-color);
+  --options-border-soft: var(--suda-surface-color);
+  --options-text: var(--suda-text-color);
+  --options-muted: var(--suda-muted-color);
+}
+
+html[data-suda-theme="arc-dark"] {
+  --options-panel: color-mix(
+    in srgb,
+    var(--suda-accent-subtle-color) 10%,
+    var(--suda-canvas-color)
+  );
+  --options-border: color-mix(
+    in srgb,
+    var(--suda-accent-color) 2%,
+    var(--suda-border-color)
+  );
+  --options-border-soft: var(--options-border);
+}
+
+html[data-suda-theme="arc-light"] {
+  --options-panel: color-mix(
+    in srgb,
+    var(--suda-accent-subtle-color) 18%,
+    var(--suda-canvas-color)
+  );
+}
+
+body.options-page {
+  background:
+    radial-gradient(
+    circle at 12% 0%,
+    color-mix(in srgb, var(--suda-accent-subtle-color) 22%, transparent),
+    transparent 34rem
+  ),
+    var(--suda-canvas-color);
+  color: var(--options-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  min-height: 100vh;
+  scrollbar-color: var(--options-border) transparent;
+}
+
+body.options-page *,
+body.options-page *::before,
+body.options-page *::after {
+  box-sizing: border-box;
+}
+
+body.options-page #wrapper {
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: 28px 28px 120px;
+}
+
+body.options-page #options-title {
+  align-items: center;
+  background: var(--options-panel);
+  border: 1px solid var(--options-border);
+  border-radius: 14px;
+  box-shadow:
+    0 22px 55px rgb(0 0 0 / 20%),
+    inset 0 0 0 1px color-mix(in srgb, white 9%, transparent);
+  display: flex;
+  justify-content: space-between;
+  min-height: 76px;
+  padding: 14px 18px;
+}
+
+#options-title-copy {
+  align-items: center;
+  display: flex;
+  gap: 13px;
+}
+
+.options-title-icon {
+  background: var(--suda-accent-selected-color);
+  border: 1px solid color-mix(in srgb, var(--suda-accent-selected-color) 82%, white);
+  border-radius: 10px;
+  color: var(--suda-accent-selected-text-color);
+  fill: currentColor;
+  height: 40px;
+  padding: 9px;
+  width: 40px;
+}
+
+.options-eyebrow {
+  color: var(--options-muted);
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+body.options-page h1 {
+  color: var(--options-text);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+#options-shortcut {
+  align-items: center;
+  color: var(--options-muted);
+  display: flex;
+  font-size: 12px;
+  gap: 6px;
+}
+
+#options-shortcut kbd,
+body.options-page code,
+body.options-page tt {
+  background: var(--suda-surface-color);
+  border: 1px solid var(--suda-border-color);
+  border-bottom-color: var(--suda-muted-color);
+  border-radius: 6px;
+  color: var(--options-text);
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 11px;
+  line-height: 20px;
+  min-width: 24px;
+  padding: 0 5px;
+  text-align: center;
+}
+
+body.options-page #settings-grid-container {
+  background: var(--options-panel);
+  border: 1px solid var(--options-border);
+  border-radius: 14px;
+  box-shadow:
+    0 22px 55px rgb(0 0 0 / 18%),
+    inset 0 0 0 1px color-mix(in srgb, white 9%, transparent);
+  display: grid;
+  font-size: 14px;
+  gap: 2px 0;
+  grid-template-columns: minmax(190px, 0.72fr) minmax(300px, 1.18fr) minmax(240px, 0.9fr);
+  margin: 18px 0 0;
+  overflow: hidden;
+  padding: 10px;
+}
+
+body.options-page #settings-grid-container > header {
+  border: 0;
+  color: var(--options-muted);
+  font-size: 11px;
+  font-weight: 750;
+  grid-column: 1 / -1;
+  letter-spacing: 0.11em;
+  margin: 0;
+  padding: 20px 13px 9px;
+  text-transform: uppercase;
+}
+
+body.options-page #settings-grid-container > header:first-child {
+  padding-top: 8px;
+}
+
+body.options-page #settings-grid-container > :not(header):not(.spacer),
+body.options-page #link-hint-characters-container > *,
+body.options-page #link-hint-numbers-container > *,
+body.options-page #wait-for-enter > * {
+  background-color: var(--options-row);
+  min-width: 0;
+}
+
+body.options-page #settings-grid-container h2 {
+  align-items: center;
+  border-radius: 6px 0 0 6px;
+  color: var(--options-text);
+  display: flex;
+  font-size: 13px;
+  font-weight: 650;
+  grid-column: auto;
+  line-height: 1.3;
+  margin: 0;
+  padding: 14px;
+}
+
+body.options-page #settings-grid-container h2:empty::before {
+  background: var(--suda-accent-color);
+  border-radius: 999px;
+  content: "";
+  height: 4px;
+  opacity: 0.55;
+  width: 18px;
+}
+
+body.options-page #settings-grid-container > div:not(.spacer),
+body.options-page #link-hint-characters-container > div,
+body.options-page #link-hint-numbers-container > div {
+  min-height: 52px;
+  padding: 10px 14px;
+}
+
+body.options-page #settings-grid-container > span,
+body.options-page #settings-grid-container > label,
+body.options-page #wait-for-enter > label {
+  align-items: center;
+  display: flex;
+  min-height: 52px;
+  padding: 10px 14px;
+}
+
+body.options-page #settings-grid-container > .example,
+body.options-page #link-hint-characters-container > .example,
+body.options-page #link-hint-numbers-container > .example,
+body.options-page #wait-for-enter > .example {
+  align-items: center;
+  border-radius: 0 6px 6px 0;
+  color: var(--options-muted);
+  display: flex;
+  font-size: 12px;
+  line-height: 1.45;
+  margin: 0;
+  min-height: 52px;
+  padding: 12px 15px;
+}
+
+body.options-page #settings-grid-container > .example pre {
+  flex: 1;
+}
+
+body.options-page .boolean-label,
+body.options-page .option-checklist label,
+body.options-page #openCommandBarContainer {
+  gap: 8px;
+}
+
+body.options-page .option-checklist {
+  gap: 8px 18px;
+}
+
+body.options-page input[type="checkbox"],
+body.options-page input[type="radio"] {
+  accent-color: var(--suda-accent-color);
+  flex: none;
+  height: 16px;
+  margin: 0;
+  width: 16px;
+}
+
+body.options-page input[type="text"],
+body.options-page input[type="number"],
+body.options-page textarea,
+body.options-page select {
+  background: var(--suda-surface-color);
+  border: 1px solid var(--options-border);
+  border-radius: 7px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, white 3%, transparent);
+  color: var(--options-text);
+  font: inherit;
+  outline: none;
+  padding: 8px 10px;
+  transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+body.options-page input[type="number"] {
+  width: 90px;
+}
+
+body.options-page select {
+  align-self: center;
+  margin: 8px 12px;
+  min-height: 36px;
+  width: calc(100% - 24px);
+}
+
+body.options-page #settings-grid-container > textarea {
+  align-self: stretch;
+  margin: 9px 12px;
+  min-height: 156px;
+  width: calc(100% - 24px);
+}
+
+body.options-page input[type="text"]:focus,
+body.options-page input[type="number"]:focus,
+body.options-page textarea:focus,
+body.options-page select:focus,
+body.options-page button:focus-visible,
+body.options-page a:focus-visible {
+  border-color: var(--suda-accent-color);
+  box-shadow: 0 0 0 3px var(--suda-accent-subtle-color);
+  outline: none;
+}
+
+body.options-page input::selection,
+body.options-page textarea::selection {
+  background: var(--suda-accent-selected-color);
+  color: var(--suda-accent-selected-text-color);
+}
+
+body.options-page textarea {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+body.options-page pre {
+  background: var(--suda-surface-color);
+  border: 1px solid var(--options-border);
+  border-radius: 7px;
+  color: var(--options-text);
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 8px 0;
+  overflow: auto;
+  padding: 9px 10px;
+}
+
+body.options-page a,
+body.options-page a:visited {
+  color: var(--suda-accent-text-color);
+  font-weight: 600;
+  text-decoration-color: color-mix(in srgb, var(--suda-accent-text-color) 45%, transparent);
+  text-underline-offset: 2px;
+}
+
+body.options-page a:hover {
+  text-decoration-color: currentColor;
+}
+
+body.options-page button,
+body.options-page input[type="file"]::file-selector-button {
+  -webkit-appearance: none;
+  background: var(--suda-surface-color);
+  border: 1px solid var(--options-border);
+  border-radius: 7px;
+  color: var(--options-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  min-height: 34px;
+  padding: 7px 12px;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+body.options-page button:hover,
+body.options-page input[type="file"]::file-selector-button:hover {
+  background: var(--options-row-hover);
+  border-color: var(--suda-accent-color);
+  color: var(--suda-accent-text-color);
+}
+
+body.options-page #exclusion-scroll-box {
+  background: var(--suda-surface-color);
+  border: 1px solid var(--options-border);
+  border-radius: 8px;
+  max-height: 215px;
+  overflow: auto;
+  padding: 6px;
+  scrollbar-color: var(--options-border) transparent;
+}
+
+body.options-page #exclusion-rules {
+  border-collapse: separate;
+  border-spacing: 4px;
+}
+
+body.options-page #exclusion-rules td {
+  border: 0;
+  padding: 0;
+}
+
+body.options-page #exclusion-rules input[type="text"] {
+  width: 100%;
+}
+
+body.options-page #exclusion-rules .remove {
+  background: transparent;
+  border: 0;
+  color: var(--options-muted);
+  min-width: 30px;
+  padding: 5px;
+}
+
+body.options-page #exclusion-rules .remove:hover {
+  background: var(--suda-danger-subtle-color);
+  color: var(--suda-danger-color);
+}
+
+body.options-page .exclusion-header-text {
+  color: var(--options-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0 6px 3px;
+  text-transform: uppercase;
+}
+
+body.options-page #exclusion-add-button {
+  float: none;
+  margin: 8px 0 0 auto;
+}
+
+body.options-page #accent-container {
+  gap: 10px;
+}
+
+body.options-page #accent-swatch {
+  height: 24px;
+  width: 24px;
+}
+
+body.options-page .reset-link {
+  margin-left: auto;
+}
+
+body.options-page #new-tab-url-container {
+  align-items: center;
+  grid-auto-rows: minmax(24px, auto);
+  grid-template-columns: auto minmax(0, 1fr);
+  row-gap: 8px;
+}
+
+body.options-page input[name="newTabCustomUrl"],
+body.options-page input[name="previousPatterns"],
+body.options-page input[name="nextPatterns"],
+body.options-page .link-hint-characters-field,
+body.options-page .link-hint-characters-field input {
+  max-width: none;
+  width: 100%;
+}
+
+body.options-page #settings-grid-container .spacer {
+  background: transparent;
+  grid-column: 1 / -1;
+  height: 8px;
+}
+
+body.options-page .validation-message {
+  background: var(--suda-danger-subtle-color);
+  border: 1px solid color-mix(in srgb, var(--suda-danger-color) 48%, transparent);
+  border-radius: 7px;
+  color: var(--suda-danger-color);
+  grid-column: 2 / -1;
+  margin: 2px 0 8px;
+  padding: 9px 11px;
+}
+
+body.options-page footer {
+  backdrop-filter: blur(16px);
+  background: color-mix(in srgb, var(--options-panel) 92%, transparent);
+  border-color: var(--options-border);
+  box-shadow: 0 -12px 36px rgb(0 0 0 / 12%);
+  padding: 12px 28px;
+}
+
+body.options-page #footer-content {
+  margin: 0 auto;
+  max-width: 1124px;
+}
+
+body.options-page #footer-help-text {
+  color: var(--options-muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+body.options-page #footer-help-text strong {
+  color: var(--options-text);
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+body.options-page #save:not([disabled]) {
+  background: var(--suda-accent-selected-color);
+  border-color: color-mix(in srgb, var(--suda-accent-selected-color) 82%, white);
+  color: var(--suda-accent-selected-text-color);
+  min-width: 112px;
+}
+
+body.options-page #save:not([disabled]):hover {
+  background: color-mix(in srgb, var(--suda-accent-selected-color) 90%, white);
+  color: var(--suda-accent-selected-text-color);
+}
+
+body.options-page #save[disabled] {
+  background: var(--options-row);
+  border-color: var(--options-border);
+  color: var(--options-muted);
+  cursor: default;
+  min-width: 112px;
+}
+
+@media (max-width: 920px) {
+  body.options-page #settings-grid-container {
+    grid-template-columns: minmax(170px, 0.7fr) minmax(300px, 1.3fr);
+  }
+
+  body.options-page #settings-grid-container > .example,
+  body.options-page #link-hint-characters-container > .example,
+  body.options-page #link-hint-numbers-container > .example,
+  body.options-page #wait-for-enter > .example {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  body.options-page #wrapper {
+    padding: 14px 14px 108px;
+  }
+
+  body.options-page #options-title {
+    border-radius: 12px;
+    min-height: 68px;
+    padding: 12px 14px;
+  }
+
+  #options-shortcut span {
+    display: none;
+  }
+
+  body.options-page #settings-grid-container {
+    border-radius: 12px;
+    display: block;
+    padding: 8px;
+  }
+
+  body.options-page #settings-grid-container > header {
+    padding: 20px 10px 8px;
+  }
+
+  body.options-page #settings-grid-container h2,
+  body.options-page #settings-grid-container > div:not(.spacer),
+  body.options-page #settings-grid-container > span,
+  body.options-page #settings-grid-container > label,
+  body.options-page #link-hint-characters-container > div,
+  body.options-page #link-hint-numbers-container > div,
+  body.options-page #wait-for-enter > label {
+    border-radius: 6px;
+    margin-top: 2px;
+  }
+
+  body.options-page #settings-grid-container h2 {
+    padding-bottom: 6px;
+  }
+
+  body.options-page #settings-grid-container > textarea,
+  body.options-page select {
+    margin: 2px 0;
+    width: 100%;
+  }
+
+  body.options-page footer {
+    padding: 10px 14px;
+  }
+
+  body.options-page #footer-help-text {
+    display: none;
+  }
+
+  body.options-page #footer-save-options,
+  body.options-page #save {
+    width: 100%;
   }
 }
 

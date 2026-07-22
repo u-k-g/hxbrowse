@@ -11,12 +11,30 @@
     <script src="options.js" type="module"></script>
   </head>
 
-  <body class="suda-body">
+  <body class="suda-body options-page">
     <div id="wrapper">
-      <header>Suda Options</header>
+      <header id="options-title">
+        <div id="options-title-copy">
+          <svg class="options-title-icon" viewBox="0 0 256 256" aria-hidden="true">
+            <path
+              d="M216,136c0-2.65-.14-5.28-.4-7.87l22.36-17a8,8,0,0,0,2.08-10.32l-16-27.71a8,8,0,0,0-9.92-3.45l-26.82,10.82a79.7,79.7,0,0,0-13.68-7.9L169.43,44a8,8,0,0,0-7.92-6.86h-32a8,8,0,0,0-7.92,6.86l-4.19,28.57a79.7,79.7,0,0,0-13.68,7.9L76.9,69.65A8,8,0,0,0,67,73.1L51,100.81A8,8,0,0,0,53,111.13l22.36,17c-.26,2.59-.4,5.22-.4,7.87s.14,5.28.4,7.87L53,160.87A8,8,0,0,0,51,171.19L67,198.9a8,8,0,0,0,9.92,3.45l26.82-10.82a79.7,79.7,0,0,0,13.68,7.9L121.59,228a8,8,0,0,0,7.92,6.86h32a8,8,0,0,0,7.92-6.86l4.19-28.57a79.7,79.7,0,0,0,13.68-7.9l26.82,10.82A8,8,0,0,0,224,198.9l16-27.71A8,8,0,0,0,238,160.87l-22.36-17C215.86,141.28,216,138.65,216,136Zm-72,32a32,32,0,1,1,32-32A32,32,0,0,1,144,168Z"
+            ></path>
+          </svg>
+          <div>
+            <span class="options-eyebrow">Suda</span>
+            <h1>Options</h1>
+          </div>
+        </div>
+        <div id="options-shortcut" aria-label="Open options shortcut">
+          <span>Open with</span>
+          <kbd>Space</kbd>
+          <kbd>,</kbd>
+        </div>
+      </header>
       <input type="hidden" name="settingsVersion" />
 
       <div id="settings-grid-container">
+        <header>General</header>
         <h2>Excluded URLs and keys</h2>
         <div>
           <div id="exclusion-scroll-box">
@@ -63,21 +81,21 @@
         <div class="example">
           Choose a Suda interface theme.
         </div>
-        <h2 id="arc-accent-heading">Accent color</h2>
-        <div id="arc-accent-container" aria-labelledby="arc-accent-heading">
-          <span id="arc-accent-swatch" aria-hidden="true"></span>
+        <h2 id="accent-heading">Accent color</h2>
+        <div id="accent-container" aria-labelledby="accent-heading">
+          <span id="accent-swatch" aria-hidden="true"></span>
           <input
             type="text"
-            name="arcAccentColor"
-            aria-label="Custom Arc accent hex color"
+            name="accentColor"
+            aria-label="Custom theme accent hex color"
             autocomplete="off"
             maxlength="7"
             placeholder="#6CED96"
             spellcheck="false"
           />
         </div>
-        <div class="example" id="arc-accent-example">
-          Accent color for the Arc themes, as a hex code.
+        <div class="example" id="accent-example">
+          Accent color for themes which support customization, as a hex code.
         </div>
 
         <h2>Custom key mappings</h2>

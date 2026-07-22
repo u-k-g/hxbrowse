@@ -1,10 +1,10 @@
 :root {
-  --command-bar-panel: var(--suda-canvas-color);
-  --command-bar-input: var(--suda-canvas-color);
+  --command-bar-panel: var(--suda-overlay-color);
+  --command-bar-input: var(--suda-overlay-color);
   --command-bar-row: color-mix(in srgb, var(--suda-surface-color) 72%, transparent);
   --command-bar-selected: var(--suda-accent-selected-color);
   --command-bar-selected-text: var(--suda-accent-selected-text-color);
-  --command-bar-border: var(--suda-border-color);
+  --command-bar-border: var(--suda-overlay-border-color);
   --command-bar-border-soft: var(--suda-surface-color);
   --command-bar-text: var(--suda-text-color);
   --command-bar-bright: var(--suda-text-color);
@@ -13,34 +13,6 @@
   --command-bar-accent: var(--suda-accent-text-color);
   --command-bar-accent-muted: var(--suda-accent-text-color);
   --command-bar-mode: var(--suda-accent-text-color);
-}
-
-html[data-suda-theme="arc-dark"] {
-  --command-bar-panel: color-mix(
-    in srgb,
-    var(--suda-accent-subtle-color) 10%,
-    var(--suda-canvas-color)
-  );
-  --command-bar-input: var(--command-bar-panel);
-  --command-bar-border: color-mix(
-    in srgb,
-    var(--suda-accent-color) 2%,
-    var(--suda-border-color)
-  );
-  --command-bar-border-soft: color-mix(
-    in srgb,
-    var(--suda-accent-color) 2%,
-    var(--suda-border-color)
-  );
-}
-
-html[data-suda-theme="arc-light"] {
-  --command-bar-panel: color-mix(
-    in srgb,
-    var(--suda-accent-subtle-color) 18%,
-    var(--suda-canvas-color)
-  );
-  --command-bar-input: var(--command-bar-panel);
 }
 
 * {

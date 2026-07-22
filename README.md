@@ -49,6 +49,7 @@
 - `space B` opens the bookmark picker
 - `space /` opens find mode; `n` / `N` move through matches
 - `space m` creates a mark and `space '` opens the mark picker
+- `space ,` opens Suda's options page
 - `:` opens the command-bar mode selector
 - `ctrl-w q` / `ctrl-w u` close / restore a tab
 - `ctrl-w n` opens search mode in a new tab

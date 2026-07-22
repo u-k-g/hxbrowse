@@ -673,6 +673,14 @@ const allCommands = [
   },
 
   {
+    name: "openOptionsPage",
+    desc: "Open Suda's options page",
+    group: "misc",
+    background: true,
+    noRepeat: true,
+  },
+
+  {
     name: "toggleViewSource",
     desc: "View page source",
     group: "misc",

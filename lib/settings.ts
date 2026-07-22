@@ -11,8 +11,8 @@ const sudaNewTabPageUrl = chrome.runtime.getURL("pages/new_tab.html") ||
 
 const defaultOptions = {
   theme: "arc-dark",
-  // Custom accent color used by the Arc themes.
-  arcAccentColor: "#6CED96",
+  // Custom accent used by themes which declare that capability.
+  accentColor: "#6CED96",
   keyBindingMode: "helix",
   scrollStepSize: 120,
   fastScrollStepSize: 800,
@@ -135,7 +135,7 @@ const Settings = {
     result = this.migrateSettingsIfNecessary(result);
     result["settingsVersion"] = Utils.getCurrentVersion();
     this._settings = Object.assign(globalThis.structuredClone(defaultOptions), result);
-    globalThis.ThemeManager?.apply(this._settings.theme, undefined, this._settings.arcAccentColor);
+    globalThis.ThemeManager?.apply(this._settings.theme, undefined, this._settings.accentColor);
   },
 
   isLoaded() {
@@ -235,12 +235,21 @@ const Settings = {
     return settings;
   },
 
+  migrateAccentColor(settings) {
+    if (settings.accentColor == null && settings.arcAccentColor != null) {
+      settings.accentColor = settings.arcAccentColor;
+    }
+    delete settings.arcAccentColor;
+    return settings;
+  },
+
   // Returns a settings object and performs any migrations required if the settings object is from
   // an older version of Suda.
   migrateSettingsIfNecessary(settings) {
     settings = this.migratePre2_0(settings);
     settings = this.migratePre2_4(settings);
     settings = this.migratePre2_4_1(settings);
+    settings = this.migrateAccentColor(settings);
     return settings;
   },
 

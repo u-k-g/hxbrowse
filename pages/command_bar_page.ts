@@ -60,32 +60,132 @@ function renderKeybindings(keybindings) {
   ).join("");
 }
 
-function renderModeCompletion(mode, keybindings) {
+function renderMatchedText(text = "", ranges = []) {
+  let html = "";
+  let offset = 0;
+  for (const [start, end] of ranges) {
+    html += Utils.escapeHtml(text.slice(offset, start));
+    html += `<span class="match">${Utils.escapeHtml(text.slice(start, end))}</span>`;
+    offset = end;
+  }
+  return html + Utils.escapeHtml(text.slice(offset));
+}
+
+function createModeCompletion(mode, keybindings) {
   return {
+    kind: "mode",
     commandBarMode: mode.name,
-    html: `<div class="completion-row mode-result">
-      <span class="result-icon">${phosphorIcon(mode.icon)}</span>
-      <span class="completion-copy">
-        <span class="mode-name">${Utils.escapeHtml(mode.name)}</span>
-        <span class="mode-description">${Utils.escapeHtml(mode.description)}</span>
-      </span>
-      <span class="completion-end">${renderKeybindings(keybindings)}</span>
-    </div>`,
+    title: mode.name,
+    description: mode.description,
+    icon: mode.icon,
+    keybindings,
   };
 }
 
-function renderLinkActionCompletion(action, selectionCount) {
+function createLinkActionCompletion(action, selectionCount) {
   const plural = selectionCount === 1 ? "" : "s";
   return {
+    kind: "link-action",
     commandBarAction: action.name,
-    html: `<div class="completion-row mode-result">
-      <span class="result-icon">${phosphorIcon(action.icon)}</span>
-      <span class="completion-copy">
-        <span class="mode-name">${Utils.escapeHtml(action.label(selectionCount))}</span>
-        <span class="mode-description">${Utils.escapeHtml(action.description + plural)}</span>
-      </span>
-    </div>`,
+    title: action.label(selectionCount),
+    description: action.description + plural,
+    icon: action.icon,
   };
+}
+
+function renderCompletionIcon(completion) {
+  if (completion.kind === "tab") {
+    const faviconUrl = new URL(chrome.runtime.getURL("/_favicon/"));
+    faviconUrl.searchParams.set("pageUrl", completion.url);
+    faviconUrl.searchParams.set("size", "16");
+    return `<img class="icon" src="${Utils.escapeHtml(faviconUrl.toString())}" />`;
+  }
+  const icons = {
+    bookmark: "folder-open",
+    command: "command",
+    "custom-search": "magnifying-glass",
+    domain: "globe",
+    history: "clock-counter-clockwise",
+    mark: "map-pin",
+    verbatim: completion.isUrlMode ? "pencil-simple" : "magnifying-glass",
+  };
+  return phosphorIcon(completion.icon ?? icons[completion.kind] ?? "globe");
+}
+
+function renderCommandKeys(keys = []) {
+  return keys.map((key) =>
+    `<span class="key-block">
+      <span class="key">${Utils.escapeHtml(key)}</span>
+      <span class="comma">, </span>
+    </span>`
+  ).join("\n");
+}
+
+function renderCompletion(completion) {
+  if (["mode", "link-action"].includes(completion.kind)) {
+    return `<div class="completion-row mode-result">
+      <span class="result-icon">${renderCompletionIcon(completion)}</span>
+      <span class="completion-copy">
+        <span class="mode-name">${Utils.escapeHtml(completion.title)}</span>
+        <span class="mode-description">${Utils.escapeHtml(completion.description)}</span>
+      </span>
+      ${
+      completion.kind === "mode"
+        ? `<span class="completion-end">${renderKeybindings(completion.keybindings)}</span>`
+        : ""
+    }
+    </div>`;
+  }
+
+  if (completion.kind === "mark") {
+    return `<div class="completion-row mark-result">
+      <span class="result-icon">${renderCompletionIcon(completion)}</span>
+      <span class="completion-copy">
+        <span class="mark-key">${Utils.escapeHtml(completion.mark.key)}</span>
+        <span class="mark-scope">${Utils.escapeHtml(completion.mark.scope)} mark</span>
+      </span>
+    </div>`;
+  }
+
+  if (completion.kind === "command") {
+    return `<div class="completion-row">
+      <span class="result-icon">${renderCompletionIcon(completion)}</span>
+      <span class="completion-copy"><span class="top-half">
+        <span class="title">${renderMatchedText(completion.title, completion.titleMatches)}</span>
+      </span></span>
+      <span class="completion-end">${renderCommandKeys(completion.command?.keys)}</span>
+    </div>`;
+  }
+
+  const isTab = completion.kind === "tab";
+  const isCustomSearch = completion.kind === "custom-search";
+  const insertTextClass = completion.insertText ? "" : "no-insert-text";
+  const source = completion.source ?? (completion.isUrlMode ? "url" : "search");
+  const action = isTab
+    ? `<span class="completion-end tab-action">
+         <span class="completion-action">Switch to tab</span>
+         <span class="completion-arrow">${phosphorIcon("arrow-right")}</span>
+       </span>`
+    : "";
+  const bottom = isCustomSearch || completion.kind === "verbatim"
+    ? ""
+    : `<span class="bottom-half">
+         <span class="url">${
+      renderMatchedText(completion.displayUrl, completion.urlMatches)
+    }</span>
+       </span>`;
+  return `<div class="completion-row${isTab ? " tab-completion" : ""}">
+    <span class="result-icon">${renderCompletionIcon(completion)}</span>
+    <span class="completion-copy">
+      <span class="top-half">
+        <span class="source ${insertTextClass}">${completion.insertText ? "&#8618;" : ""}</span>
+        <span class="source">${Utils.escapeHtml(source)}</span>
+        <span class="title">${renderMatchedText(completion.title, completion.titleMatches)}</span>
+      </span>
+      ${bottom}
+    </span>
+    ${action}
+  </div>`;
 }
 
 const modeSelector = {
@@ -727,7 +827,7 @@ class CommandBarUI {
           return { mode, index, rank };
         },
       ).filter(Boolean).sort((a, b) => a.rank - b.rank || a.index - b.index).map(({ mode }) =>
-        renderModeCompletion(mode, this.getModeKeybindings(mode))
+        createModeCompletion(mode, this.getModeKeybindings(mode))
       );
       this.selection = this.completions.length > 0 ? 0 : -1;
       this.renderCompletions(this.completions);
@@ -741,14 +841,8 @@ class CommandBarUI {
         this.completions = this.marks.filter((mark) =>
           mark.key.toLowerCase().includes(query) || mark.scope.includes(query)
         ).map((mark) => ({
+          kind: "mark",
           mark,
-          html: `<div class="completion-row mark-result">
-            <span class="result-icon">${phosphorIcon("map-pin")}</span>
-            <span class="completion-copy">
-              <span class="mark-key">${Utils.escapeHtml(mark.key)}</span>
-              <span class="mark-scope">${mark.scope} mark</span>
-            </span>
-          </div>`,
         }));
         this.selection = this.completions.length > 0 ? 0 : -1;
       } else if (this.mode === linkActionMode.name) {
@@ -759,7 +853,7 @@ class CommandBarUI {
           `${action.label(this.linkSelectionCount)} ${action.description}`.toLowerCase().includes(
             query,
           )
-        ).map((action) => renderLinkActionCompletion(action, this.linkSelectionCount));
+        ).map((action) => createLinkActionCompletion(action, this.linkSelectionCount));
         this.selection = this.completions.length > 0 ? 0 : -1;
       } else {
         this.completions = [];
@@ -801,24 +895,15 @@ class CommandBarUI {
     ) {
       const isUrlMode = this.mode === "url";
       const verbatimCompletion = {
+        kind: "verbatim",
         verbatimQuery,
-        html: `<div class="completion-row">
-          <span class="result-icon">${
-          phosphorIcon(
-            isUrlMode ? "pencil-simple" : "magnifying-glass",
-          )
-        }</span>
-          <span class="completion-copy">
-            <span class="top-half">
-              <span class="source">${isUrlMode ? "url" : "search"}</span>
-              <span class="title">${Utils.escapeHtml(verbatimQuery)}</span>
-            </span>
-          </span>
-        </div>`,
+        isUrlMode,
+        title: verbatimQuery,
+        titleMatches: [],
       };
       const modeSelectorMatches = this.mode === "" &&
         modeSelector.name.includes(verbatimQuery.toLowerCase());
-      const modeSelectorCompletion = renderModeCompletion(
+      const modeSelectorCompletion = createModeCompletion(
         modeSelector,
         this.getModeKeybindings(modeSelector),
       );
@@ -840,7 +925,9 @@ class CommandBarUI {
   }
 
   renderCompletions(completions) {
-    this.completionList.innerHTML = completions.map((c) => `<li>${c.html}</li>`).join("\n");
+    this.completionList.innerHTML = completions.map((completion) =>
+      `<li>${renderCompletion(completion)}</li>`
+    ).join("\n");
     this.completionList.style.display = completions.length > 0 ? "block" : "none";
     this.box.classList.toggle("has-completions", completions.length > 0);
   }
@@ -912,7 +999,7 @@ class CommandBarUI {
   }
 
   openCompletion(completion, openInNewTab) {
-    if (completion.description == "tab") {
+    if (completion.kind === "tab") {
       chrome.runtime.sendMessage({ handler: "selectSpecificTab", id: completion.tabId });
     } else {
       this.launchUrl(completion.url, openInNewTab);

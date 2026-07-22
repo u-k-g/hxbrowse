@@ -616,7 +616,7 @@ context("suggestions", () => {
     stub(chrome.runtime, "getURL", returns("https://test/"));
   });
 
-  should("escape html in page titles", () => {
+  should("transport page titles as data rather than HTML", () => {
     const suggestion = new Suggestion({
       queryTerms: ["queryterm"],
       description: "tab",
@@ -624,10 +624,12 @@ context("suggestions", () => {
       title: "title <span>",
       relevancyFunction: returns(1),
     });
-    assert.isTrue(suggestion.generateHtml({}).indexOf("title &lt;span&gt;") >= 0);
+    const completion = suggestion.toCompletion();
+    assert.equal("title <span>", completion.title);
+    assert.isFalse(Object.hasOwn(completion, "html"));
   });
 
-  should("group a tab action so it can be centered across the entire result", () => {
+  should("identify tab completions structurally", () => {
     const suggestion = new Suggestion({
       queryTerms: [],
       description: "tab",
@@ -635,9 +637,7 @@ context("suggestions", () => {
       title: "Example",
       relevancyFunction: returns(1),
     });
-    const html = suggestion.generateHtml({});
-    assert.isTrue(html.includes('class="completion-row tab-completion"'));
-    assert.isTrue(html.includes('class="completion-end tab-action"'));
+    assert.equal("tab", suggestion.toCompletion().kind);
   });
 
   should("highlight query words", () => {
@@ -648,8 +648,7 @@ context("suggestions", () => {
       title: "ninjawords",
       relevancyFunction: returns(1),
     });
-    const expected = "<span class='match'>ninj</span>a<span class='match'>words</span>";
-    assert.isTrue(suggestion.generateHtml({}).indexOf(expected) >= 0);
+    assert.equal([[0, 4], [5, 10]], suggestion.toCompletion().titleMatches);
   });
 
   should("highlight query words correctly when whey they overlap", () => {
@@ -660,8 +659,7 @@ context("suggestions", () => {
       title: "ninjawords",
       relevancyFunction: returns(1),
     });
-    const expected = "<span class='match'>ninjaword</span>s";
-    assert.isTrue(suggestion.generateHtml({}).indexOf(expected) >= 0);
+    assert.equal([[0, 9]], suggestion.toCompletion().titleMatches);
   });
 
   should("shorten urls", () => {
@@ -672,7 +670,7 @@ context("suggestions", () => {
       title: "ninjawords",
       relevancyFunction: returns(1),
     });
-    assert.equal(-1, suggestion.generateHtml({}).indexOf("http://ninjawords.com"));
+    assert.equal("ninjawords.com", suggestion.toCompletion().displayUrl);
   });
 });
 

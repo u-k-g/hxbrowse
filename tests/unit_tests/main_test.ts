@@ -167,6 +167,21 @@ context("excludeAllSudaKeys command", () => {
   });
 });
 
+context("openOptionsPage command", () => {
+  should("open Suda's options page in the next tab", async () => {
+    let tabCreated;
+    stub(chrome.runtime, "getURL", (path) => `chrome-extension://suda/${path}`);
+    stub(chrome.tabs, "create", (properties) => tabCreated = properties);
+
+    await BackgroundCommands.openOptionsPage({ tab: { index: 3 } });
+
+    assert.equal({
+      url: "chrome-extension://suda/pages/options.html",
+      index: 4,
+    }, tabCreated);
+  });
+});
+
 context("selectSpecificTab", () => {
   should("ignore a tab which closed after its command-bar suggestion was rendered", async () => {
     stub(chrome.tabs, "get", async () => {

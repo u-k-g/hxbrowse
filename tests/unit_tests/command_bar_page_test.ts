@@ -245,7 +245,15 @@ context("commandBar page", () => {
   should("put the exact typed query first in search and URL modes", async () => {
     stub(chrome.runtime, "sendMessage", async (message) => {
       if (message.handler === "filterCompletions") {
-        return [{ url: "https://suggestion.example", html: "suggestion" }];
+        return [{
+          kind: "history",
+          source: "history",
+          title: "Suggestion",
+          titleMatches: [],
+          url: "https://suggestion.example",
+          displayUrl: "suggestion.example",
+          urlMatches: [],
+        }];
       }
     });
 
@@ -297,8 +305,8 @@ context("commandBar page", () => {
 
   should("scroll the selected completion into view", () => {
     ui.renderCompletions([
-      { html: "<span>first</span>" },
-      { html: "<span>second</span>" },
+      { kind: "verbatim", title: "first", titleMatches: [] },
+      { kind: "verbatim", title: "second", titleMatches: [] },
     ]);
     let scrollOptions = null;
     ui.completionList.children[1].scrollIntoView = (options) => scrollOptions = options;
@@ -315,7 +323,7 @@ context("commandBar page", () => {
     stub(chrome.runtime, "sendMessage", async (message) => {
       if (message.handler == "filterCompletions") {
         const s = new Suggestion({ url: "http://hello.com" });
-        return [s];
+        return [s.toCompletion()];
       }
     });
     await ui.update();

@@ -33,8 +33,8 @@ context("options page", () => {
 
   should("show the default accent field only for Arc themes", () => {
     const theme = optionsPage.getOptionEl("theme");
-    const accent = optionsPage.getOptionEl("arcAccentColor");
-    const container = document.querySelector("#arc-accent-container");
+    const accent = optionsPage.getOptionEl("accentColor");
+    const container = document.querySelector("#accent-container");
 
     assert.equal("arc-dark", theme.value);
     assert.equal("#6CED96", accent.value);
@@ -43,7 +43,7 @@ context("options page", () => {
     theme.value = "gruvbox-dark-hard";
     theme.dispatchEvent(new window.Event("input"));
     assert.equal("none", container.style.display);
-    assert.equal("none", document.querySelector("#arc-accent-heading").style.display);
+    assert.equal("none", document.querySelector("#accent-heading").style.display);
 
     theme.value = "arc-light";
     theme.dispatchEvent(new window.Event("input"));
@@ -51,29 +51,29 @@ context("options page", () => {
   });
 
   should("preview and save a valid custom Arc accent", async () => {
-    const accent = optionsPage.getOptionEl("arcAccentColor");
+    const accent = optionsPage.getOptionEl("accentColor");
     accent.value = "12abEF";
     accent.dispatchEvent(new window.Event("input"));
 
     assert.equal("#12abef", document.documentElement.style.getPropertyValue("--suda-accent-color"));
     assert.equal(
       "rgb(18, 171, 239)",
-      document.querySelector("#arc-accent-swatch").style.backgroundColor,
+      document.querySelector("#accent-swatch").style.backgroundColor,
     );
 
     await optionsPage.saveOptions();
-    assert.equal("#12ABEF", Settings.get("arcAccentColor"));
+    assert.equal("#12ABEF", Settings.get("accentColor"));
   });
 
   should("reject an invalid custom Arc accent", async () => {
-    const accent = optionsPage.getOptionEl("arcAccentColor");
+    const accent = optionsPage.getOptionEl("accentColor");
     accent.value = "green";
 
     await optionsPage.saveOptions();
 
     assert.isTrue(accent.classList.contains("validation-error"));
     assert.isTrue(document.querySelector(".validation-message").textContent.includes("hex color"));
-    assert.equal("#6CED96", Settings.get("arcAccentColor"));
+    assert.equal("#6CED96", Settings.get("accentColor"));
   });
 
   should("leave the browser's new-tab page untouched by default", () => {

@@ -262,6 +262,7 @@ context("Validate commands and options data structures", () => {
     assert.equal("CommandBar.activateMarks", helixKeyMappings["<space>'"]);
     assert.equal("Marks.activateCreateMode", helixKeyMappings["<space>m"]);
     assert.equal("CommandBar.activateAll", helixKeyMappings["<space>t"]);
+    assert.equal("openOptionsPage", helixKeyMappings["<space>,"]);
     assert.equal("CommandBar.activateInNewTab", helixKeyMappings["<c-w>n"]);
     assert.isFalse(Object.hasOwn(helixKeyMappings, "<c-t>"));
     assert.isFalse(Object.hasOwn(helixKeyMappings, "<space>h"));

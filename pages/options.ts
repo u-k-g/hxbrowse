@@ -6,7 +6,7 @@ import { Commands, KeyMappingsParser } from "../background_scripts/commands.js";
 import * as userSearchEngines from "../background_scripts/user_search_engines.js";
 
 const options = {
-  arcAccentColor: "string",
+  accentColor: "string",
   commandBarCenter: "option",
   disabledCommandBarModes: "inverted-set",
   disabledModelessCommandBarSources: "inverted-set",
@@ -49,10 +49,10 @@ export async function init() {
     }
   }
   themeSelect.addEventListener("input", () => {
-    maintainArcAccentView();
+    maintainAccentView();
     applyThemePreview();
   });
-  getOptionEl("arcAccentColor").addEventListener("input", () => applyThemePreview());
+  getOptionEl("accentColor").addEventListener("input", () => applyThemePreview());
 
   const shortcutLabel = document.querySelector("#shortcut-to-save-all");
   shortcutLabel.textContent = KeyboardUtils.platform == "Mac" ? "Cmd-Enter" : "Ctrl-Enter";
@@ -167,7 +167,7 @@ function setFormFromSettings(settings) {
   ExclusionRulesEditor.setForm(settings["exclusionRules"]);
 
   document.querySelector("#upload-backup").value = "";
-  maintainArcAccentView();
+  maintainAccentView();
   applyThemePreview();
   maintainLinkHintsView();
   maintainNewTabUrlView();
@@ -208,35 +208,35 @@ function getSettingsFromForm() {
     settings["linkHintCharacters"] = settings["linkHintCharacters"].toLowerCase();
   }
   const normalizedAccent = globalThis.ThemeManager?.normalizeHexColor(
-    settings["arcAccentColor"],
+    settings["accentColor"],
   );
-  if (normalizedAccent) settings["arcAccentColor"] = normalizedAccent.toUpperCase();
+  if (normalizedAccent) settings["accentColor"] = normalizedAccent.toUpperCase();
   settings["exclusionRules"] = ExclusionRulesEditor.getRules();
   return settings;
 }
 
-function isArcThemeSelected() {
-  return globalThis.ThemeManager?.arcThemes.has(getOptionEl("theme").value) ?? false;
+function isCustomAccentThemeSelected() {
+  return globalThis.ThemeManager?.isAccentCustomizable(getOptionEl("theme").value) ?? false;
 }
 
-// The accent is part of Arc's appearance, so keep this setting out of the way for other themes.
-function maintainArcAccentView() {
-  const visible = isArcThemeSelected();
-  showElement(document.querySelector("#arc-accent-heading"), visible);
-  showElement(document.querySelector("#arc-accent-container"), visible);
-  showElement(document.querySelector("#arc-accent-example"), visible);
+// Keep the control out of the way for themes whose accent is fixed by their palette.
+function maintainAccentView() {
+  const visible = isCustomAccentThemeSelected();
+  showElement(document.querySelector("#accent-heading"), visible);
+  showElement(document.querySelector("#accent-container"), visible);
+  showElement(document.querySelector("#accent-example"), visible);
 }
 
-// Live-preview both the chosen theme and a valid custom Arc accent.
+// Live-preview both the chosen theme and a valid custom accent.
 function applyThemePreview() {
-  const accentInput = getOptionEl("arcAccentColor");
+  const accentInput = getOptionEl("accentColor");
   const normalizedAccent = globalThis.ThemeManager?.normalizeHexColor(accentInput.value);
   globalThis.ThemeManager?.apply(
     getOptionEl("theme").value,
     document.documentElement,
     normalizedAccent,
   );
-  document.querySelector("#arc-accent-swatch").style.backgroundColor = normalizedAccent ??
+  document.querySelector("#accent-swatch").style.backgroundColor = normalizedAccent ??
     "transparent";
 }
 
@@ -274,10 +274,10 @@ function getValidationErrors() {
     results["linkHintNumbers"] = "This must be at least two characters long.";
   }
 
-  // Arc accent color field. Hidden theme-specific controls must not block saving another theme.
-  text = getOptionEl("arcAccentColor").value.trim();
-  if (isArcThemeSelected() && !globalThis.ThemeManager?.normalizeHexColor(text)) {
-    results["arcAccentColor"] = "Enter a six-digit hex color, for example #6CED96.";
+  // Hidden theme-specific controls must not block saving another theme.
+  text = getOptionEl("accentColor").value.trim();
+  if (isCustomAccentThemeSelected() && !globalThis.ThemeManager?.normalizeHexColor(text)) {
+    results["accentColor"] = "Enter a six-digit hex color, for example #6CED96.";
   }
 
   return results;
@@ -285,7 +285,7 @@ function getValidationErrors() {
 
 function addValidationMessage(el, message) {
   el.classList.add("validation-error");
-  const exampleEl = el.closest("#arc-accent-container") ?? el.nextElementSibling ?? el;
+  const exampleEl = el.closest("#accent-container") ?? el.nextElementSibling ?? el;
   const messageEl = document.createElement("div");
   messageEl.classList.add("validation-message");
   messageEl.textContent = message;

@@ -338,6 +338,13 @@ const BackgroundCommands = {
     );
   },
 
+  openOptionsPage({ tab }) {
+    return chrome.tabs.create({
+      url: chrome.runtime.getURL("pages/options.html"),
+      index: tab.index + 1,
+    });
+  },
+
   // Create a new tab. Also, with:
   //     map X createTab http://www.bbc.com/news
   // create a new tab with the given URL.
@@ -723,12 +730,7 @@ const sendRequestHandlers = {
     });
   },
   openUrlInCurrentTab: TabOperations.openUrlInCurrentTab,
-  openOptionsPageInNewTab(request) {
-    return chrome.tabs.create({
-      url: chrome.runtime.getURL("pages/options.html"),
-      index: request.tab.index + 1,
-    });
-  },
+  openOptionsPageInNewTab: BackgroundCommands.openOptionsPage,
 
   launchSearchQuery({ query, openInNewTab }) {
     query = query?.trim();
@@ -817,12 +819,7 @@ const sendRequestHandlers = {
   async filterCompletions(request) {
     const completer = completers[request.completerName];
     if (!completer) return [];
-    let response = await completer.filter(request);
-
-    // Remove function properties before sending the response across the extension message channel.
-    response = JSON.parse(JSON.stringify(response));
-
-    return response;
+    return await completer.filter(request);
   },
 
   refreshCompletions(request) {

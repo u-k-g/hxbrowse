@@ -17,7 +17,6 @@ import * as userSearchEngines from "../user_search_engines.js";
 import * as ranking from "./ranking.js";
 import { allCommands } from "../all_commands.js";
 import { Commands, RegistryEntry } from "../commands.js";
-import { icon as phosphorIcon } from "../../lib/phosphor_icons.js";
 import { RegexpCache } from "./ranking.js";
 
 // Set this to true to render relevancy when debugging the ranking scores.
@@ -25,6 +24,7 @@ const showRelevancy = false;
 
 // TODO(philc): Consider moving out the "computeRelevancy" function.
 export class Suggestion {
+  kind;
   queryTerms;
   description;
   url;
@@ -56,11 +56,10 @@ export class Suggestion {
   // Whether this is meant to be the first suggestion from the user's custom search engine which
   // represents their query as typed, verbatim.
   isPrimarySuggestion = false;
-  // The generated HTML string for showing this suggestion in the CommandBar.
-  html;
   searchUrl;
 
   constructor(options) {
+    this.kind = options.kind ?? options.description;
     Object.seal(this);
     Object.assign(this, options);
   }
@@ -75,99 +74,27 @@ export class Suggestion {
     return this.relevancy;
   }
 
-  generateHtml() {
-    if (this.html) return this.html;
-    const relevancyHtml = showRelevancy
-      ? `<span class='relevancy'>${this.computeRelevancy()}</span>`
-      : "";
-    const insertTextClass = this.insertText ? "" : "no-insert-text";
-    const insertTextIndicator = "&#8618;"; // A right hooked arrow.
-    if (this.insertText && this.isCustomSearch) {
-      this.title = this.insertText;
-    }
-    // The phosphor icon representing this suggestion's source, shown in the boxed icon well on the
-    // left of the row, in the style of the Arc command bar.
-    const sourceIcons = {
-      bookmark: "folder-open",
-      history: "clock-counter-clockwise",
-      domain: "globe",
+  toCompletion() {
+    const kind = this.command ? "command" : this.isCustomSearch ? "custom-search" : this.kind;
+    const title = this.insertText && this.isCustomSearch ? this.insertText : this.title;
+    const displayUrl = this.url ? this.shortenUrl() : "";
+    return {
+      kind,
+      source: this.description,
+      title,
+      titleMatches: this.matchingRanges(title),
+      url: this.url,
+      displayUrl,
+      urlMatches: this.matchingRanges(displayUrl),
+      insertText: this.insertText,
+      autoSelect: this.autoSelect,
+      tabId: this.tabId,
+      command: this.command,
+      searchUrl: this.searchUrl,
+      isCustomSearch: this.isCustomSearch,
+      isPrimarySuggestion: this.isPrimarySuggestion,
+      relevancy: showRelevancy ? this.computeRelevancy() : undefined,
     };
-    let iconHtml = "";
-    if (this.description === "tab") {
-      const faviconUrl = new URL(chrome.runtime.getURL("/_favicon/"));
-      faviconUrl.searchParams.set("pageUrl", this.url);
-      faviconUrl.searchParams.set("size", "16");
-      iconHtml = `<img class="icon" src="${faviconUrl.toString()}" />`;
-    } else if (this.isCustomSearch) {
-      iconHtml = phosphorIcon("magnifying-glass");
-    } else {
-      iconHtml = phosphorIcon(sourceIcons[this.description] ?? "globe");
-    }
-    if (this.isCustomSearch) {
-      this.html = `\
-<div class="completion-row">
-   <span class="result-icon">${iconHtml}</span>
-   <span class="completion-copy">
-     <span class="top-half">
-       <span class="source ${insertTextClass}">${insertTextIndicator}</span><span class="source">${this.description}</span>
-       <span class="title">${this.highlightQueryTerms(Utils.escapeHtml(this.title))}</span>
-       ${relevancyHtml}
-     </span>
-   </span>
-</div>\
-`;
-    } else if (this.command) {
-      // Key mappings containing key modifiers are represented in the form of '<modifier-key>'
-      // (e.g <c-e>) and are parsed as HTML tags when used in a raw string. Escape them properly.
-      const escapeKeyForHtml = (key) => {
-        return key.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      };
-      const keybindings = this.command.keys.map((key) =>
-        `<span class="key-block">
-          <span class="key">${escapeKeyForHtml(key)}</span>
-          <span class="comma">, </span>
-        </span>`
-      ).join("\n");
-
-      // Don't show the source label for command suggestions. It's unnecessary because commands are
-      // currently never shown alongside other suggestion types.
-      this.html = `\
-  <div class="completion-row">
-    <span class="result-icon">${phosphorIcon("command")}</span>
-    <span class="completion-copy">
-      <span class="top-half">
-        <span class="title">${this.highlightQueryTerms(this.title)}</span>
-      </span>
-    </span>
-    <span class="completion-end">${keybindings}</span>${relevancyHtml}
-  </div>
-`;
-    } else {
-      const isTab = this.description === "tab";
-      const actionHtml = isTab
-        ? `<span class="completion-end tab-action">
-             <span class="completion-action">Switch to tab</span>
-             <span class="completion-arrow">${phosphorIcon("arrow-right")}</span>
-           </span>`
-        : "";
-      this.html = `\
-<div class="completion-row${isTab ? " tab-completion" : ""}">
-   <span class="result-icon">${iconHtml}</span>
-   <span class="completion-copy">
-     <span class="top-half">
-       <span class="source ${insertTextClass}">${insertTextIndicator}</span><span class="source">${this.description}</span>
-       <span class="title">${this.highlightQueryTerms(Utils.escapeHtml(this.title))}</span>
-     </span>
-     <span class="bottom-half">
-       <span class="url">${this.highlightQueryTerms(Utils.escapeHtml(this.shortenUrl()))}</span>
-       ${relevancyHtml}
-     </span>
-   </span>
-   ${actionHtml}
-</div>\
-`;
-    }
-    return this.html;
   }
 
   // Use neat trick to snatch a domain (http://stackoverflow.com/a/8498668).
@@ -214,28 +141,13 @@ export class Suggestion {
     }
   }
 
-  // Wraps each occurence of the query terms in the given string in a <span>.
-  highlightQueryTerms(string) {
-    if (!this.highlightTerms) return string;
+  matchingRanges(string) {
+    if (!this.highlightTerms || !string) return [];
     let ranges = [];
-    const escapedTerms = this.queryTerms.map((term) => Utils.escapeHtml(term));
-    for (const term of escapedTerms) {
+    for (const term of this.queryTerms) {
       this.pushMatchingRanges(string, term, ranges);
     }
-
-    if (ranges.length === 0) {
-      return string;
-    }
-
-    ranges = this.mergeRanges(ranges.sort((a, b) => a[0] - b[0]));
-    // Replace portions of the string from right to left.
-    ranges = ranges.sort((a, b) => b[0] - a[0]);
-    for (const [start, end] of ranges) {
-      string = string.substring(0, start) +
-        `<span class='match'>${string.substring(start, end)}</span>` +
-        string.substring(end);
-    }
-    return string;
+    return ranges.length === 0 ? [] : this.mergeRanges(ranges.sort((a, b) => a[0] - b[0]));
   }
 
   // Merges the given list of ranges such that any overlapping regions are combined. E.g.
@@ -844,7 +756,7 @@ export class MultiCompleter {
       // an already-open matching tab is more useful than navigating to that domain again, so give
       // tabs enough additional weight to rank above domains. Standalone tab selection and all
       // other completer modes retain their original ranking.
-      if (request.commandBarMode === "" && s.description === "tab") {
+      if (request.commandBarMode === "" && s.kind === "tab") {
         s.relevancy += 2;
       }
     }
@@ -869,12 +781,7 @@ export class MultiCompleter {
       }
     }
 
-    // Generate HTML for the remaining suggestions and return them.
-    for (const s of dedupedSuggestions) {
-      s.generateHtml(request);
-    }
-
-    return dedupedSuggestions;
+    return dedupedSuggestions.map((suggestion) => suggestion.toCompletion());
   }
 }
 
