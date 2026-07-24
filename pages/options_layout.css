@@ -1,0 +1,372 @@
+/*
+ * Reference-inspired settings composition. Component colors and interaction states continue to
+ * come from the command-bar-aligned rules in options.css and the active Suda theme.
+ */
+html {
+  background: var(--suda-canvas-color);
+}
+
+body.options-page {
+  min-height: 100vh;
+}
+
+body.options-page::after {
+  border: 1px solid var(--options-hairline);
+  border-radius: 18px;
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: 20;
+}
+
+body.options-page #wrapper {
+  margin: 0;
+  max-width: none;
+  padding: 0 28px 128px;
+}
+
+body.options-page #options-title {
+  align-items: center;
+  background: color-mix(in srgb, var(--suda-canvas-color) 94%, transparent);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  min-height: 64px;
+  padding: 0;
+}
+
+.settings-page-label {
+  color: var(--options-muted);
+  font-size: 12px;
+  font-weight: 680;
+}
+
+#options-title-actions {
+  gap: 14px;
+}
+
+.options-page-link {
+  background: transparent;
+  border-color: transparent;
+  color: var(--options-text);
+}
+
+.options-page-link:hover {
+  background: var(--options-row);
+  border-color: var(--options-border);
+}
+
+body.options-page #settings-grid-container {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  display: block;
+  margin: 58px auto 0;
+  max-width: 1280px;
+  overflow: visible;
+  padding: 0 0 80px;
+}
+
+body.options-page #settings-grid-container > .settings-section-heading {
+  border: 0;
+  border-top: 1px solid var(--options-hairline);
+  color: var(--options-text);
+  font-size: 20px;
+  font-weight: 720;
+  letter-spacing: -0.015em;
+  margin: 54px 0 0;
+  padding: 48px 0 18px;
+  text-transform: none;
+}
+
+body.options-page #settings-grid-container > .settings-section-heading:first-child {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+body.options-page #settings-grid-container > .setting-row {
+  align-items: center;
+  border: 0;
+  display: grid;
+  gap: 56px;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 320px);
+  margin: 0;
+  min-height: 94px;
+  padding: 18px 0;
+}
+
+body.options-page #settings-grid-container .setting-copy {
+  min-width: 0;
+}
+
+body.options-page #settings-grid-container .setting-copy h2,
+body.options-page #settings-grid-container .setting-name {
+  color: var(--options-text);
+  display: block;
+  font-size: 14px;
+  font-weight: 680;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0;
+}
+
+body.options-page #settings-grid-container .setting-copy > .example {
+  color: var(--options-muted);
+  font-size: 12px;
+  line-height: 1.55;
+  margin: 6px 0 0;
+  max-width: 720px;
+  padding: 0;
+}
+
+body.options-page #settings-grid-container .setting-control {
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+  padding: 0;
+}
+
+body.options-page #settings-grid-container .setting-control > div,
+body.options-page #settings-grid-container .setting-control > span,
+body.options-page #settings-grid-container .setting-control > select,
+body.options-page #settings-grid-container .setting-control > textarea,
+body.options-page #settings-grid-container .setting-control > a,
+body.options-page #settings-grid-container .setting-control > input[type="file"] {
+  margin: 0;
+  max-width: 320px;
+  padding: 0;
+  width: 100%;
+}
+
+body.options-page input[type="text"],
+body.options-page input[type="number"],
+body.options-page textarea,
+body.options-page select {
+  background: var(--options-row);
+  border: 1px solid var(--options-border);
+  border-radius: 9px;
+  min-height: 38px;
+}
+
+body.options-page select {
+  padding-inline: 12px;
+  width: 100%;
+}
+
+body.options-page #settings-grid-container .setting-control > textarea {
+  min-height: 150px;
+}
+
+body.options-page #accent-container {
+  justify-content: flex-end;
+  width: auto;
+}
+
+body.options-page #accent-container input {
+  width: 126px;
+}
+
+body.options-page #accent-swatch {
+  box-shadow: none;
+  height: 22px;
+  width: 22px;
+}
+
+body.options-page #new-tab-url-container,
+body.options-page .option-checklist,
+body.options-page #exclusion-scroll-box {
+  background: color-mix(in srgb, var(--options-row) 72%, transparent);
+  border: 1px solid var(--options-border);
+  border-radius: 10px;
+}
+
+body.options-page #new-tab-url-container,
+body.options-page .option-checklist {
+  padding: 12px;
+}
+
+body.options-page .option-checklist {
+  grid-template-columns: 1fr;
+}
+
+body.options-page #exclusion-scroll-box {
+  max-height: 210px;
+  padding: 7px;
+}
+
+body.options-page #exclusion-add-button {
+  float: none;
+  margin: 9px 0 0;
+}
+
+body.options-page #exclusion-rules {
+  width: 100%;
+}
+
+body.options-page #exclusion-rules .remove {
+  min-width: 28px;
+}
+
+body.options-page #settings-grid-container .link-hint-characters-field {
+  align-items: center;
+  display: flex;
+  gap: 9px;
+}
+
+body.options-page #settings-grid-container .link-hint-characters-field .reset-link,
+body.options-page #settings-grid-container .setting-control > div > .reset-link {
+  flex: none;
+  margin: 0;
+}
+
+body.options-page #settings-grid-container .setting-switch {
+  cursor: pointer;
+  display: block;
+}
+
+body.options-page #settings-grid-container .setting-switch input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background:
+    radial-gradient(
+    circle at 11px 50%,
+    color-mix(in srgb, var(--options-muted) 72%, var(--options-panel)) 0 7px,
+    transparent 8px
+  ),
+    var(--options-row);
+  border: 1px solid var(--options-border);
+  border-radius: 999px;
+  cursor: pointer;
+  display: block;
+  height: 24px;
+  margin: 0;
+  transition: background-color 140ms ease, border-color 140ms ease;
+  width: 42px;
+}
+
+body.options-page #settings-grid-container .setting-switch input[type="checkbox"]:checked {
+  background:
+    radial-gradient(
+    circle at calc(100% - 11px) 50%,
+    var(--suda-accent-selected-text-color) 0 7px,
+    transparent 8px
+  ),
+    var(--suda-accent-selected-color);
+  border-color: color-mix(in srgb, var(--suda-accent-selected-color) 82%, white);
+}
+
+body.options-page #settings-grid-container .setting-switch input[type="checkbox"]:focus-visible {
+  box-shadow: 0 0 0 3px var(--suda-accent-subtle-color);
+}
+
+body.options-page .validation-message {
+  margin-top: 8px;
+  width: 100%;
+}
+
+/* Larger editors keep their copy and editing surface readable without stretching every control. */
+body.options-page #settings-grid-container > .setting-row:has(textarea[name="searchEngines"]),
+body.options-page #settings-grid-container > .setting-row:has(textarea[name="userDefinedLinkHintCss"]),
+body.options-page #settings-grid-container > .setting-row:has(#exclusion-scroll-box),
+body.options-page #settings-grid-container > .setting-row:has(#new-tab-url-container) {
+  align-items: start;
+}
+
+body.options-page #settings-grid-container > .setting-row:has(textarea[name="searchEngines"]),
+body.options-page #settings-grid-container > .setting-row:has(textarea[name="userDefinedLinkHintCss"]) {
+  padding-block: 26px;
+}
+
+body.options-page #settings-grid-container > .setting-row:has(textarea[name="searchEngines"]) .setting-control,
+body.options-page #settings-grid-container > .setting-row:has(textarea[name="userDefinedLinkHintCss"]) .setting-control,
+body.options-page #settings-grid-container > .setting-row:has(#exclusion-scroll-box) .setting-control,
+body.options-page #settings-grid-container > .setting-row:has(#new-tab-url-container) .setting-control {
+  padding-top: 2px;
+}
+
+body.options-page #settings-grid-container .setting-copy pre {
+  background: transparent;
+  border: 0;
+  color: var(--options-muted);
+  font-size: 11px;
+  line-height: 1.55;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+body.options-page #download-backup {
+  justify-self: end;
+  margin: 0;
+}
+
+body.options-page footer {
+  background: color-mix(in srgb, var(--suda-canvas-color) 94%, transparent);
+  border-color: var(--options-hairline);
+  box-shadow: none;
+  padding: 11px 28px;
+}
+
+body.options-page #footer-content {
+  max-width: 1280px;
+}
+
+@media (max-width: 820px) {
+  body.options-page #settings-grid-container {
+    margin-top: 34px;
+  }
+
+  body.options-page #settings-grid-container > .setting-row {
+    gap: 16px;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 20px 0;
+  }
+
+  body.options-page #settings-grid-container .setting-control {
+    justify-content: stretch;
+  }
+
+  body.options-page #settings-grid-container .setting-control > div,
+  body.options-page #settings-grid-container .setting-control > span,
+  body.options-page #settings-grid-container .setting-control > select,
+  body.options-page #settings-grid-container .setting-control > textarea,
+  body.options-page #settings-grid-container .setting-control > a,
+  body.options-page #settings-grid-container .setting-control > input[type="file"] {
+    max-width: none;
+  }
+
+  body.options-page #settings-grid-container .setting-switch {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  body.options-page #wrapper {
+    padding-inline: 18px;
+  }
+
+  body.options-page #options-title {
+    min-height: 58px;
+  }
+
+  #options-shortcut {
+    display: none;
+  }
+
+  body.options-page #settings-grid-container {
+    margin-top: 28px;
+  }
+
+  body.options-page #settings-grid-container > .settings-section-heading {
+    font-size: 18px;
+    margin-top: 38px;
+    padding-top: 36px;
+  }
+
+  body.options-page footer {
+    padding-inline: 18px;
+  }
+}

@@ -674,7 +674,15 @@ const allCommands = [
 
   {
     name: "openOptionsPage",
-    desc: "Open Suda's options page",
+    desc: "Edit options",
+    group: "misc",
+    background: true,
+    noRepeat: true,
+  },
+
+  {
+    name: "openKeybindingsPage",
+    desc: "Edit keybindings",
     group: "misc",
     background: true,
     noRepeat: true,

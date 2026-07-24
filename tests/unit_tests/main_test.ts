@@ -182,6 +182,21 @@ context("openOptionsPage command", () => {
   });
 });
 
+context("openKeybindingsPage command", () => {
+  should("open Suda's keybindings page in the next tab", async () => {
+    let tabCreated;
+    stub(chrome.runtime, "getURL", (path) => `chrome-extension://suda/${path}`);
+    stub(chrome.tabs, "create", (properties) => tabCreated = properties);
+
+    await BackgroundCommands.openKeybindingsPage({ tab: { index: 3 } });
+
+    assert.equal({
+      url: "chrome-extension://suda/pages/keybindings.html",
+      index: 4,
+    }, tabCreated);
+  });
+});
+
 context("selectSpecificTab", () => {
   should("ignore a tab which closed after its command-bar suggestion was rendered", async () => {
     stub(chrome.tabs, "get", async () => {

@@ -390,12 +390,24 @@ context("multi completer", () => {
     stub(chrome.storage.session, "get", async () => ({ commandToOptionsToKeys: {} }));
     const modelessCompleter = new MultiCompleter([tabCompleter, new CommandCompleter()]);
 
-    const results = await filterCompleter(modelessCompleter, ["reload"], {
-      commandBarMode: "",
-    });
+    const [reloadResults, optionsResults, keybindingsResults] = await Promise.all([
+      filterCompleter(modelessCompleter, ["reload"], { commandBarMode: "" }),
+      filterCompleter(modelessCompleter, ["edit", "options"], { commandBarMode: "" }),
+      filterCompleter(modelessCompleter, ["edit", "keybindings"], { commandBarMode: "" }),
+    ]);
 
     assert.isTrue(
-      results.some((suggestion) => suggestion.command?.registryEntry.command === "reload"),
+      reloadResults.some((suggestion) => suggestion.command?.registryEntry.command === "reload"),
+    );
+    assert.isTrue(
+      optionsResults.some(
+        (suggestion) => suggestion.command?.registryEntry.command === "openOptionsPage",
+      ),
+    );
+    assert.isTrue(
+      keybindingsResults.some(
+        (suggestion) => suggestion.command?.registryEntry.command === "openKeybindingsPage",
+      ),
     );
   });
 

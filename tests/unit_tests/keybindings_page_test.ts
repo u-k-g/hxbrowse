@@ -30,6 +30,12 @@ context("keybindings page", () => {
     );
   });
 
+  should("load only settings-page dependencies", async () => {
+    const source = await Deno.readTextFile("pages/keybindings.ts");
+    assert.isTrue(source.includes('import "./settings_page_dependencies.js"'));
+    assert.isFalse(source.includes('import "./all_content_scripts.js"'));
+  });
+
   should("organize active commands into feature groups", () => {
     const groups = Array.from(document.querySelectorAll(".binding-group"))
       .map((group) => group.dataset.group);

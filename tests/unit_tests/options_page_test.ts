@@ -19,6 +19,34 @@ context("options page", () => {
     assert.isTrue(document.querySelector('.options-page-link[href="keybindings.html"]') != null);
   });
 
+  should("load only settings-page dependencies", async () => {
+    const source = await Deno.readTextFile("pages/options.ts");
+    assert.isTrue(source.includes('import "./settings_page_dependencies.js"'));
+    assert.isFalse(source.includes('import "./all_content_scripts.js"'));
+    assert.isTrue(document.querySelector('link[href="options_layout.css"]') != null);
+  });
+
+  should("group each setting's copy and control into one row", () => {
+    const theme = optionsPage.getOptionEl("theme").closest(".setting-row");
+    assert.equal("Theme", theme.querySelector(".setting-copy h2").textContent);
+    assert.isTrue(
+      theme.querySelector(".setting-copy .example").textContent.includes(
+        "Choose a Suda interface theme",
+      ),
+    );
+    assert.equal(optionsPage.getOptionEl("theme"), theme.querySelector(".setting-control select"));
+
+    const hideHud = optionsPage.getOptionEl("hideHud").closest(".setting-row");
+    assert.equal(
+      "Hide the Heads Up Display (HUD) in insert mode",
+      hideHud.querySelector(".setting-name").textContent,
+    );
+    assert.equal(
+      optionsPage.getOptionEl("hideHud"),
+      hideHud.querySelector(".setting-switch input"),
+    );
+  });
+
   should("preserve keybinding settings when saving options", async () => {
     await Settings.set("keyBindingMode", "vim");
     await Settings.set("keyMappings", "map q scrollUp");

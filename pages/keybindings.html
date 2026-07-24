@@ -28,96 +28,110 @@
         <a class="page-link" href="options.html">Options</a>
       </header>
 
-      <section id="keybindings-toolbar" aria-label="Keybinding controls">
-        <fieldset id="profile-selector">
-          <legend>Binding profile</legend>
-          <label>
-            <input type="radio" name="keyBindingMode" value="helix" checked>
-            <span>Helix</span>
-          </label>
-          <label>
-            <input type="radio" name="keyBindingMode" value="vim">
-            <span>Suda classic</span>
-          </label>
-        </fieldset>
+      <div id="keybindings-workspace">
+        <section id="keybindings-toolbar" aria-label="Keybinding controls">
+          <fieldset id="profile-selector">
+            <legend>Binding profile</legend>
+            <label>
+              <input type="radio" name="keyBindingMode" value="helix" checked>
+              <span>Helix</span>
+            </label>
+            <label>
+              <input type="radio" name="keyBindingMode" value="vim">
+              <span>Suda classic</span>
+            </label>
+          </fieldset>
 
-        <div class="toolbar-actions">
-          <span id="binding-count" aria-live="polite"></span>
-          <label id="binding-search">
-            <svg viewBox="0 0 256 256" aria-hidden="true">
-              <path
-                d="M232.49,215.51,185,168a92.12,92.12,0,1,0-17,17l47.53,47.54a12,12,0,0,0,17-17ZM44,112a68,68,0,1,1,68,68A68.07,68.07,0,0,1,44,112Z"
-              ></path>
-            </svg>
-            <input type="search" placeholder="Search keybindings" aria-label="Search keybindings">
-          </label>
-          <button
-            id="toggle-editor"
-            type="button"
-            aria-expanded="false"
-            aria-controls="custom-mappings-editor"
-            title="Edit custom mappings"
-          >
-            <svg viewBox="0 0 256 256" aria-hidden="true">
-              <path
-                d="M216,120H136V40a8,8,0,0,0-16,0v80H40a8,8,0,0,0,0,16h80v80a8,8,0,0,0,16,0V136h80a8,8,0,0,0,0-16Z"
-              ></path>
-            </svg>
-            <span>Edit</span>
-          </button>
-        </div>
-      </section>
-
-      <section id="custom-mappings-editor" hidden>
-        <div class="editor-heading">
-          <div>
-            <span class="section-label">Custom mappings</span>
-            <h2>Layer your shortcuts over the selected profile</h2>
-            <p>
-              Use <code>map</code>, <code>unmap</code>, <code>unmapAll</code>, and
-              <code>mapkey</code>. Custom mappings override the profile below.
-            </p>
-          </div>
-          <button id="close-editor" class="icon-button" type="button" aria-label="Close editor">
-            <svg viewBox="0 0 256 256" aria-hidden="true">
-              <path
-                d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"
-              ></path>
-            </svg>
-          </button>
-        </div>
-        <textarea
-          name="keyMappings"
-          spellcheck="false"
-          aria-label="Custom key mappings"
-          placeholder="map &lt;space&gt;x removeTab"
-        ></textarea>
-        <div id="mapping-validation" class="validation-message" hidden></div>
-        <div class="editor-footer">
-          <div class="syntax-example">
-            <code>map &lt;space&gt;x removeTab</code>
-            <code>unmap x</code>
-          </div>
-          <div class="editor-actions">
-            <button id="discard-mappings" type="button">Discard</button>
-            <button id="save-mappings" class="primary-button" type="button" disabled>
-              No changes
+          <div class="toolbar-actions">
+            <span id="binding-count" aria-live="polite"></span>
+            <label id="binding-search">
+              <svg viewBox="0 0 256 256" aria-hidden="true">
+                <path
+                  d="M232.49,215.51,185,168a92.12,92.12,0,1,0-17,17l47.53,47.54a12,12,0,0,0,17-17ZM44,112a68,68,0,1,1,68,68A68.07,68.07,0,0,1,44,112Z"
+                ></path>
+              </svg>
+              <input type="search" placeholder="Search keybindings" aria-label="Search keybindings">
+            </label>
+            <button
+              id="toggle-editor"
+              type="button"
+              aria-expanded="false"
+              aria-controls="custom-mappings-editor"
+              title="Edit custom mappings"
+            >
+              <svg viewBox="0 0 256 256" aria-hidden="true">
+                <path
+                  d="M216,120H136V40a8,8,0,0,0-16,0v80H40a8,8,0,0,0,0,16h80v80a8,8,0,0,0,16,0V136h80a8,8,0,0,0,0-16Z"
+                ></path>
+              </svg>
+              <span>Edit</span>
             </button>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section id="bindings-table" aria-label="Active keybindings">
-        <div class="table-header" aria-hidden="true">
-          <span>Command</span>
-          <span>Keybinding</span>
-        </div>
-        <div id="binding-groups"></div>
-        <div id="empty-bindings" hidden>
-          <strong>No matching keybindings</strong>
-          <span>Try another command, feature, or key sequence.</span>
-        </div>
-      </section>
+        <section id="custom-mappings-editor" aria-label="Custom mappings editor" hidden>
+          <div class="editor-heading">
+            <div>
+              <span class="section-label">Custom mappings</span>
+              <h2>Layer your shortcuts over the selected profile</h2>
+              <p>
+                Use <code>map</code>, <code>unmap</code>, <code>unmapAll</code>, and
+                <code>mapkey</code>. Custom mappings override the profile below.
+              </p>
+            </div>
+            <button id="close-editor" class="icon-button" type="button" aria-label="Close editor">
+              <svg viewBox="0 0 256 256" aria-hidden="true">
+                <path
+                  d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <textarea
+            name="keyMappings"
+            spellcheck="false"
+            aria-label="Custom key mappings"
+            placeholder="map &lt;space&gt;x removeTab"
+          ></textarea>
+          <div
+            id="mapping-validation"
+            class="validation-message"
+            role="alert"
+            aria-live="polite"
+            hidden
+          ></div>
+          <div class="editor-footer">
+            <div class="syntax-example">
+              <code>map &lt;space&gt;x removeTab</code>
+              <code>unmap x</code>
+            </div>
+            <div class="editor-actions">
+              <button id="discard-mappings" type="button">Discard</button>
+              <button
+                id="save-mappings"
+                class="primary-button"
+                type="button"
+                aria-live="polite"
+                disabled
+              >
+                No changes
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section id="bindings-table" aria-label="Active keybindings">
+          <div class="table-header" aria-hidden="true">
+            <span>Command</span>
+            <span>Keybinding</span>
+          </div>
+          <div id="binding-groups"></div>
+          <div id="empty-bindings" hidden>
+            <strong>No matching keybindings</strong>
+            <span>Try another command, feature, or key sequence.</span>
+          </div>
+        </section>
+      </div>
     </main>
 
     <template id="binding-group-template">

@@ -345,6 +345,13 @@ const BackgroundCommands = {
     });
   },
 
+  openKeybindingsPage({ tab }) {
+    return chrome.tabs.create({
+      url: chrome.runtime.getURL("pages/keybindings.html"),
+      index: tab.index + 1,
+    });
+  },
+
   // Create a new tab. Also, with:
   //     map X createTab http://www.bbc.com/news
   // create a new tab with the given URL.

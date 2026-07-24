@@ -1,5 +1,5 @@
 // @ts-nocheck -- staged conversion of legacy dynamic JavaScript patterns.
-import "./all_content_scripts.js";
+import "./settings_page_dependencies.js";
 import { allCommands } from "../background_scripts/all_commands.js";
 import { getDefaultKeyMappings, KeyMappingsParser } from "../background_scripts/commands.js";
 
