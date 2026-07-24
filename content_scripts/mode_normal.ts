@@ -181,23 +181,6 @@ const NormalModeCommands = {
     globalThis.location.href = globalThis.location.origin;
   },
 
-  toggleViewSource() {
-    Utils.promiseIgnoringClosedTab(
-      chrome.runtime.sendMessage({ handler: "getCurrentTabUrl" }),
-    ).then((url) => {
-      if (url != null) {
-        if (url.substr(0, 12) === "view-source:") {
-          url = url.substr(12, url.length - 12);
-        } else {
-          url = "view-source:" + url;
-        }
-        return Utils.promiseIgnoringClosedTab(
-          chrome.runtime.sendMessage({ handler: "openUrlInNewTab", url }),
-        );
-      }
-    });
-  },
-
   copyCurrentUrl() {
     Utils.promiseIgnoringClosedTab(
       chrome.runtime.sendMessage({ handler: "getCurrentTabUrl" }),

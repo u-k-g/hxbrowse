@@ -63,6 +63,27 @@ context("settings", () => {
     });
   });
 
+  context("removed command migration", () => {
+    teardown(async () => {
+      await Settings.clear();
+    });
+
+    should("discard mappings for commands which no longer exist", async () => {
+      await chrome.storage.sync.set({
+        settingsVersion: "2.4.1",
+        keyMappings: [
+          "map x toggleViewSource",
+          "map z1 setZoom level=1.1",
+          "map y reload",
+        ].join("\n"),
+      });
+
+      await Settings.load();
+
+      assert.equal("map y reload", Settings.get("keyMappings"));
+    });
+  });
+
   context("v2.0 migration", () => {
     setup(async () => {
       // Prior to Suda 2.0.0, the settings values were encoded as JSON strings.

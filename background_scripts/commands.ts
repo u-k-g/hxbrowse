@@ -377,9 +377,9 @@ const Commands = {
         "zoomReset": {
           "": ["z0", "zz"] // No options, with two key maps, ie: `map zz zoomReset`
         },
-        "setZoom": {
-          "1.1": ["z1"], // `map z1 setZoom 1.1`
-          "1.2": ["z2"], // `map z2 setZoom 1.2`
+        "toggleMuteTab": {
+          "all": ["za"], // `map za toggleMuteTab all`
+          "other": ["zo"], // `map zo toggleMuteTab other`
         }
       }
     */
@@ -470,7 +470,6 @@ const helixKeyMappings = {
   "<space>'": "CommandBar.activateMarks",
   "<space>r": "reload",
   "<space>R": "hardReload",
-  "<space>v": "toggleViewSource",
   "<space>,": "openOptionsPage",
   ":": "CommandBar.activateModeSelection",
 

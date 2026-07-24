@@ -310,6 +310,13 @@ context("Validate commands and options data structures", () => {
     assert.isFalse(Object.hasOwn(helixKeyMappings, "<space>d"));
   });
 
+  should("remove setZoom and toggleViewSource entirely", () => {
+    const commandNames = allCommands.map(({ name }) => name);
+    assert.isFalse(commandNames.includes("setZoom"));
+    assert.isFalse(commandNames.includes("toggleViewSource"));
+    assert.isFalse(Object.hasOwn(helixKeyMappings, "<space>v"));
+  });
+
   should("use Space-f as the only Helix link-hint binding", () => {
     assert.equal("LinkHints.activateMode", helixKeyMappings["<space>f"]);
     for (const key of ["<space>F", "<space>a", "<space>y"]) {

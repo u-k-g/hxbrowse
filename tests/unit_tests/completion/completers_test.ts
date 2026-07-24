@@ -487,7 +487,6 @@ context("multi completer", () => {
 context("command completer", () => {
   const commandCompleter = new CommandCompleter();
   const multiCompleter = new MultiCompleter([commandCompleter]);
-  const setZoom = allCommands.filter((command) => command.name == "setZoom")[0];
 
   should("return all commands with default options if no mappings are specified", async () => {
     stub(chrome.storage.session, "get", async () => ({
@@ -509,9 +508,9 @@ context("command completer", () => {
   should("create suggestions for different variations of the same command", async () => {
     stub(chrome.storage.session, "get", async () => ({
       commandToOptionsToKeys: {
-        "setZoom": {
-          "value=1.1": ["z1"],
-          "value=1.2": ["z2"],
+        "toggleMuteTab": {
+          "all": ["z1"],
+          "other": ["z2"],
         },
       },
     }));
@@ -521,9 +520,13 @@ context("command completer", () => {
       "z2": new RegistryEntry(),
     });
 
-    const suggestions = await filterCompleter(multiCompleter, ["set", "zoom"]);
+    const suggestions = await filterCompleter(multiCompleter, ["mute", "tab"]);
     assert.equal(
-      ["Set zoom", "Set zoom (value=1.1)", "Set zoom (value=1.2)", "Reset zoom"],
+      [
+        "Mute or unmute current tab",
+        "Mute or unmute current tab (all)",
+        "Mute or unmute current tab (other)",
+      ],
       suggestions.map((s) => s.title),
     );
   });

@@ -616,18 +616,6 @@ const allCommands = [
   },
 
   {
-    name: "setZoom",
-    desc: "Set zoom",
-    group: "tabs",
-    advanced: true,
-    background: true,
-    options: {
-      level: "The zoom level. This can be a range of [0.25, 5.0]. 1.0 is the default.",
-    },
-    noRepeat: true,
-  },
-
-  {
     name: "zoomIn",
     desc: "Zoom in",
     group: "tabs",
@@ -677,14 +665,6 @@ const allCommands = [
     desc: "Edit keybindings",
     group: "misc",
     background: true,
-    noRepeat: true,
-  },
-
-  {
-    name: "toggleViewSource",
-    desc: "View page source",
-    group: "misc",
-    advanced: true,
     noRepeat: true,
   },
 

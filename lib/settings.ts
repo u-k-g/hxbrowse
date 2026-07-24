@@ -256,6 +256,16 @@ const Settings = {
     return settings;
   },
 
+  migrateRemovedCommands(settings) {
+    if (typeof settings.keyMappings !== "string") return settings;
+    settings.keyMappings = settings.keyMappings.split("\n")
+      .filter((line) => {
+        return !/^\s*map\s+\S+\s+(?:toggleViewSource|setZoom)(?:\s|$)/.test(line);
+      })
+      .join("\n");
+    return settings;
+  },
+
   // Returns a settings object and performs any migrations required if the settings object is from
   // an older version of Suda.
   migrateSettingsIfNecessary(settings) {
@@ -265,6 +275,7 @@ const Settings = {
     settings = this.migrateAccentColor(settings);
     settings = this.migrateLegacyKeyBindingMode(settings);
     settings = this.migrateHardReloadCommand(settings);
+    settings = this.migrateRemovedCommands(settings);
     return settings;
   },
 
