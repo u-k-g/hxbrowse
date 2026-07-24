@@ -218,25 +218,6 @@ body.settings-page #settings-grid-container {
   max-width: none;
 }
 
-body.settings-page footer {
-  left: 0;
-  width: 100%;
-}
-
-body.settings-page #footer-content {
-  margin: 0 auto;
-  max-width: 1040px;
-  padding-inline: 28px;
-}
-
-body.settings-page[data-active-section="keybindings"] footer {
-  display: none;
-}
-
-body.settings-page[data-active-section="keybindings"] #options-shortcut {
-  display: none;
-}
-
 /* ------------------------------------------------------------------ */
 /* Keybindings panel                                                  */
 /* ------------------------------------------------------------------ */
@@ -263,10 +244,6 @@ body.settings-page[data-active-section="keybindings"] #options-shortcut {
 @media (max-width: 640px) {
   #settings-topbar,
   .settings-panel {
-    padding-inline: 16px;
-  }
-
-  body.settings-page #footer-content {
     padding-inline: 16px;
   }
 

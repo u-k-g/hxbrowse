@@ -62,9 +62,7 @@ body.keybindings-page *::after {
   box-shadow: 0 0 0 3px var(--suda-accent-subtle-color);
 }
 
-#binding-search svg,
-#toggle-editor svg,
-.icon-button svg {
+#binding-search svg {
   fill: currentColor;
   flex: none;
   height: 15px;
@@ -95,46 +93,6 @@ body.keybindings-page *::after {
   opacity: 0.65;
 }
 
-#toggle-editor,
-.icon-button,
-#discard-mappings,
-#save-mappings,
-body.settings-page #panel-keybindings button {
-  -webkit-appearance: none;
-  appearance: none;
-  background: var(--bindings-row);
-  border: 1px solid var(--bindings-border);
-  border-radius: 8px;
-  color: var(--bindings-text);
-  cursor: pointer;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 650;
-  height: 32px;
-  padding: 0 12px;
-  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
-}
-
-#toggle-editor {
-  align-items: center;
-  display: inline-flex;
-  gap: 7px;
-}
-
-#toggle-editor:hover,
-#discard-mappings:hover,
-.icon-button:hover {
-  background: var(--bindings-row-hover);
-  border-color: var(--suda-accent-color);
-  color: var(--suda-accent-text-color);
-}
-
-#toggle-editor[aria-expanded="true"] {
-  background: var(--suda-accent-selected-color);
-  border-color: color-mix(in srgb, var(--suda-accent-selected-color) 82%, white);
-  color: var(--suda-accent-selected-text-color);
-}
-
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
@@ -145,54 +103,16 @@ textarea:focus-visible {
 }
 
 /* ------------------------------------------------------------------ */
-/* Custom mappings editor                                             */
+/* Direct keybinding editor                                           */
 /* ------------------------------------------------------------------ */
 
-#custom-mappings-editor {
-  background: color-mix(in srgb, var(--bindings-row) 42%, transparent);
-  border: 1px solid var(--bindings-border-soft);
-  border-radius: 12px;
-  margin-bottom: 16px;
-  padding: 16px;
-}
-
-#custom-mappings-editor[hidden] {
-  display: none;
-}
-
-.editor-heading {
-  align-items: flex-start;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.section-label {
-  color: var(--bindings-muted);
-  display: block;
-  font-size: 11px;
-  font-weight: 750;
-  letter-spacing: 0.11em;
-  line-height: 1;
-  margin-bottom: 4px;
-  text-transform: uppercase;
-}
-
-.editor-heading h2 {
-  font-size: 15px;
-  font-weight: 700;
-  margin: 0 0 5px;
-}
-
-.editor-heading p {
+#binding-instructions {
   color: var(--bindings-muted);
   font-size: 12px;
-  margin: 0;
+  margin: 0 0 12px;
 }
 
-#panel-keybindings code,
 #panel-keybindings kbd,
-body.keybindings-page code,
 body.keybindings-page kbd {
   background: var(--suda-surface-color);
   border: 1px solid var(--suda-border-color);
@@ -203,35 +123,6 @@ body.keybindings-page kbd {
   font-size: 11px;
 }
 
-#panel-keybindings code,
-body.keybindings-page code {
-  line-height: 22px;
-  padding: 0 6px;
-}
-
-.icon-button {
-  align-items: center;
-  display: inline-flex;
-  justify-content: center;
-  padding: 0;
-  width: 32px;
-}
-
-#custom-mappings-editor textarea {
-  background: var(--suda-surface-color);
-  border: 1px solid var(--bindings-border);
-  border-radius: 8px;
-  color: var(--bindings-text);
-  display: block;
-  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
-  font-size: 12px;
-  line-height: 1.55;
-  min-height: 180px;
-  padding: 12px;
-  resize: vertical;
-  width: 100%;
-}
-
 #panel-keybindings .validation-message,
 body.keybindings-page .validation-message {
   background: var(--suda-danger-subtle-color);
@@ -239,40 +130,13 @@ body.keybindings-page .validation-message {
   border-radius: 7px;
   color: var(--suda-danger-color);
   font-size: 12px;
-  margin-top: 10px;
+  margin: 0 0 12px;
   padding: 9px 11px;
   white-space: pre-line;
 }
 
 .validation-message[hidden] {
   display: none;
-}
-
-.editor-footer {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  margin-top: 12px;
-}
-
-.syntax-example,
-.editor-actions {
-  align-items: center;
-  display: flex;
-  gap: 8px;
-}
-
-.primary-button:not([disabled]) {
-  background: var(--suda-accent-selected-color);
-  border-color: color-mix(in srgb, var(--suda-accent-selected-color) 82%, white);
-  color: var(--suda-accent-selected-text-color);
-  min-width: 112px;
-}
-
-button[disabled] {
-  color: var(--bindings-muted);
-  cursor: default;
-  opacity: 0.72;
 }
 
 /* ------------------------------------------------------------------ */
@@ -290,7 +154,7 @@ button[disabled] {
 .binding-row {
   column-gap: 12px;
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(160px, 0.8fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.65fr);
 }
 
 .table-header {
@@ -351,7 +215,7 @@ button[disabled] {
 }
 
 .command-copy,
-.binding-keys {
+.binding-control {
   min-width: 0;
   padding: 10px 16px;
 }
@@ -383,12 +247,118 @@ button[disabled] {
   white-space: nowrap;
 }
 
-.binding-keys {
+.binding-control {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.binding-editor {
+  -webkit-appearance: none;
+  appearance: none;
+  align-items: center;
+  background: color-mix(in srgb, var(--bindings-row) 64%, transparent);
+  border: 1px solid var(--bindings-border);
+  border-radius: 8px;
+  color: var(--bindings-text);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: 10px;
+  justify-content: space-between;
+  min-height: 34px;
+  min-width: 180px;
+  padding: 5px 8px;
+  transition: background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.binding-editor:hover,
+.binding-editor:focus-visible,
+.binding-editor.is-recording {
+  background: var(--bindings-row-hover);
+  border-color: var(--suda-accent-color);
+}
+
+.binding-editor.is-recording {
+  box-shadow: 0 0 0 3px var(--suda-accent-subtle-color);
+}
+
+.binding-editor .binding-keys {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  justify-content: flex-end;
+  gap: 4px;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+.binding-edit-label {
+  color: var(--bindings-muted);
+  flex: none;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.binding-editor.is-recording .binding-edit-label,
+.binding-capture-prompt {
+  color: var(--suda-accent-text-color);
+}
+
+.binding-capture-prompt {
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.clear-binding,
+.revert-binding {
+  -webkit-appearance: none;
+  appearance: none;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--bindings-muted);
+  cursor: pointer;
+  display: inline-flex;
+  flex: none;
+  height: 28px;
+  justify-content: center;
+  opacity: 0;
+  padding: 0;
+  transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;
+  width: 28px;
+}
+
+.clear-binding svg,
+.revert-binding svg {
+  fill: currentColor;
+  height: 14px;
+  width: 14px;
+}
+
+.binding-row:hover .clear-binding,
+.clear-binding:focus-visible,
+.revert-binding {
+  opacity: 1;
+}
+
+.clear-binding:hover {
+  background: var(--suda-danger-subtle-color);
+  color: var(--suda-danger-color);
+}
+
+.revert-binding:hover {
+  background: var(--suda-accent-subtle-color);
+  color: var(--suda-accent-text-color);
+}
+
+.clear-binding[hidden],
+.revert-binding[hidden] {
+  display: none;
 }
 
 .binding-unbound {
@@ -403,8 +373,21 @@ button[disabled] {
 }
 
 .key-sequence {
+  align-items: center;
   display: inline-flex;
   gap: 3px;
+}
+
+.key-chord-joiner,
+.key-sequence-separator {
+  color: var(--bindings-muted);
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.key-sequence-separator {
+  margin-inline: 2px;
 }
 
 #panel-keybindings kbd,
@@ -441,12 +424,12 @@ body.keybindings-page kbd {
 @media (max-width: 900px) {
   .table-header,
   .binding-row {
-    grid-template-columns: minmax(0, 1.2fr) minmax(140px, 0.8fr);
+    grid-template-columns: minmax(0, 1.1fr) minmax(210px, 0.9fr);
   }
 
   .table-header span,
   .command-copy,
-  .binding-keys {
+  .binding-control {
     padding-inline: 12px;
   }
 }
@@ -472,18 +455,13 @@ body.keybindings-page kbd {
     padding: 0;
   }
 
-  .binding-keys {
+  .binding-control {
     grid-column: 2;
     justify-content: flex-end;
     padding: 0;
   }
 
-  .editor-footer {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .syntax-example {
-    display: none;
+  .binding-editor {
+    min-width: 150px;
   }
 }

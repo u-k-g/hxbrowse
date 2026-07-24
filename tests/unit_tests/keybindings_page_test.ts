@@ -4,6 +4,31 @@ import "../../tests/unit_tests/test_chrome_stubs.js";
 import * as keybindingsPage from "../../pages/keybindings.js";
 import * as optionsPage from "../../pages/options.js";
 
+const waitForBindingSave = () => new Promise((resolve) => setTimeout(resolve, 50));
+
+async function recordShortcut(command, currentKey, keyEvents) {
+  const row = document.querySelector(
+    `.binding-row[data-command="${command}"][data-key="${currentKey}"]`,
+  );
+  const editor = row.querySelector(".binding-editor");
+  editor.click();
+  for (const event of keyEvents) {
+    editor.dispatchEvent(
+      new window.KeyboardEvent("keydown", {
+        bubbles: true,
+        altKey: event.altKey,
+        code: event.code,
+        ctrlKey: event.ctrlKey,
+        key: event.key,
+        metaKey: event.metaKey,
+        shiftKey: event.shiftKey,
+      }),
+    );
+  }
+  editor.blur();
+  await waitForBindingSave();
+}
+
 context("keybindings page", () => {
   setup(async () => {
     // Keybindings live inside the unified settings shell on options.html.
@@ -23,7 +48,7 @@ context("keybindings page", () => {
     const scrollDown = document.querySelector('[data-command="scrollDown"]');
     assert.isTrue(scrollDown != null);
     assert.isTrue(
-      Array.from(scrollDown.querySelectorAll("kbd")).some((key) => key.textContent === "j"),
+      Array.from(scrollDown.querySelectorAll("kbd")).some((key) => key.textContent === "J"),
     );
 
     const options = document.querySelector('[data-command="openOptionsPage"]');
@@ -31,6 +56,10 @@ context("keybindings page", () => {
       ["Space", ","],
       Array.from(options.querySelectorAll("kbd")).map((key) => key.textContent),
     );
+    assert.equal(null, document.querySelector("#toggle-editor"));
+    assert.equal(null, document.querySelector("#custom-mappings-editor"));
+    assert.equal(null, document.querySelector('textarea[name="keyMappings"]'));
+    assert.isTrue(document.querySelector(".binding-editor") != null);
   });
 
   should("list every registered command, including those without a default binding", async () => {
@@ -70,9 +99,8 @@ context("keybindings page", () => {
   });
 
   should("mark customized command titles with the accent class", async () => {
-    const customMappings = document.querySelector('textarea[name="keyMappings"]');
-    customMappings.value = "map q scrollUp";
-    customMappings.dispatchEvent(new window.Event("input"));
+    await Settings.set("keyMappings", "map q scrollUp");
+    keybindingsPage.renderBindings();
 
     const customized = document.querySelector(
       '[data-command="scrollUp"] .command-description.command-custom',
@@ -103,25 +131,152 @@ context("keybindings page", () => {
     );
   });
 
-  should("preview and save custom mappings", async () => {
-    document.querySelector("#toggle-editor").click();
-    const customMappings = document.querySelector('textarea[name="keyMappings"]');
-    customMappings.value = "map q scrollUp";
-    customMappings.dispatchEvent(new window.Event("input"));
+  should("record and automatically save a key sequence from the binding cell", async () => {
+    await recordShortcut("scrollDown", "j", [
+      { code: "KeyQ", key: "q" },
+      { code: "KeyQ", key: "q" },
+    ]);
 
-    assert.isFalse(document.querySelector("#custom-mappings-editor").hidden);
-    assert.isFalse(document.querySelector("#save-mappings").disabled);
-    assert.isTrue(await keybindingsPage.saveMappings());
-    assert.equal("map q scrollUp", Settings.get("keyMappings"));
+    const customMappings = Settings.get("keyMappings");
+    assert.isTrue(customMappings.includes("unmap j"));
+    assert.isTrue(customMappings.includes("map qq scrollDown"));
+    assert.equal(customMappings, (await chrome.storage.sync.get("keyMappings")).keyMappings);
+
+    const rebound = document.querySelector(
+      '.binding-row[data-command="scrollDown"][data-key="qq"]',
+    );
+    assert.equal(
+      ["Q", "Q"],
+      Array.from(rebound.querySelectorAll("kbd")).map((key) => key.textContent),
+    );
   });
 
-  should("reject invalid custom mappings", async () => {
-    const customMappings = document.querySelector('textarea[name="keyMappings"]');
-    customMappings.value = "invalid-mapping-statement";
-    customMappings.dispatchEvent(new window.Event("input"));
+  should("record modifier shortcuts", async () => {
+    await recordShortcut("scrollDown", "j", [
+      { code: "KeyD", ctrlKey: true, key: "d" },
+    ]);
 
-    assert.isFalse(await keybindingsPage.saveMappings());
-    assert.isFalse(document.querySelector("#mapping-validation").hidden);
-    assert.equal(Settings.defaultOptions.keyMappings, Settings.get("keyMappings"));
+    assert.isTrue(Settings.get("keyMappings").includes("map <c-d> scrollDown"));
+    const rebound = document.querySelector(
+      '.binding-row[data-command="scrollDown"][data-key="<c-d>"]',
+    );
+    assert.equal(
+      ["Ctrl", "D"],
+      Array.from(rebound.querySelectorAll("kbd")).map((key) => key.textContent),
+    );
+    assert.equal("+", rebound.querySelector(".key-chord-joiner").textContent);
+  });
+
+  should("record a Ctrl chord followed by another key as a sequence", async () => {
+    await recordShortcut("scrollDown", "j", [
+      { code: "KeyW", ctrlKey: true, key: "w" },
+      { code: "KeyL", key: "l" },
+    ]);
+
+    assert.isTrue(Settings.get("keyMappings").includes("map <c-w>l scrollDown"));
+    const rebound = document.querySelector(
+      '.binding-row[data-command="scrollDown"][data-key="<c-w>l"]',
+    );
+    assert.equal(
+      ["Ctrl", "W", "L"],
+      Array.from(rebound.querySelectorAll("kbd")).map((key) => key.textContent),
+    );
+    assert.equal("+", rebound.querySelector(".key-chord-joiner").textContent);
+    assert.equal("›", rebound.querySelector(".key-sequence-separator").textContent);
+  });
+
+  should("record Space followed by another key as a sequence", async () => {
+    await recordShortcut("scrollDown", "j", [
+      { code: "Space", key: " " },
+      { code: "KeyT", key: "t" },
+    ]);
+
+    assert.isTrue(Settings.get("keyMappings").includes("map <space>t scrollDown"));
+    const rebound = document.querySelector(
+      '.binding-row[data-command="scrollDown"][data-key="<space>t"]',
+    );
+    assert.equal(
+      ["Space", "T"],
+      Array.from(rebound.querySelectorAll("kbd")).map((key) => key.textContent),
+    );
+    assert.equal("›", rebound.querySelector(".key-sequence-separator").textContent);
+  });
+
+  should("move a shortcut away from a conflicting command", async () => {
+    await recordShortcut("scrollDown", "j", [{ code: "KeyK", key: "k" }]);
+
+    assert.equal(
+      null,
+      document.querySelector('.binding-row[data-command="scrollUp"][data-key="k"]'),
+    );
+    assert.isTrue(
+      document.querySelector('.binding-row[data-command="scrollDown"][data-key="k"]') != null,
+    );
+  });
+
+  should("remove a binding with its clear control", async () => {
+    const row = document.querySelector('.binding-row[data-command="scrollDown"][data-key="j"]');
+    row.querySelector(".clear-binding").click();
+    await waitForBindingSave();
+
+    assert.isTrue(Settings.get("keyMappings").includes("unmap j"));
+    assert.equal(
+      null,
+      document.querySelector('.binding-row[data-command="scrollDown"][data-key="j"]'),
+    );
+    assert.isTrue(
+      document.querySelector('.binding-row[data-command="scrollDown"][data-key="zj"]') != null,
+    );
+    const removedDefault = document.querySelector(
+      '.binding-row[data-command="scrollDown"][data-key=""][data-revert-key="j"]',
+    );
+    assert.isTrue(removedDefault.classList.contains("is-custom"));
+    assert.isFalse(removedDefault.querySelector(".revert-binding").hidden);
+  });
+
+  should("revert a changed binding to its default", async () => {
+    await recordShortcut("scrollDown", "j", [{ code: "KeyX", key: "x" }]);
+
+    const changed = document.querySelector(
+      '.binding-row[data-command="scrollDown"][data-key="x"]',
+    );
+    assert.isFalse(changed.querySelector(".revert-binding").hidden);
+    changed.querySelector(".revert-binding").click();
+    await waitForBindingSave();
+
+    assert.equal(
+      null,
+      document.querySelector('.binding-row[data-command="scrollDown"][data-key="x"]'),
+    );
+    const restored = document.querySelector(
+      '.binding-row[data-command="scrollDown"][data-key="j"]',
+    );
+    assert.isTrue(restored != null);
+    assert.isTrue(restored.querySelector(".revert-binding").hidden);
+    assert.isTrue(Settings.get("keyMappings").includes("map j scrollDown"));
+  });
+
+  should("revert a removed default binding", async () => {
+    const original = document.querySelector(
+      '.binding-row[data-command="scrollDown"][data-key="j"]',
+    );
+    original.querySelector(".clear-binding").click();
+    await waitForBindingSave();
+
+    const removedDefault = document.querySelector(
+      '.binding-row[data-command="scrollDown"][data-key=""][data-revert-key="j"]',
+    );
+    removedDefault.querySelector(".revert-binding").click();
+    await waitForBindingSave();
+
+    assert.isTrue(
+      document.querySelector('.binding-row[data-command="scrollDown"][data-key="j"]') != null,
+    );
+    assert.equal(
+      null,
+      document.querySelector(
+        '.binding-row[data-command="scrollDown"][data-key=""][data-revert-key="j"]',
+      ),
+    );
   });
 });

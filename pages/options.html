@@ -559,73 +559,21 @@
                 <input type="search" placeholder="Search keybindings"
                   aria-label="Search keybindings">
               </label>
-              <button
-                id="toggle-editor"
-                type="button"
-                aria-expanded="false"
-                aria-controls="custom-mappings-editor"
-                title="Edit custom mappings"
-              >
-                <svg viewBox="0 0 256 256" aria-hidden="true">
-                  <path
-                    d="M216,120H136V40a8,8,0,0,0-16,0v80H40a8,8,0,0,0,0,16h80v80a8,8,0,0,0,16,0V136h80a8,8,0,0,0,0-16Z"></path>
-                </svg>
-                <span>Edit</span>
-              </button>
             </div>
           </div>
 
           <div id="keybindings-workspace">
-            <section id="custom-mappings-editor" aria-label="Custom mappings editor" hidden>
-              <div class="editor-heading">
-                <div>
-                  <span class="section-label">Custom mappings</span>
-                  <h2>Customize Helix keybindings</h2>
-                  <p>
-                    Use <code>map</code>, <code>unmap</code>, <code>unmapAll</code>, and
-                    <code>mapkey</code>. Custom mappings override the Helix defaults below.
-                  </p>
-                </div>
-                <button id="close-editor" class="icon-button" type="button"
-                  aria-label="Close editor">
-                  <svg viewBox="0 0 256 256" aria-hidden="true">
-                    <path
-                      d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
-                  </svg>
-                </button>
-              </div>
-              <textarea
-                name="keyMappings"
-                spellcheck="false"
-                aria-label="Custom key mappings"
-                placeholder="map &lt;space&gt;x removeTab"
-              ></textarea>
-              <div
-                id="mapping-validation"
-                class="validation-message"
-                role="alert"
-                aria-live="polite"
-                hidden
-              ></div>
-              <div class="editor-footer">
-                <div class="syntax-example">
-                  <code>map &lt;space&gt;x removeTab</code>
-                  <code>unmap x</code>
-                </div>
-                <div class="editor-actions">
-                  <button id="discard-mappings" type="button">Discard</button>
-                  <button
-                    id="save-mappings"
-                    class="primary-button"
-                    type="button"
-                    aria-live="polite"
-                    disabled
-                  >
-                    No changes
-                  </button>
-                </div>
-              </div>
-            </section>
+            <p id="binding-instructions">
+              Click a keybinding, then press a shortcut or sequence. Pause briefly to save.
+              Changes apply automatically.
+            </p>
+            <div
+              id="mapping-validation"
+              class="validation-message"
+              role="alert"
+              aria-live="polite"
+              hidden
+            ></div>
 
             <section id="bindings-table" aria-label="Active keybindings">
               <div class="table-header" aria-hidden="true">
@@ -640,19 +588,6 @@
             </section>
           </div>
         </section>
-
-        <footer>
-          <div id="footer-content">
-            <div id="footer-help-text">
-              Type <strong>?</strong> to show the help dialog.
-              <br>
-              Type <strong id="shortcut-to-save-all"></strong> to save all options.
-            </div>
-            <div id="footer-save-options">
-              <button id="save" disabled="disabled">No changes</button>
-            </div>
-          </div>
-        </footer>
       </div>
     </div>
 
@@ -686,7 +621,26 @@
           <strong class="command-description"></strong>
           <span class="command-name"></span>
         </div>
-        <div class="binding-keys"></div>
+        <div class="binding-control">
+          <button class="binding-editor" type="button">
+            <span class="binding-keys"></span>
+            <span class="binding-edit-label">Edit</span>
+          </button>
+          <button class="revert-binding" type="button" title="Restore default keybinding"
+            aria-label="Restore default keybinding">
+            <svg viewBox="0 0 256 256" aria-hidden="true">
+              <path
+                d="M232,128a104,104,0,1,1-30.46-73.54l8.49,8.48V40a8,8,0,0,1,16,0V82.33a13.69,13.69,0,0,1-13.67,13.67H170a8,8,0,0,1,0-16h28.69l-8.46-8.46A88,88,0,1,0,216,128a8,8,0,0,1,16,0Z"></path>
+            </svg>
+          </button>
+          <button class="clear-binding" type="button" title="Remove keybinding"
+            aria-label="Remove keybinding">
+            <svg viewBox="0 0 256 256" aria-hidden="true">
+              <path
+                d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+            </svg>
+          </button>
+        </div>
       </article>
     </template>
   </body>

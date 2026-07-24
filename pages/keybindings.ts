@@ -12,8 +12,13 @@ const groupMetadata = {
   misc: { label: "Miscellaneous", order: 5 },
 };
 
-function formatKeyToken(token) {
-  if (!token.startsWith("<")) return token;
+const captureCommitDelay = 1000;
+let activeCapture = null;
+
+function formatKeyTokenParts(token) {
+  if (!token.startsWith("<")) {
+    return [/^[a-z]$/.test(token) ? token.toUpperCase() : token];
+  }
   const parts = token.slice(1, -1).split("-");
   const modifierNames = {
     a: "Alt",
@@ -42,24 +47,59 @@ function formatKeyToken(token) {
   };
   const displayKey = namedKeys[keyName] ??
     (modifiers.length > 0 && /^[a-z]$/.test(keyName) ? keyName.toUpperCase() : keyName);
-  return [...modifiers, displayKey].join("-");
+  return [...modifiers, displayKey];
+}
+
+function appendKeyStep(container, token) {
+  const formattedParts = formatKeyTokenParts(token);
+  formattedParts.forEach((part, index) => {
+    if (index > 0) {
+      const joiner = document.createElement("span");
+      joiner.className = "key-chord-joiner";
+      joiner.textContent = "+";
+      container.appendChild(joiner);
+    }
+    const key = document.createElement("kbd");
+    key.textContent = part;
+    container.appendChild(key);
+  });
 }
 
 function appendKeySequence(container, keySequence) {
   const binding = document.createElement("span");
   binding.className = "key-sequence";
-  for (const token of keySequence.match(/<[^>]+>|./g) ?? []) {
-    const key = document.createElement("kbd");
-    key.textContent = formatKeyToken(token);
-    binding.appendChild(key);
-  }
+  const tokens = keySequence.match(/<[^>]+>|./g) ?? [];
+  tokens.forEach((token, index) => {
+    if (index > 0) {
+      const separator = document.createElement("span");
+      separator.className = "key-sequence-separator";
+      separator.textContent = "›";
+      separator.setAttribute("aria-label", "then");
+      binding.appendChild(separator);
+    }
+    appendKeyStep(binding, token);
+  });
   container.appendChild(binding);
 }
 
+function renderBindingValue(container, keySequence) {
+  container.textContent = "";
+  if (keySequence) {
+    appendKeySequence(container, keySequence);
+  } else {
+    const empty = document.createElement("span");
+    empty.className = "binding-unbound";
+    empty.textContent = "None";
+    container.appendChild(empty);
+  }
+}
+
 function formatOptionString(options) {
-  return Object.entries(options ?? {}).map(([name, value]) =>
-    value === true ? name : `${name}=${value}`
-  ).join(" ");
+  return Object.entries(options ?? {}).map(([name, value]) => {
+    if (value === true) return name;
+    const formattedValue = /\s/.test(String(value)) ? `"${value}"` : value;
+    return `${name}=${formattedValue}`;
+  }).join(" ");
 }
 
 function parseActiveMappings(customMappings) {
@@ -72,40 +112,98 @@ function parseActiveMappings(customMappings) {
 function buildBindingRows(customMappings) {
   const parsed = parseActiveMappings(customMappings);
   const defaultKeyToCommand = { ...helixKeyMappings };
-  const bindingsByCommand = {};
+  const activeBindings = Object.entries(parsed.keyToRegistryEntry).map(([key, registryEntry]) => ({
+    command: registryEntry.command,
+    key,
+    options: formatOptionString(registryEntry.options),
+  }));
+  const bindingsByCommand = Object.groupBy(activeBindings, (binding) => binding.command);
+  const missingDefaultKeys = new Set(
+    Object.entries(defaultKeyToCommand)
+      .filter(([key, command]) => {
+        return parsed.keyToRegistryEntry[key]?.command !== command ||
+          Object.keys(parsed.keyToRegistryEntry[key]?.options ?? {}).length > 0;
+      })
+      .map(([key]) => key),
+  );
+  const revertKeysByActiveKey = {};
+  const claimedDefaultKeys = new Set();
 
-  for (const [key, registryEntry] of Object.entries(parsed.keyToRegistryEntry)) {
-    const options = formatOptionString(registryEntry.options);
-    bindingsByCommand[registryEntry.command] ||= {};
-    bindingsByCommand[registryEntry.command][options] ||= [];
-    bindingsByCommand[registryEntry.command][options].push(key);
+  // A default key assigned to another command reverts to that key's original command.
+  for (const binding of activeBindings) {
+    const defaultCommand = defaultKeyToCommand[binding.key];
+    if (
+      defaultCommand &&
+      (defaultCommand !== binding.command || binding.options !== "")
+    ) {
+      revertKeysByActiveKey[binding.key] = [binding.key];
+      claimedDefaultKeys.add(binding.key);
+    }
+  }
+
+  // Pair a replacement key with a missing default for the same command. This lets a row changed
+  // from "j" to "x" restore "j", while an additional custom shortcut simply removes itself.
+  for (const binding of activeBindings) {
+    const replacedDefault = [...missingDefaultKeys].find((key) => {
+      return !claimedDefaultKeys.has(key) && defaultKeyToCommand[key] === binding.command;
+    });
+    if (replacedDefault != null && defaultKeyToCommand[binding.key] !== binding.command) {
+      revertKeysByActiveKey[binding.key] ||= [];
+      revertKeysByActiveKey[binding.key].push(replacedDefault);
+      claimedDefaultKeys.add(replacedDefault);
+    }
   }
 
   // Include every registered command, even when the Helix defaults leave it unbound.
   const rows = [];
   for (const command of allCommands) {
-    const optionSets = bindingsByCommand[command.name];
-    if (optionSets == null) {
+    const bindings = (bindingsByCommand[command.name] ?? [])
+      .sort((a, b) => a.key.localeCompare(b.key));
+    for (const binding of bindings) {
+      const isDefault = defaultKeyToCommand[binding.key] === command.name &&
+        binding.options === "";
+      const revertKeys = revertKeysByActiveKey[binding.key] ?? [];
+      const revertKey = revertKeys.find((key) => {
+        return defaultKeyToCommand[key] === command.name;
+      }) ?? revertKeys[0] ?? "";
+      rows.push({
+        ...command,
+        key: binding.key,
+        options: binding.options,
+        isCustom: !isDefault,
+        isUnbound: false,
+        revertKey,
+        revertKeys,
+      });
+    }
+
+    // Keep a visible, revertible row when a default binding was removed without a replacement.
+    const removedDefaults = [...missingDefaultKeys].filter((key) => {
+      return defaultKeyToCommand[key] === command.name && !claimedDefaultKeys.has(key);
+    });
+    for (const revertKey of removedDefaults) {
+      claimedDefaultKeys.add(revertKey);
+      rows.push({
+        ...command,
+        key: "",
+        options: "",
+        isCustom: true,
+        isUnbound: true,
+        revertKey,
+        revertKeys: [revertKey],
+      });
+    }
+
+    if (bindings.length === 0 && removedDefaults.length === 0) {
       rows.push({
         ...command,
         key: "",
         options: "",
         isCustom: false,
         isUnbound: true,
+        revertKey: "",
+        revertKeys: [],
       });
-      continue;
-    }
-    for (const [options, keys] of Object.entries(optionSets)) {
-      for (const key of keys.sort((a, b) => a.localeCompare(b))) {
-        const isDefault = defaultKeyToCommand[key] === command.name && options === "";
-        rows.push({
-          ...command,
-          key,
-          options,
-          isCustom: !isDefault,
-          isUnbound: false,
-        });
-      }
     }
   }
 
@@ -113,7 +211,7 @@ function buildBindingRows(customMappings) {
 }
 
 function currentCustomMappings() {
-  return document.querySelector('textarea[name="keyMappings"]').value;
+  return Settings.get("keyMappings");
 }
 
 function renderBindings() {
@@ -141,6 +239,9 @@ function renderBindings() {
       const rowNode = rowTemplate.cloneNode(true);
       const rowElement = rowNode.querySelector(".binding-row");
       rowElement.dataset.command = row.name;
+      rowElement.dataset.key = row.key;
+      rowElement.dataset.options = row.options;
+      rowElement.dataset.revertKey = row.revertKey;
       rowElement.dataset.search = [
         row.name,
         row.desc,
@@ -159,15 +260,31 @@ function renderBindings() {
       }
       if (row.isUnbound) rowElement.classList.add("is-unbound");
       rowNode.querySelector(".command-name").textContent = row.name;
-      const keysContainer = rowNode.querySelector(".binding-keys");
-      if (row.key) {
-        appendKeySequence(keysContainer, row.key);
-      } else {
-        const empty = document.createElement("span");
-        empty.className = "binding-unbound";
-        empty.textContent = "None";
-        keysContainer.appendChild(empty);
-      }
+      const editor = rowNode.querySelector(".binding-editor");
+      const keysContainer = editor.querySelector(".binding-keys");
+      renderBindingValue(keysContainer, row.key);
+      editor.setAttribute(
+        "aria-label",
+        `${row.desc}: ${row.key ? `currently ${row.key}` : "currently unbound"}. Edit keybinding`,
+      );
+      editor.addEventListener("click", () => beginShortcutCapture(editor, row));
+      editor.addEventListener("keydown", onCaptureKeydown);
+      editor.addEventListener("blur", () => finishCaptureOnBlur(editor));
+
+      const clearButton = rowNode.querySelector(".clear-binding");
+      clearButton.hidden = !row.key;
+      clearButton.setAttribute("aria-label", `Remove ${row.key} from ${row.desc}`);
+      clearButton.addEventListener("click", () => void updateBinding(row, ""));
+
+      const revertButton = rowNode.querySelector(".revert-binding");
+      revertButton.hidden = !row.isCustom;
+      revertButton.setAttribute(
+        "aria-label",
+        row.revertKey
+          ? `Restore the default ${row.revertKey} binding`
+          : `Remove the custom ${row.key} binding`,
+      );
+      revertButton.addEventListener("click", () => void revertBinding(row));
       rowsContainer.appendChild(rowNode);
     }
     groupsContainer.appendChild(groupNode);
@@ -200,37 +317,118 @@ function filterBindings() {
   document.querySelector("#empty-bindings").hidden = visibleRows !== 0;
 }
 
-function setEditorOpen(open) {
-  const editor = document.querySelector("#custom-mappings-editor");
-  editor.hidden = !open;
-  document.querySelector("#toggle-editor").setAttribute("aria-expanded", String(open));
-  if (open) document.querySelector('textarea[name="keyMappings"]').focus();
+function eventToKeyToken(event) {
+  let keyChar = KeyboardUtils.getKeyChar(event);
+  if (!keyChar) return "";
+  const modifiers = [];
+  if (event.shiftKey && keyChar.length === 1) keyChar = keyChar.toUpperCase();
+  if (event.altKey) modifiers.push("a");
+  if (event.ctrlKey) modifiers.push("c");
+  if (event.metaKey) modifiers.push("m");
+  if (event.shiftKey && keyChar.length > 1) modifiers.push("s");
+  const token = [...modifiers, keyChar].join("-");
+  return token.length > 1 ? `<${token}>` : token;
 }
 
-function markDirty() {
-  const saveButton = document.querySelector("#save-mappings");
-  saveButton.disabled = false;
-  saveButton.textContent = "Save changes";
-  document.querySelector("#mapping-validation").hidden = true;
-  renderBindings();
+function showCaptureValue(capture) {
+  const keysContainer = capture.editor.querySelector(".binding-keys");
+  keysContainer.textContent = "";
+  if (capture.tokens.length > 0) {
+    appendKeySequence(keysContainer, capture.tokens.join(""));
+  } else {
+    const prompt = document.createElement("span");
+    prompt.className = "binding-capture-prompt";
+    prompt.textContent = "Press shortcut…";
+    keysContainer.appendChild(prompt);
+  }
 }
 
-function resetFormFromSettings() {
-  document.querySelector('textarea[name="keyMappings"]').value = Settings.get("keyMappings");
-  const saveButton = document.querySelector("#save-mappings");
-  saveButton.disabled = true;
-  saveButton.textContent = "No changes";
-  document.querySelector("#mapping-validation").hidden = true;
-  renderBindings();
+function cancelShortcutCapture() {
+  if (activeCapture == null) return;
+  clearTimeout(activeCapture.timer);
+  const { editor, row } = activeCapture;
+  activeCapture = null;
+  editor.classList.remove("is-recording");
+  editor.querySelector(".binding-edit-label").textContent = "Edit";
+  editor.removeAttribute("aria-live");
+  renderBindingValue(editor.querySelector(".binding-keys"), row.key);
 }
 
-async function saveMappings() {
-  const customMappings = currentCustomMappings().trim();
+function beginShortcutCapture(editor, row) {
+  if (activeCapture?.editor === editor) return;
+  cancelShortcutCapture();
+  activeCapture = { editor, row, tokens: [], timer: null };
+  editor.classList.add("is-recording");
+  editor.querySelector(".binding-edit-label").textContent = "Recording";
+  editor.setAttribute("aria-live", "polite");
+  showCaptureValue(activeCapture);
+  editor.focus();
+}
+
+function onCaptureKeydown(event) {
+  if (activeCapture?.editor !== event.currentTarget) return;
+  event.preventDefault();
+  event.stopPropagation();
+  if (event.key === "Escape") {
+    cancelShortcutCapture();
+    return;
+  }
+  if (event.repeat || KeyboardUtils.isModifier(event)) return;
+
+  const token = eventToKeyToken(event);
+  if (!token) return;
+  activeCapture.tokens.push(token);
+  showCaptureValue(activeCapture);
+  clearTimeout(activeCapture.timer);
+  activeCapture.timer = setTimeout(() => void commitShortcutCapture(), captureCommitDelay);
+}
+
+function finishCaptureOnBlur(editor) {
+  queueMicrotask(() => {
+    if (activeCapture?.editor !== editor) return;
+    if (activeCapture.tokens.length > 0) {
+      void commitShortcutCapture();
+    } else {
+      cancelShortcutCapture();
+    }
+  });
+}
+
+async function commitShortcutCapture() {
+  if (activeCapture == null || activeCapture.tokens.length === 0) return;
+  clearTimeout(activeCapture.timer);
+  const { editor, row, tokens } = activeCapture;
+  activeCapture = null;
+  editor.classList.remove("is-recording");
+  editor.querySelector(".binding-edit-label").textContent = "Saving";
+  editor.removeAttribute("aria-live");
+  await updateBinding(row, tokens.join(""));
+}
+
+function appendMappingStatements(customMappings, statements) {
+  const current = customMappings.trimEnd();
+  return `${current}${current ? "\n" : ""}${statements.join("\n")}`;
+}
+
+async function updateBinding(row, nextKey) {
+  if (nextKey === row.key) {
+    renderBindings();
+    return true;
+  }
+
+  const statements = [];
+  if (row.key) statements.push(`unmap ${row.key}`);
+  if (nextKey) {
+    const options = row.options ? ` ${row.options}` : "";
+    statements.push(`map ${nextKey} ${row.name}${options}`);
+  }
+  const customMappings = appendMappingStatements(currentCustomMappings(), statements);
   const parsed = KeyMappingsParser.parse(customMappings);
   const validation = document.querySelector("#mapping-validation");
   if (parsed.validationErrors.length > 0) {
     validation.textContent = parsed.validationErrors.join("\n");
     validation.hidden = false;
+    renderBindings();
     return false;
   }
 
@@ -238,11 +436,28 @@ async function saveMappings() {
   settings.keyMappings = customMappings;
   await Settings.setSettings(settings);
   validation.hidden = true;
-  const saveButton = document.querySelector("#save-mappings");
-  saveButton.disabled = true;
-  saveButton.textContent = "Saved";
   renderBindings();
   return true;
+}
+
+async function revertBinding(row) {
+  const statements = [];
+  if (row.key) statements.push(`unmap ${row.key}`);
+  for (const revertKey of row.revertKeys) {
+    statements.push(`map ${revertKey} ${helixKeyMappings[revertKey]}`);
+  }
+  const customMappings = appendMappingStatements(currentCustomMappings(), statements);
+  const settings = Settings.getSettings();
+  settings.keyMappings = customMappings;
+  await Settings.setSettings(settings);
+  document.querySelector("#mapping-validation").hidden = true;
+  renderBindings();
+}
+
+function resetFromSettings() {
+  cancelShortcutCapture();
+  document.querySelector("#mapping-validation").hidden = true;
+  renderBindings();
 }
 
 async function init() {
@@ -255,32 +470,14 @@ async function init() {
   // Re-init safely when the document is replaced (unit tests), but don't double-bind on the
   // same DOM when options.init() is called more than once.
   if (root.dataset.keybindingsReady === "true") {
-    resetFormFromSettings();
+    resetFromSettings();
     return;
   }
   root.dataset.keybindingsReady = "true";
 
-  resetFormFromSettings();
+  resetFromSettings();
 
   document.querySelector("#binding-search input").addEventListener("input", filterBindings);
-  document.querySelector('textarea[name="keyMappings"]').addEventListener("input", markDirty);
-  document.querySelector("#toggle-editor").addEventListener(
-    "click",
-    () => setEditorOpen(document.querySelector("#custom-mappings-editor").hidden),
-  );
-  document.querySelector("#close-editor").addEventListener("click", () => setEditorOpen(false));
-  document.querySelector("#discard-mappings").addEventListener("click", () => {
-    resetFormFromSettings();
-    setEditorOpen(false);
-  });
-  document.querySelector("#save-mappings").addEventListener("click", saveMappings);
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
-      if (!document.querySelector("#panel-keybindings")?.hidden) {
-        saveMappings();
-      }
-    }
-  });
 }
 
 const testEnv = globalThis.window == null ||
@@ -295,4 +492,4 @@ if (!testEnv && isStandaloneKeybindingsPage) {
   });
 }
 
-export { buildBindingRows, filterBindings, init, renderBindings, saveMappings };
+export { buildBindingRows, filterBindings, init, renderBindings, revertBinding, updateBinding };

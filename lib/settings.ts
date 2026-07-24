@@ -20,7 +20,7 @@ const defaultOptions = {
   commandBarCenter: "window",
   disabledCommandBarModes: ["url"],
   disabledModelessCommandBarSources: ["history"],
-  keyMappings: "# Insert your preferred key mappings here.",
+  keyMappings: "",
   linkHintCharacters: "sadfjklewcmpgh",
   linkHintNumbers: "0123456789",
   filterLinkHints: false,

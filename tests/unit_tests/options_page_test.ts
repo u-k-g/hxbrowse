@@ -3,6 +3,8 @@ import * as testHelper from "./test_helper.js";
 import "../../tests/unit_tests/test_chrome_stubs.js";
 import * as optionsPage from "../../pages/options.js";
 
+const waitForAutoSave = () => new Promise((resolve) => setTimeout(resolve, 350));
+
 context("options page", () => {
   setup(async () => {
     await testHelper.jsdomStub("pages/options.html");
@@ -14,7 +16,8 @@ context("options page", () => {
   });
 
   should("fold keybindings into the unified settings shell", () => {
-    assert.isTrue(optionsPage.getOptionEl("keyMappings") != null);
+    assert.equal(null, optionsPage.getOptionEl("keyMappings"));
+    assert.isTrue(typeof Settings.get("keyMappings") === "string");
     assert.equal(null, document.querySelector('input[name="keyBindingMode"]'));
     assert.isTrue(document.querySelector("#settings-shell") != null);
     assert.isTrue(document.querySelector("#panel-keybindings") != null);
@@ -22,6 +25,8 @@ context("options page", () => {
     assert.isTrue(
       document.querySelector('.settings-section-option[data-section="keybindings"]') != null,
     );
+    assert.equal(null, document.querySelector("footer"));
+    assert.equal(null, document.querySelector("#save"));
   });
 
   should("load only settings-page dependencies", async () => {
@@ -102,6 +107,17 @@ context("options page", () => {
       assert.equal("customUrl", Settings.get("newTabDestination"));
     },
   );
+
+  should("automatically save changed options", async () => {
+    const scrollStepSize = optionsPage.getOptionEl("scrollStepSize");
+    scrollStepSize.value = "144";
+    scrollStepSize.dispatchEvent(new window.Event("input"));
+
+    await waitForAutoSave();
+
+    assert.equal(144, Settings.get("scrollStepSize"));
+    assert.equal(144, (await chrome.storage.sync.get("scrollStepSize")).scrollStepSize);
+  });
 
   should("preserve custom keybindings when saving options", async () => {
     await Settings.set("keyMappings", "map q scrollUp");

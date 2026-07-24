@@ -33,6 +33,9 @@ const options = {
   waitForEnterForFilteredHints: "boolean",
 };
 
+const autoSaveDelay = 250;
+let autoSaveTimer = null;
+
 const settingsSections = ["general", "keybindings"];
 const settingsSectionLabels = {
   general: "General",
@@ -147,27 +150,22 @@ export async function init() {
   // Theme options are filled above; wrap every select after its options exist.
   enhanceSelectDropdowns();
 
-  const shortcutLabel = document.querySelector("#shortcut-to-save-all");
-  shortcutLabel.textContent = `${KeyboardUtils.primaryModifierLabel}-Enter`;
-
-  const saveButton = document.querySelector("#save");
-
   const onUpdated = () => {
     maintainNewTabUrlView();
-    saveButton.disabled = false;
-    saveButton.textContent = "Save changes";
+    scheduleOptionsSave();
   };
 
-  for (const el of document.querySelectorAll("input, textarea, select")) {
-    // We want to immediately enable the save button when a setting is changed, so we want to use
-    // the HTML element's "input" event here rather than the "change" event.
+  for (
+    const el of document.querySelectorAll(
+      '#panel-general input:not([type="file"]):not([type="button"]), ' +
+        "#panel-general textarea, #panel-general select",
+    )
+  ) {
     el.addEventListener("input", () => onUpdated());
     el.addEventListener("blur", () => {
       showValidationErrors();
     });
   }
-
-  saveButton.addEventListener("click", () => saveOptions());
 
   getOptionEl("filterLinkHints").addEventListener(
     "click",
@@ -191,21 +189,6 @@ export async function init() {
       onUpdated();
     });
   }
-
-  globalThis.onbeforeunload = () => {
-    if (!saveButton.disabled) {
-      return "You have unsaved changes to options.";
-    }
-  };
-
-  document.addEventListener("keydown", (event) => {
-    // Support both Ctrl-Enter and Cmd-Enter for saving options.
-    const isCtrlEnter = event.ctrlKey && event.keyCode === 13;
-    const isCmdEnter = event.metaKey && event.keyCode === 13;
-    if ((isCtrlEnter || isCmdEnter) && document.body.dataset.activeSection !== "keybindings") {
-      saveOptions();
-    }
-  });
 
   ExclusionRulesEditor.init();
   ExclusionRulesEditor.addEventListener("input", onUpdated);
@@ -626,17 +609,27 @@ function removeDuplicateChars(str) {
 }
 
 export async function saveOptions() {
+  if (autoSaveTimer != null) {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = null;
+  }
   const hasErrors = showValidationErrors();
   if (hasErrors) {
-    // TODO(philc): If no fields with validation errors are in view, scroll one of them into view
-    // so it's clear what the issue is.
-    return;
+    return false;
   }
 
   await Settings.setSettings(getSettingsFromForm());
-  const el = document.querySelector("#save");
-  el.disabled = true;
-  el.textContent = "Saved";
+  return true;
+}
+
+function scheduleOptionsSave() {
+  if (autoSaveTimer != null) clearTimeout(autoSaveTimer);
+  const sourceDocument = document;
+  autoSaveTimer = setTimeout(() => {
+    autoSaveTimer = null;
+    if (document !== sourceDocument) return;
+    void saveOptions();
+  }, autoSaveDelay);
 }
 
 function showElement(el, visible) {
@@ -714,9 +707,6 @@ function onUploadBackupClicked() {
 
       await Settings.setSettings(backup);
       setFormFromSettings(Settings.getSettings());
-      const saveButton = document.querySelector("#save");
-      saveButton.disabled = true;
-      saveButton.textContent = "Saved";
       alert("Settings have been restored from the backup.");
     };
   }

@@ -662,17 +662,6 @@ body.options-page #accent-row {
   display: grid;
 }
 
-body.options-page footer {
-  background: color-mix(in srgb, var(--suda-canvas-color) 94%, transparent);
-  border-color: var(--options-hairline);
-  box-shadow: none;
-  padding: 11px 28px;
-}
-
-body.options-page #footer-content {
-  max-width: var(--settings-content-width);
-}
-
 @media (max-width: 820px) {
   body.options-page #settings-grid-container {
     margin-top: 24px;
@@ -733,9 +722,5 @@ body.options-page #footer-content {
     font-size: 18px;
     margin-top: 32px;
     padding-top: 24px;
-  }
-
-  body.options-page footer {
-    padding-inline: 18px;
   }
 }
