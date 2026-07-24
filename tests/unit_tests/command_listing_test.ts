@@ -42,6 +42,16 @@ context("command listing", () => {
     assert.equal(allCommands.length, rows.length);
   });
 
+  should("exclude disabled actions", async () => {
+    Settings._settings.disabledActions = ["hardReload"];
+
+    await commandListing.populatePage();
+
+    Settings._settings.disabledActions = [];
+    assert.equal(null, globalThis.document.querySelector(".command#hardReload"));
+    assert.isTrue(globalThis.document.querySelector(".command#reload") != null);
+  });
+
   should("show key mappings for mapped commands", async () => {
     const getKeys = (commandName) => {
       const el = globalThis.document.querySelector(`.command#${commandName}`);

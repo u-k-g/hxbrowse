@@ -50,6 +50,7 @@ context("commandBar page", () => {
     Settings._settings.disabledModelessCommandBarSources = structuredClone(
       Settings.defaultOptions.disabledModelessCommandBarSources,
     );
+    Settings._settings.disabledActions = [];
   });
 
   should("hide when escape is pressed", async () => {
@@ -167,6 +168,15 @@ context("commandBar page", () => {
 
   should("hide user-disabled modes from the mode selector", async () => {
     Settings._settings.disabledCommandBarModes = ["tabs"];
+    await commandBarPage.activate({ mode: "modes", completer: "modes" });
+    ui.setQuery("tabs");
+    await ui.update();
+
+    assert.isFalse(ui.completions.some((completion) => completion.commandBarMode === "tabs"));
+  });
+
+  should("hide modes whose activation actions are disabled", async () => {
+    Settings._settings.disabledActions = ["CommandBar.activateTabSelection"];
     await commandBarPage.activate({ mode: "modes", completer: "modes" });
     ui.setQuery("tabs");
     await ui.update();

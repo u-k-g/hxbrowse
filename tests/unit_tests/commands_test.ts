@@ -214,6 +214,28 @@ context("KeyMappingsParser", () => {
   });
 });
 
+context("disabled actions", () => {
+  should(
+    "keep their configured keys but omit them from active mappings and help data",
+    async () => {
+      Settings._settings.disabledActions = ["scrollDown"];
+      await Commands.loadKeyMappings("");
+      const activeMapping =
+        (await chrome.storage.session.get("normalModeKeyStateMapping")).normalModeKeyStateMapping;
+      const helpData =
+        (await chrome.storage.session.get("commandToOptionsToKeys")).commandToOptionsToKeys;
+      const configuredCommand = Commands.keyToRegistryEntry["j"]?.command;
+
+      Settings._settings.disabledActions = [];
+      await Commands.loadKeyMappings("");
+
+      assert.equal("scrollDown", configuredCommand);
+      assert.isFalse(Object.hasOwn(activeMapping, "j"));
+      assert.isFalse(Object.hasOwn(helpData, "scrollDown"));
+    },
+  );
+});
+
 context("Validate commands and options data structures", () => {
   should("have either noRepeat or repeatLimit, but not both", () => {
     for (const command of allCommands) {

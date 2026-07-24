@@ -22,6 +22,8 @@ const options = {
   nextPatterns: "string",
   openCommandBarOnNewTabPage: "boolean",
   previousPatterns: "string",
+  recentTabCycleSize: "number",
+  recentTabCycleTimeoutMs: "number",
   regexFindMode: "boolean",
   scrollStepSize: "number",
   searchEngines: "string",

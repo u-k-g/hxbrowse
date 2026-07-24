@@ -552,6 +552,22 @@ context("command completer", () => {
     assert.equal([["r"], []], suggestions.map((suggestion) => suggestion.command.keys));
   });
 
+  should("exclude disabled actions", async () => {
+    stub(chrome.storage.session, "get", async () => ({ commandToOptionsToKeys: {} }));
+    stub(Commands, "keyToRegistryEntry", {});
+    Settings._settings.disabledActions = ["reload"];
+
+    const suggestions = await filterCompleter(multiCompleter, ["reload"]);
+
+    Settings._settings.disabledActions = [];
+    assert.isFalse(
+      suggestions.some((suggestion) => suggestion.command.registryEntry.command === "reload"),
+    );
+    assert.isTrue(
+      suggestions.some((suggestion) => suggestion.command.registryEntry.command === "hardReload"),
+    );
+  });
+
   should("include the exclude-all-keys command", async () => {
     stub(chrome.storage.session, "get", async () => ({ commandToOptionsToKeys: {} }));
     stub(Commands, "keyToRegistryEntry", {});

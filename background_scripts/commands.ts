@@ -327,7 +327,9 @@ const Commands = {
     // when users press printable keys in insert mode, they expect that character to be input, not
     // to be droppped into a special Suda mode.
     const passNextKeys = Object.entries(this.keyToRegistryEntry)
-      .filter(([key, v]) => v.command == "passNextKey" && key.length > 1)
+      .filter(([key, v]) =>
+        v.command == "passNextKey" && key.length > 1 && Settings.isActionEnabled(v.command)
+      )
       .map(([key, v]) => key);
     await chrome.storage.session.set({ passNextKeyKeys: passNextKeys });
   },
@@ -338,6 +340,7 @@ const Commands = {
     const keyStateMapping = {};
     for (const keys of Object.keys(this.keyToRegistryEntry || {})) {
       const registryEntry = this.keyToRegistryEntry[keys];
+      if (!Settings.isActionEnabled(registryEntry.command)) continue;
       let currentMapping = keyStateMapping;
       for (let index = 0; index < registryEntry.keySequence.length; index++) {
         const key = registryEntry.keySequence[index];
@@ -398,6 +401,7 @@ const Commands = {
     };
     for (const key of Object.keys(this.keyToRegistryEntry || {})) {
       const registryEntry = this.keyToRegistryEntry[key];
+      if (!Settings.isActionEnabled(registryEntry.command)) continue;
       const optionString = formatOptionString(registryEntry.options || {});
       commandToOptionsToKeys[registryEntry.command] ||= {};
       commandToOptionsToKeys[registryEntry.command][optionString] ||= [];

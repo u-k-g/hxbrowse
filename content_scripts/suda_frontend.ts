@@ -399,6 +399,7 @@ const messageHandlers = {
     // TODO(philc): it seems to me that we should be able to get rid of this runInTopFrame
     // command, and instead use chrome.tabs.sendMessage with a frameId 0 from the background page.
     if (DomUtils.isTopFrame()) {
+      if (!Settings.isActionEnabled(registryEntry.command)) return;
       return NormalModeCommands[registryEntry.command](sourceFrameId, registryEntry);
     }
   },

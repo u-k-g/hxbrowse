@@ -15,11 +15,14 @@ const defaultOptions = {
   accentColor: "#6CED96",
   scrollStepSize: 120,
   fastScrollStepSize: 800,
+  recentTabCycleSize: 5,
+  recentTabCycleTimeoutMs: 800,
   smoothScroll: true,
   showCommandBarModeDescriptions: false,
   commandBarCenter: "window",
   disabledCommandBarModes: ["url"],
   disabledModelessCommandBarSources: ["history"],
+  disabledActions: [],
   keyMappings: "",
   linkHintCharacters: "sadfjklewcmpgh",
   linkHintNumbers: "0123456789",
@@ -146,6 +149,11 @@ const Settings = {
       throw new Error(`Getting the setting ${key} before settings have been loaded.`);
     }
     return globalThis.structuredClone(this._settings[key]);
+  },
+
+  isActionEnabled(actionName) {
+    if (!this.isLoaded()) return true;
+    return !(this._settings.disabledActions ?? []).includes(actionName);
   },
 
   async set(key, value) {

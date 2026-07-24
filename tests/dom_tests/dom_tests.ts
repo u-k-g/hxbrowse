@@ -705,6 +705,20 @@ context("Filtered link hints", () => {
 });
 
 context("Helix normal-mode commands", () => {
+  should("not execute disabled actions", () => {
+    let executed = false;
+    Settings._settings.disabledActions = ["scrollDown"];
+    stub(NormalModeCommands, "scrollDown", () => executed = true);
+
+    NormalMode.prototype.commandHandler({
+      command: { command: "scrollDown", options: {} },
+      count: 1,
+    });
+
+    Settings._settings.disabledActions = [];
+    assert.isFalse(executed);
+  });
+
   should("find selected text with the find command", () => {
     let updatedQuery = null;
     let savedQuery = false;

@@ -33,6 +33,7 @@ import * as TabOperations from "./tab_operations.js";
 
 export async function handleExtensionCommand(command, tab) {
   if (command !== "open-command-bar" || tab?.id == null) return;
+  if (!Settings.isActionEnabled("CommandBar.activateAll")) return;
   await bgUtils.runTabCallbackOperation(
     (callback) =>
       chrome.tabs.sendMessage(
@@ -269,15 +270,26 @@ function nextZoomLevel(currentZoom, steps) {
   }
 }
 
-const recentTabCycleTimeoutMs = 800;
-const recentTabCycleSize = 5;
 let recentTabCycle = null;
 
 function resetRecentTabCycle() {
   recentTabCycle = null;
 }
 
-async function startRecentTabCycle(currentTabId, pressedAt) {
+function getRecentTabCycleSettings() {
+  const configuredSize = Number(Settings.get("recentTabCycleSize"));
+  const configuredTimeoutMs = Number(Settings.get("recentTabCycleTimeoutMs"));
+  return {
+    size: Number.isFinite(configuredSize) && configuredSize >= 1
+      ? Math.floor(configuredSize)
+      : Settings.defaultOptions.recentTabCycleSize,
+    timeoutMs: Number.isFinite(configuredTimeoutMs) && configuredTimeoutMs >= 0
+      ? configuredTimeoutMs
+      : Settings.defaultOptions.recentTabCycleTimeoutMs,
+  };
+}
+
+async function startRecentTabCycle(currentTabId, pressedAt, size) {
   await bgUtils.tabRecency.init();
   const openTabs = await chrome.tabs.query({});
   const openTabIds = new Set(openTabs.map((tab) => tab.id));
@@ -295,17 +307,20 @@ async function startRecentTabCycle(currentTabId, pressedAt) {
   recentTabCycle = {
     lastPressedAt: pressedAt,
     nextIndex: 0,
-    tabIds: tabIds.concat(remainingTabIds).slice(0, recentTabCycleSize),
+    size,
+    tabIds: tabIds.concat(remainingTabIds).slice(0, size),
   };
 }
 
 async function selectNextRecentTab(currentTabId) {
   const pressedAt = Date.now();
+  const { size, timeoutMs } = getRecentTabCycleSettings();
   if (
     recentTabCycle == null ||
-    pressedAt - recentTabCycle.lastPressedAt > recentTabCycleTimeoutMs
+    recentTabCycle.size !== size ||
+    pressedAt - recentTabCycle.lastPressedAt > timeoutMs
   ) {
-    await startRecentTabCycle(currentTabId, pressedAt);
+    await startRecentTabCycle(currentTabId, pressedAt, size);
   } else {
     recentTabCycle.lastPressedAt = pressedAt;
   }
@@ -708,12 +723,14 @@ const HintCoordinator = {
 
 const sendRequestHandlers = {
   runBackgroundCommand(request, sender) {
+    if (!Settings.isActionEnabled(request.registryEntry.command)) return;
     return BackgroundCommands[request.registryEntry.command](request, sender);
   },
   // Executes a command as if it was run in normal mode by a content script.
   // Used by the CommandBar's command completer, which can be used to execute any command in Suda.
   // The "request" must contain a "count" and a valid "command: RegistryEntry" parameter.
   runNormalModeCommand(request, sender) {
+    if (!Settings.isActionEnabled(request.command.command)) return;
     return bgUtils.runTabOperation(() => chrome.tabs.sendMessage(sender.tab.id, request));
   },
   // getCurrentTabUrl is used by the content scripts to get their full URL, because window.location

@@ -34,7 +34,7 @@ async function populatePage() {
 
   for (const h2 of Array.from(h2s)) {
     const group = h2.dataset["group"];
-    let commands = byGroup[group];
+    let commands = byGroup[group].filter((command) => Settings.isActionEnabled(command.name));
     // Display them in alphabetical order.
     commands = commands.sort((a, b) => b.name.localeCompare(a.name));
     for (const command of commands) {

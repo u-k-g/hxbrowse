@@ -119,6 +119,28 @@ context("options page", () => {
     assert.equal(144, (await chrome.storage.sync.get("scrollStepSize")).scrollStepSize);
   });
 
+  should("save recent-tab cycle settings", async () => {
+    const size = optionsPage.getOptionEl("recentTabCycleSize");
+    const timeout = optionsPage.getOptionEl("recentTabCycleTimeoutMs");
+    size.value = "7";
+    timeout.value = "1200";
+    size.dispatchEvent(new window.Event("input"));
+    timeout.dispatchEvent(new window.Event("input"));
+
+    await waitForAutoSave();
+
+    assert.equal(7, Settings.get("recentTabCycleSize"));
+    assert.equal(1200, Settings.get("recentTabCycleTimeoutMs"));
+    assert.equal(
+      7,
+      (await chrome.storage.sync.get("recentTabCycleSize")).recentTabCycleSize,
+    );
+    assert.equal(
+      1200,
+      (await chrome.storage.sync.get("recentTabCycleTimeoutMs")).recentTabCycleTimeoutMs,
+    );
+  });
+
   should("preserve custom keybindings when saving options", async () => {
     await Settings.set("keyMappings", "map q scrollUp");
 
@@ -130,6 +152,11 @@ context("options page", () => {
   should("show the configurable scroll defaults", () => {
     assert.equal("120", optionsPage.getOptionEl("scrollStepSize").value);
     assert.equal("800", optionsPage.getOptionEl("fastScrollStepSize").value);
+  });
+
+  should("show the recent-tab cycle defaults", () => {
+    assert.equal("5", optionsPage.getOptionEl("recentTabCycleSize").value);
+    assert.equal("800", optionsPage.getOptionEl("recentTabCycleTimeoutMs").value);
   });
 
   should("show the default accent field only for Arc themes", () => {

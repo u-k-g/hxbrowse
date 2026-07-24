@@ -344,7 +344,9 @@ export class CommandCompleter {
       });
     };
 
-    const matchingCommands = allCommands.filter((c) => ranking.matches(queryTerms, c.desc));
+    const matchingCommands = allCommands.filter((command) =>
+      Settings.isActionEnabled(command.name) && ranking.matches(queryTerms, command.desc)
+    );
 
     const boundSuggestions = [];
     const unboundSuggestions = [];

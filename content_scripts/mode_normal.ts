@@ -32,6 +32,8 @@ class NormalMode extends KeyHandlerMode {
   }
 
   commandHandler({ command: registryEntry, count }) {
+    if (!Settings.isActionEnabled(registryEntry.command)) return;
+
     if (
       [
         "CommandBar.activateCommandSelection",

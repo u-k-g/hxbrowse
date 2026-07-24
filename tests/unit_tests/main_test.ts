@@ -6,7 +6,10 @@ import { RegistryEntry } from "../../background_scripts/commands.js";
 import * as bgUtils from "../../background_scripts/bg_utils.js";
 
 context("extension command", () => {
-  teardown(() => chrome.runtime.lastError = undefined);
+  teardown(() => {
+    chrome.runtime.lastError = undefined;
+    if (Settings.isLoaded()) Settings._settings.disabledActions = [];
+  });
 
   should("suggest the native new-tab shortcut for the all-mode command bar", () => {
     const command = chrome.runtime.getManifest().commands["open-command-bar"];
@@ -29,6 +32,17 @@ context("extension command", () => {
     assert.equal("runInTopFrame", sentMessage.message.handler);
     assert.equal("CommandBar.activateAll", sentMessage.message.registryEntry.command);
     assert.equal({ frameId: 0 }, sentOptions);
+  });
+
+  should("ignore the native command-bar shortcut when its action is disabled", async () => {
+    let sentMessage = false;
+    await Settings.onLoaded();
+    Settings._settings.disabledActions = ["CommandBar.activateAll"];
+    stub(chrome.tabs, "sendMessage", () => sentMessage = true);
+
+    await handleExtensionCommand("open-command-bar", { id: 42 });
+
+    assert.isFalse(sentMessage);
   });
 
   should("open a current-tab command bar fallback from a protected page", async () => {
@@ -254,15 +268,25 @@ context("tab navigation", () => {
 });
 
 context("cycleRecentTabs command", () => {
+  let cycleSize;
+  let cycleTimeoutMs;
   let now;
   let recencyOrder;
   let selectedTabIds;
 
   setup(() => {
+    cycleSize = 5;
+    cycleTimeoutMs = 800;
     now = 1000;
     recencyOrder = [1, 2, 3, 4, 5, 6, 7];
     selectedTabIds = [];
     resetRecentTabCycle();
+    const getSetting = Settings.get.bind(Settings);
+    stub(Settings, "get", (key) => {
+      if (key === "recentTabCycleSize") return cycleSize;
+      if (key === "recentTabCycleTimeoutMs") return cycleTimeoutMs;
+      return getSetting(key);
+    });
     stub(Date, "now", () => now);
     stub(bgUtils.tabRecency, "init", async () => {});
     stub(bgUtils.tabRecency, "getTabsByRecency", () => recencyOrder);
@@ -286,9 +310,31 @@ context("cycleRecentTabs command", () => {
     assert.equal([2, 3, 4, 5, 6, 2], selectedTabIds);
   });
 
-  should("restart from the most recent non-current tab after 800ms", async () => {
+  should("respect the configured cycle size", async () => {
+    cycleSize = 3;
     await BackgroundCommands.cycleRecentTabs({ tab: { id: 1 } });
-    now += 801;
+    for (const currentTabId of [2, 3, 4]) {
+      now += 500;
+      await BackgroundCommands.cycleRecentTabs({ tab: { id: currentTabId } });
+    }
+
+    assert.equal([2, 3, 4, 2], selectedTabIds);
+  });
+
+  should("continue the cycle within the configured timeout", async () => {
+    cycleTimeoutMs = 1200;
+    await BackgroundCommands.cycleRecentTabs({ tab: { id: 1 } });
+    now += 1000;
+    recencyOrder = [2, 6, 5, 4, 3, 1, 7];
+    await BackgroundCommands.cycleRecentTabs({ tab: { id: 2 } });
+
+    assert.equal([2, 3], selectedTabIds);
+  });
+
+  should("restart from the most recent non-current tab after the configured timeout", async () => {
+    cycleTimeoutMs = 1200;
+    await BackgroundCommands.cycleRecentTabs({ tab: { id: 1 } });
+    now += 1201;
     recencyOrder = [2, 6, 5, 4, 3, 1, 7];
     await BackgroundCommands.cycleRecentTabs({ tab: { id: 2 } });
 

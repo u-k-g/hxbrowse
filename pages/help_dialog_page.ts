@@ -78,6 +78,7 @@ const HelpDialogPage = {
     for (const [group, commands] of Object.entries(byGroup)) {
       const list = [];
       for (const command of commands) {
+        if (!Settings.isActionEnabled(command.name)) continue;
         // Note that commands which are unbound won't be present in this data structure, and that's
         // desired; we don't want to show unbound commands in the help dialog.
         const variations = commandToOptionsToKeys[command.name] || {};

@@ -38,12 +38,15 @@ const createStorageAPI = (areaName) => {
       }
     },
 
-    async remove(key) {
+    async remove(keysArg) {
       chrome.runtime.lastError = undefined;
-      if (key in this.store) {
-        delete this.store[key];
+      const keys = Array.isArray(keysArg) ? keysArg : [keysArg];
+      for (const key of keys) {
+        if (key in this.store) {
+          delete this.store[key];
+        }
+        globalThis.chrome.storage.onChanged.callEmpty(key);
       }
-      globalThis.chrome.storage.onChanged.callEmpty(key);
     },
 
     async clear() {

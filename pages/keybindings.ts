@@ -185,6 +185,7 @@ function buildBindingRows(customMappings) {
   // Include every registered command, even when the Helix defaults leave it unbound.
   const rows = [];
   for (const command of allCommands) {
+    const isDisabled = !Settings.isActionEnabled(command.name);
     const bindings = (bindingsByCommand[command.name] ?? [])
       .sort((a, b) => a.key.localeCompare(b.key));
     for (const binding of bindings) {
@@ -199,6 +200,7 @@ function buildBindingRows(customMappings) {
         key: binding.key,
         options: binding.options,
         isCustom: !isDefault,
+        isDisabled,
         isUnbound: false,
         revertKey,
         revertKeys,
@@ -223,6 +225,7 @@ function buildBindingRows(customMappings) {
         key: "",
         options: def.options,
         isCustom: true,
+        isDisabled,
         isUnbound: true,
         revertKey,
         revertKeys: [revertKey],
@@ -235,6 +238,7 @@ function buildBindingRows(customMappings) {
         key: "",
         options: "",
         isCustom: false,
+        isDisabled,
         isUnbound: true,
         revertKey: "",
         revertKeys: [],
@@ -249,14 +253,94 @@ function currentCustomMappings() {
   return Settings.get("keyMappings");
 }
 
+async function setActionEnabled(actionName, enabled) {
+  const disabledActions = new Set(Settings.get("disabledActions"));
+  if (enabled) {
+    disabledActions.delete(actionName);
+  } else {
+    disabledActions.add(actionName);
+  }
+  await Settings.set("disabledActions", [...disabledActions]);
+  renderBindings();
+}
+
+function createBindingRow(row, groupLabel, rowTemplate) {
+  const rowNode = rowTemplate.cloneNode(true);
+  const rowElement = rowNode.querySelector(".binding-row");
+  rowElement.dataset.command = row.name;
+  rowElement.dataset.key = row.key;
+  rowElement.dataset.options = row.options;
+  rowElement.dataset.revertKey = row.revertKey;
+  rowElement.dataset.search = [
+    row.name,
+    row.desc,
+    row.details,
+    groupLabel,
+    row.key,
+    row.options,
+    row.isUnbound ? "unbound" : "",
+    row.isDisabled ? "disabled" : "enabled",
+  ].filter(Boolean).join(" ").toLowerCase();
+  const description = rowNode.querySelector(".command-description");
+  description.textContent = row.desc;
+  description.classList.toggle("command-custom", row.isCustom);
+  if (row.isCustom) {
+    description.title = "Custom or remapped binding";
+    rowElement.classList.add("is-custom");
+  }
+  if (row.isUnbound) rowElement.classList.add("is-unbound");
+  if (row.isDisabled) rowElement.classList.add("is-disabled");
+  rowNode.querySelector(".command-name").textContent = row.name;
+  const editor = rowNode.querySelector(".binding-editor");
+  editor.disabled = row.isDisabled;
+  const keysContainer = editor.querySelector(".binding-keys");
+  renderBindingValue(keysContainer, row.key);
+  editor.setAttribute(
+    "aria-label",
+    `${row.desc}: ${
+      row.key ? `currently ${row.key}` : "currently unbound"
+    }. Click to change keybinding. Escape while capturing removes the binding.`,
+  );
+  editor.addEventListener("click", () => beginShortcutCapture(editor, row));
+  editor.addEventListener("keydown", onCaptureKeydown);
+  editor.addEventListener("blur", () => finishCaptureOnBlur(editor));
+
+  const revertButton = rowNode.querySelector(".revert-binding");
+  revertButton.disabled = row.isDisabled;
+  revertButton.hidden = !row.isCustom;
+  revertButton.setAttribute(
+    "aria-label",
+    row.revertKey
+      ? `Restore the default ${row.revertKey} binding`
+      : `Remove the custom ${row.key} binding`,
+  );
+  revertButton.addEventListener("click", () => void revertBinding(row));
+  const actionToggle = rowNode.querySelector(".action-enabled");
+  actionToggle.checked = !row.isDisabled;
+  actionToggle.setAttribute(
+    "aria-label",
+    `${row.isDisabled ? "Enable" : "Disable"} ${row.desc}`,
+  );
+  actionToggle.addEventListener(
+    "change",
+    () => void setActionEnabled(row.name, actionToggle.checked),
+  );
+  return rowNode;
+}
+
 function renderBindings() {
   const { rows } = buildBindingRows(currentCustomMappings());
   const groupsContainer = document.querySelector("#binding-groups");
   const groupTemplate = document.querySelector("#binding-group-template").content;
+  const disabledGroupTemplate = document.querySelector("#disabled-binding-group-template").content;
   const rowTemplate = document.querySelector("#binding-row-template").content;
+  const disabledGroupWasOpen = groupsContainer.querySelector(".disabled-actions-group")?.open ??
+    false;
   groupsContainer.textContent = "";
 
-  const rowsByGroup = Object.groupBy(rows, (row) => row.group);
+  const enabledRows = rows.filter((row) => !row.isDisabled);
+  const disabledRows = rows.filter((row) => row.isDisabled);
+  const rowsByGroup = Object.groupBy(enabledRows, (row) => row.group);
   const groups = Object.entries(rowsByGroup).sort(
     ([a], [b]) => groupMetadata[a].order - groupMetadata[b].order,
   );
@@ -268,57 +352,25 @@ function renderBindings() {
     groupElement.dataset.group = group;
     const groupLabel = groupMetadata[group]?.label ?? group;
     groupNode.querySelector(".group-name").textContent = groupLabel;
-    groupNode.querySelector(".group-count").textContent = `${groupRows.length} commands`;
+    groupNode.querySelector(".group-count").textContent = `${groupRows.length} actions`;
 
     const rowsContainer = groupNode.querySelector(".group-rows");
     for (const row of groupRows) {
-      const rowNode = rowTemplate.cloneNode(true);
-      const rowElement = rowNode.querySelector(".binding-row");
-      rowElement.dataset.command = row.name;
-      rowElement.dataset.key = row.key;
-      rowElement.dataset.options = row.options;
-      rowElement.dataset.revertKey = row.revertKey;
-      rowElement.dataset.search = [
-        row.name,
-        row.desc,
-        row.details,
-        groupLabel,
-        row.key,
-        row.options,
-        row.isUnbound ? "unbound" : "",
-      ].filter(Boolean).join(" ").toLowerCase();
-      const description = rowNode.querySelector(".command-description");
-      description.textContent = row.desc;
-      description.classList.toggle("command-custom", row.isCustom);
-      if (row.isCustom) {
-        description.title = "Custom or remapped binding";
-        rowElement.classList.add("is-custom");
-      }
-      if (row.isUnbound) rowElement.classList.add("is-unbound");
-      rowNode.querySelector(".command-name").textContent = row.name;
-      const editor = rowNode.querySelector(".binding-editor");
-      const keysContainer = editor.querySelector(".binding-keys");
-      renderBindingValue(keysContainer, row.key);
-      editor.setAttribute(
-        "aria-label",
-        `${row.desc}: ${
-          row.key ? `currently ${row.key}` : "currently unbound"
-        }. Click to change keybinding. Escape while capturing removes the binding.`,
-      );
-      editor.addEventListener("click", () => beginShortcutCapture(editor, row));
-      editor.addEventListener("keydown", onCaptureKeydown);
-      editor.addEventListener("blur", () => finishCaptureOnBlur(editor));
+      rowsContainer.appendChild(createBindingRow(row, groupLabel, rowTemplate));
+    }
+    groupsContainer.appendChild(groupNode);
+  }
 
-      const revertButton = rowNode.querySelector(".revert-binding");
-      revertButton.hidden = !row.isCustom;
-      revertButton.setAttribute(
-        "aria-label",
-        row.revertKey
-          ? `Restore the default ${row.revertKey} binding`
-          : `Remove the custom ${row.key} binding`,
-      );
-      revertButton.addEventListener("click", () => void revertBinding(row));
-      rowsContainer.appendChild(rowNode);
+  if (disabledRows.length > 0) {
+    const groupNode = disabledGroupTemplate.cloneNode(true);
+    const groupElement = groupNode.querySelector(".disabled-actions-group");
+    groupElement.dataset.group = "disabled";
+    groupElement.open = disabledGroupWasOpen;
+    groupNode.querySelector(".group-count").textContent = `${disabledRows.length} actions`;
+    const rowsContainer = groupNode.querySelector(".group-rows");
+    for (const row of disabledRows) {
+      const groupLabel = groupMetadata[row.group]?.label ?? row.group;
+      rowsContainer.appendChild(createBindingRow(row, groupLabel, rowTemplate));
     }
     groupsContainer.appendChild(groupNode);
   }
@@ -342,10 +394,16 @@ function filterBindings() {
       }
     }
     group.hidden = groupVisibleRows === 0;
-    group.querySelector(".group-count").textContent = `${groupVisibleRows} commands`;
+    if (
+      terms.length > 0 && groupVisibleRows > 0 &&
+      group.classList.contains("disabled-actions-group")
+    ) {
+      group.open = true;
+    }
+    group.querySelector(".group-count").textContent = `${groupVisibleRows} actions`;
   }
 
-  const suffix = visibleRows === 1 ? "command" : "commands";
+  const suffix = visibleRows === 1 ? "action" : "actions";
   document.querySelector("#binding-count").textContent = `${visibleRows} ${suffix}`;
   document.querySelector("#empty-bindings").hidden = visibleRows !== 0;
 }
@@ -538,4 +596,12 @@ if (!testEnv && isStandaloneKeybindingsPage) {
   });
 }
 
-export { buildBindingRows, filterBindings, init, renderBindings, revertBinding, updateBinding };
+export {
+  buildBindingRows,
+  filterBindings,
+  init,
+  renderBindings,
+  revertBinding,
+  setActionEnabled,
+  updateBinding,
+};

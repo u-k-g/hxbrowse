@@ -45,6 +45,19 @@ context("help dialog", () => {
     );
   });
 
+  should("exclude disabled actions", () => {
+    Settings._settings.disabledActions = ["hardReload"];
+    const result = HelpDialogPage.getRowsForDialog({
+      reload: { "": ["a"] },
+      hardReload: { "": ["b"] },
+    });
+    Settings._settings.disabledActions = [];
+
+    const actionNames = result.navigation.map(([action]) => action.name);
+    assert.isTrue(actionNames.includes("reload"));
+    assert.isFalse(actionNames.includes("hardReload"));
+  });
+
   should("have a section in the help dialog for every group", async () => {
     // This test is to prevent code editing errors, where a command is added but doesn't have a
     // corresponding group in the help dialog.

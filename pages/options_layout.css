@@ -497,14 +497,14 @@ body.options-page #settings-grid-container .setting-control > div > .reset-link 
 }
 
 /* iOS-style boolean switches on the right */
-body.options-page #settings-grid-container .setting-switch {
+body.options-page .setting-switch {
   cursor: pointer;
   display: block;
   flex: none;
   width: auto !important;
 }
 
-body.options-page #settings-grid-container .setting-switch input[type="checkbox"] {
+body.options-page .setting-switch input[type="checkbox"] {
   -webkit-appearance: none;
   appearance: none;
   background:
@@ -524,7 +524,7 @@ body.options-page #settings-grid-container .setting-switch input[type="checkbox"
   width: 42px;
 }
 
-body.options-page #settings-grid-container .setting-switch input[type="checkbox"]:checked {
+body.options-page .setting-switch input[type="checkbox"]:checked {
   background:
     radial-gradient(
     circle at calc(100% - 11px) 50%,
@@ -535,7 +535,7 @@ body.options-page #settings-grid-container .setting-switch input[type="checkbox"
   border-color: color-mix(in srgb, var(--suda-accent-selected-color) 82%, white);
 }
 
-body.options-page #settings-grid-container .setting-switch input[type="checkbox"]:focus-visible {
+body.options-page .setting-switch input[type="checkbox"]:focus-visible {
   box-shadow: 0 0 0 3px var(--suda-accent-subtle-color);
 }
 

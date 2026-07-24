@@ -330,6 +330,11 @@ const commandBarModesByName: Record<string, CommandBarMode> = Object.fromEntries
   [...commandBarModes, linkActionMode].map((mode) => [mode.name, mode]),
 );
 
+function isCommandBarModeEnabled(mode) {
+  return mode.bindingCommands.length === 0 ||
+    mode.bindingCommands.some((action) => Settings.isActionEnabled(action));
+}
+
 // An instance of CommandBarUI. Exported for use by tests.
 export let ui;
 
@@ -419,8 +424,8 @@ class CommandBarUI {
     this.commandToOptionsToKeys = commandToOptionsToKeys;
   }
   getModeKeybindings(mode) {
-    const keys = mode.bindingCommands.flatMap((command) =>
-      Object.values(this.commandToOptionsToKeys[command] ?? {}).flat()
+    const keys = mode.bindingCommands.filter((action) => Settings.isActionEnabled(action)).flatMap(
+      (action) => Object.values(this.commandToOptionsToKeys[action] ?? {}).flat(),
     );
     return Array.from(new Set(keys));
   }
@@ -460,7 +465,7 @@ class CommandBarUI {
       return;
     }
     const mode = commandBarModesByName[name];
-    if (!mode) return;
+    if (!mode || !isCommandBarModeEnabled(mode)) return;
     if (mode.action) {
       UIComponentMessenger.postMessage({ name: "commandBarAction", action: name });
       return;
@@ -842,7 +847,9 @@ class CommandBarUI {
       const query = this.input.value.trim().toLowerCase();
       const queryTerms = query.split(/\s+/).filter(Boolean);
       const disabledModes = new Set(Settings.get("disabledCommandBarModes"));
-      this.completions = commandBarModes.filter((mode) => !disabledModes.has(mode.name)).map(
+      this.completions = commandBarModes.filter((mode) =>
+        isCommandBarModeEnabled(mode) && !disabledModes.has(mode.name)
+      ).map(
         (mode, index) => {
           const name = mode.name.toLowerCase();
           const aliases = mode.aliases.toLowerCase();

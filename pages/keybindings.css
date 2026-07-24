@@ -140,7 +140,7 @@ body.keybindings-page .validation-message {
 }
 
 /* ------------------------------------------------------------------ */
-/* Bindings table — COMMAND | KEYBINDING                              */
+/* Bindings table — ACTION | KEYBINDING | ENABLED                     */
 /* ------------------------------------------------------------------ */
 
 #bindings-table {
@@ -154,7 +154,7 @@ body.keybindings-page .validation-message {
 .binding-row {
   column-gap: 12px;
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.65fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.65fr) 84px;
 }
 
 .table-header {
@@ -194,6 +194,39 @@ body.keybindings-page .validation-message {
   font-size: 10px;
 }
 
+.disabled-actions-group > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.disabled-actions-group > summary::-webkit-details-marker {
+  display: none;
+}
+
+.group-summary-meta {
+  align-items: center;
+  display: inline-flex;
+  gap: 10px;
+}
+
+.group-disclosure {
+  color: var(--bindings-muted);
+  display: inline-block;
+  font-size: 17px;
+  line-height: 1;
+  transform: rotate(0deg);
+  transition: transform 140ms ease;
+}
+
+.disabled-actions-group[open] .group-disclosure {
+  transform: rotate(90deg);
+}
+
+.disabled-actions-group > summary:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--suda-accent-color);
+  outline: none;
+}
+
 .binding-row {
   align-items: center;
   border-bottom: 1px solid var(--bindings-border-soft);
@@ -215,7 +248,8 @@ body.keybindings-page .validation-message {
 }
 
 .command-copy,
-.binding-control {
+.binding-control,
+.action-toggle-control {
   min-width: 0;
   padding: 10px 16px;
 }
@@ -252,6 +286,28 @@ body.keybindings-page .validation-message {
   display: flex;
   gap: 8px;
   justify-content: flex-start;
+}
+
+.action-toggle-control {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.binding-row.is-disabled .command-copy,
+.binding-row.is-disabled .binding-control {
+  opacity: 0.42;
+}
+
+.binding-row.is-disabled .command-description,
+.binding-row.is-disabled .command-name,
+.binding-row.is-disabled .binding-editor {
+  color: var(--bindings-muted);
+}
+
+.binding-row.is-disabled .binding-editor,
+.binding-row.is-disabled .revert-binding {
+  cursor: default;
 }
 
 /* Revert sits to the left of the keybinding cell.
@@ -470,12 +526,13 @@ body.keybindings-page kbd {
 @media (max-width: 900px) {
   .table-header,
   .binding-row {
-    grid-template-columns: minmax(0, 1.1fr) minmax(210px, 0.9fr);
+    grid-template-columns: minmax(0, 1.1fr) minmax(210px, 0.9fr) 76px;
   }
 
   .table-header span,
   .command-copy,
-  .binding-control {
+  .binding-control,
+  .action-toggle-control {
     padding-inline: 12px;
   }
 }
@@ -502,8 +559,15 @@ body.keybindings-page kbd {
   }
 
   .binding-control {
-    grid-column: 2;
+    grid-column: 1 / -1;
+    grid-row: 2;
     justify-content: flex-start;
+    padding: 0;
+  }
+
+  .action-toggle-control {
+    grid-column: 2;
+    grid-row: 1;
     padding: 0;
   }
 

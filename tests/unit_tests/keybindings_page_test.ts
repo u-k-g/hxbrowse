@@ -122,16 +122,27 @@ context("keybindings page", () => {
     assert.isFalse(source.includes('import "./all_content_scripts.js"'));
   });
 
-  should("render the two-column keybindings table", () => {
+  should("render the three-column keybindings table", () => {
     const headers = Array.from(document.querySelectorAll(".table-header span"))
       .map((el) => el.textContent.trim().toLowerCase());
-    assert.equal(["command", "keybinding"], headers);
+    assert.equal(["action", "keybinding", "enabled"], headers);
 
     const row = document.querySelector(".binding-row");
     assert.isTrue(row.querySelector(".command-copy") != null);
     assert.isTrue(row.querySelector(".binding-keys") != null);
-    assert.equal(null, row.querySelector(".binding-when"));
-    assert.equal(null, row.querySelector(".binding-status"));
+    assert.isTrue(row.querySelector(".action-enabled") != null);
+  });
+
+  should("use the same full-size toggle component as general settings", async () => {
+    const css = await Deno.readTextFile("pages/options_layout.css");
+    assert.isTrue(
+      css.includes('body.options-page .setting-switch input[type="checkbox"]'),
+    );
+    assert.isFalse(
+      css.includes(
+        'body.options-page #settings-grid-container .setting-switch input[type="checkbox"]',
+      ),
+    );
   });
 
   should("mark customized command titles with the accent class", async () => {
@@ -164,6 +175,57 @@ context("keybindings page", () => {
     }
   });
 
+  should(
+    "move disabled actions into a collapsed section and restore their original group",
+    async () => {
+      await keybindingsPage.setActionEnabled("scrollDown", false);
+
+      const disabledGroup = document.querySelector(
+        "#binding-groups > .disabled-actions-group",
+      );
+      const disabledRow = disabledGroup.querySelector('[data-command="scrollDown"]');
+      assert.isTrue(disabledGroup != null);
+      assert.isFalse(disabledGroup.open);
+      assert.equal("disabled", disabledGroup.dataset.group);
+      assert.isTrue(disabledRow.classList.contains("is-disabled"));
+      assert.isTrue(disabledRow.querySelector(".binding-editor").disabled);
+      assert.isFalse(disabledRow.querySelector(".action-enabled").checked);
+      if (
+        document.querySelector(
+          '.binding-group[data-group="navigation"] [data-command="scrollDown"]',
+        ) != null
+      ) {
+        assert.fail("disabled action remained in its original group");
+      }
+      assert.equal(["scrollDown"], Settings.get("disabledActions"));
+
+      disabledGroup.open = true;
+      await keybindingsPage.setActionEnabled("scrollDown", true);
+
+      if (document.querySelector("#binding-groups > .disabled-actions-group") != null) {
+        const remaining = Array.from(
+          document.querySelectorAll(
+            "#binding-groups > .disabled-actions-group .binding-row",
+          ),
+        ).map((row) => row.dataset.command);
+        assert.fail(
+          `disabled section remained after re-enabling its only action: ${
+            JSON.stringify({
+              remaining,
+              setting: Settings.get("disabledActions"),
+            })
+          }`,
+        );
+      }
+      assert.isTrue(
+        document.querySelector(
+          '.binding-group[data-group="navigation"] [data-command="scrollDown"]',
+        ) != null,
+      );
+      assert.equal([], Settings.get("disabledActions"));
+    },
+  );
+
   should("filter by command descriptions, names, groups, and keys", () => {
     const search = document.querySelector("#binding-search input");
     search.value = "removetab";
@@ -175,7 +237,7 @@ context("keybindings page", () => {
     assert.isTrue(visibleRows.every((row) => row.dataset.command === "removeTab"));
     assert.isTrue(
       document.querySelector("#binding-count").textContent.includes(
-        `${visibleRows.length} command`,
+        `${visibleRows.length} action`,
       ),
     );
   });

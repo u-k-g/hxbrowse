@@ -274,6 +274,36 @@
 
               <div class="setting-row">
                 <div class="setting-copy">
+                  <h2>Recent-tab cycle size</h2>
+                  <div class="example">
+              The number of recent destination tabs included when repeatedly pressing <tt>r</tt>.
+            </div>
+                </div>
+                <div class="setting-control">
+                  <span class="setting-number-field">
+                    <input name="recentTabCycleSize" type="number" min="1" step="1" />
+                    <span class="setting-unit">tabs</span>
+                  </span>
+                </div>
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-copy">
+                  <h2>Recent-tab cycle timeout</h2>
+                  <div class="example">
+              The maximum delay between <tt>r</tt> presses that continues the current cycle.
+            </div>
+                </div>
+                <div class="setting-control">
+                  <span class="setting-number-field">
+                    <input name="recentTabCycleTimeoutMs" type="number" min="0" step="50" />
+                    <span class="setting-unit">ms</span>
+                  </span>
+                </div>
+              </div>
+
+              <div class="setting-row">
+                <div class="setting-copy">
                   <h2>Scroll step size</h2>
                   <div class="example">
               The size for basic movements (usually j/k/h/l).
@@ -577,8 +607,9 @@
 
             <section id="bindings-table" aria-label="Active keybindings">
               <div class="table-header" aria-hidden="true">
-                <span>Command</span>
+                <span>Action</span>
                 <span>Keybinding</span>
+                <span>Enabled</span>
               </div>
               <div id="binding-groups"></div>
               <div id="empty-bindings" hidden>
@@ -615,6 +646,19 @@
       </section>
     </template>
 
+    <template id="disabled-binding-group-template">
+      <details class="binding-group disabled-actions-group">
+        <summary class="group-heading">
+          <span class="group-name">Disabled</span>
+          <span class="group-summary-meta">
+            <span class="group-count"></span>
+            <span class="group-disclosure" aria-hidden="true">›</span>
+          </span>
+        </summary>
+        <div class="group-rows"></div>
+      </details>
+    </template>
+
     <template id="binding-row-template">
       <article class="binding-row">
         <div class="command-copy">
@@ -633,6 +677,11 @@
             <span class="binding-keys"></span>
             <span class="binding-edit-label">Edit</span>
           </button>
+        </div>
+        <div class="action-toggle-control">
+          <label class="setting-switch action-toggle">
+            <input class="action-enabled" type="checkbox" />
+          </label>
         </div>
       </article>
     </template>
