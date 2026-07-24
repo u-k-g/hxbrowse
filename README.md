@@ -32,41 +32,6 @@
 
 </details>
 
-<details open>
-<summary><strong>key bindings</strong></summary>
-
-- `h` `j` `k` `l` scroll the viewport
-- `J` / `K` scroll down / up quickly
-- `gg` / `ge` go to the top / bottom of the page
-- `gh` / `gl` go to the left / right edge of the page
-- `ctrl-d` / `ctrl-u` scroll half a page down / up
-- `ctrl-o` / `ctrl-i` go backward / forward in browser history
-- `gn` / `gp` go to the next / previous tab
-- `v` enters select mode and `x` selects the current line
-- `space f` selects one or more links; press `enter` to choose an action
-- `space t` opens the all-mode command bar
-- `space b` opens the tab picker
-- `space B` opens the bookmark picker
-- `space /` opens find mode; `n` / `N` move through matches
-- `space m` creates a mark and `space '` opens the mark picker
-- `space ,` opens Suda's options page
-- `:` opens the command-bar mode selector
-- `ctrl-w q` / `ctrl-w u` close / restore a tab
-- `ctrl-w n` opens search mode in a new tab
-- `cmd-t` (`ctrl-t` elsewhere) opens all mode in the current tab; protected browser pages use a
-  temporary Suda tab which is replaced by the selected result
-
-</details>
-
-<details>
-<summary><strong>configuration</strong></summary>
-
-open Suda's keybindings page, click any shortcut and press the replacement key or sequence. changes
-save automatically. use the options page for themes, search engines, exclusions, link hints and
-optional new-tab behavior.
-
-</details>
-
 <details>
 <summary><strong>upstream</strong></summary>
 

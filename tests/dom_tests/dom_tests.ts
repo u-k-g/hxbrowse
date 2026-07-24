@@ -1505,6 +1505,19 @@ context("FindMode", () => {
     assert.equal("phrase split across several elements", getSelection().toString());
   });
 
+  should("find text inside display-contents wrappers styled by a stylesheet", () => {
+    document.getElementById("test-div").innerHTML = `
+      <style>.find-display-contents { display: contents; }</style>
+      <div class="find-display-contents">
+        <span>banana ban</span>
+      </div>
+    `;
+
+    assert.isTrue(find("banana"));
+    assert.equal(1, FindMode.query.matchCount);
+    assert.equal("banana", getSelection().toString());
+  });
+
   should("treat visible line breaks as whitespace in plain find", () => {
     document.getElementById("test-div").innerHTML = "first line<br>second line";
 

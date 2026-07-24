@@ -538,7 +538,7 @@ const getSearchableText = () => {
     } else if (
       node.nodeType === Node.ELEMENT_NODE &&
       !ignoredFindElements.has(node.tagName) &&
-      (node.checkVisibility() || node.style.display === "contents")
+      (node.checkVisibility() || getComputedStyle(node).display === "contents")
     ) {
       if (node.tagName === "BR") return appendBoundary();
       const isBlock = blockElements.has(node.tagName);
