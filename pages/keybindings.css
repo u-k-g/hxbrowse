@@ -371,25 +371,29 @@ body.settings-page .binding-editor:focus-visible,
   min-width: 0;
 }
 
+/* Always reserve layout space so hover doesn't grow the hit target. */
 .binding-edit-label {
   background: color-mix(in srgb, var(--suda-surface-color) 72%, transparent);
   border: 1px solid var(--bindings-border);
   border-radius: 6px;
   color: var(--bindings-muted);
-  display: none;
   flex: none;
   font-size: 9px;
   font-weight: 750;
   letter-spacing: 0.06em;
   line-height: 20px;
+  opacity: 0;
   padding: 0 6px;
+  pointer-events: none;
   text-transform: uppercase;
+  visibility: hidden;
 }
 
 .binding-editor:hover .binding-edit-label,
 .binding-editor:focus-visible .binding-edit-label,
 .binding-editor.is-recording .binding-edit-label {
-  display: inline-block;
+  opacity: 1;
+  visibility: visible;
 }
 
 .binding-capture-prompt {
