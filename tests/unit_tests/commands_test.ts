@@ -290,20 +290,57 @@ context("Validate commands and options data structures", () => {
     assert.equal({ completer: "omni", mode: "search", newTab: true }, openOptions);
   });
 
+  should("open command selection in actions mode", () => {
+    let openOptions = null;
+    stub(CommandBar, "open", (_sourceFrameId, options) => openOptions = options);
+
+    CommandBar.activateCommandSelection(0, { options: {} });
+
+    assert.equal({ completer: "commands", mode: "actions", selectFirst: true }, openOptions);
+  });
+
   should("bind Helix J and K to configurable fast scrolling", () => {
     assert.equal("scrollFastDown", helixKeyMappings["J"]);
     assert.equal("scrollFastUp", helixKeyMappings["K"]);
     assert.equal(800, Settings.defaultOptions.fastScrollStepSize);
   });
 
-  should("bind Helix r to recent-tab cycling while keeping reload under Space", () => {
+  should("bind Helix r to recent-tab cycling while keeping only soft reload under Space", () => {
     assert.equal("cycleRecentTabs", helixKeyMappings["r"]);
     assert.equal("reload", helixKeyMappings["<space>r"]);
-    assert.equal("hardReload", helixKeyMappings["<space>R"]);
+    assert.isFalse(Object.hasOwn(helixKeyMappings, "<space>R"));
   });
 
   should("bind Helix a directly to caret mode", () => {
     assert.equal("enterCaretMode", helixKeyMappings["a"]);
+  });
+
+  should("fold selected-text search into slash and remove the standalone commands", () => {
+    assert.equal("enterFindMode", helixKeyMappings["/"]);
+    assert.isFalse(Object.hasOwn(helixKeyMappings, "*"));
+    assert.isFalse(Object.hasOwn(helixKeyMappings, "<a-*>"));
+    const commandNames = allCommands.map(({ name }) => name);
+    assert.isFalse(commandNames.includes("findSelected"));
+    assert.isFalse(commandNames.includes("findSelectedBackwards"));
+  });
+
+  should("leave optional navigation actions unbound by default", () => {
+    for (
+      const key of [
+        "gh",
+        "gl",
+        "<space>R",
+        "p",
+        "gu",
+        "gU",
+        "[[",
+        "]]",
+        "<c-w>d",
+        "<c-w>v",
+      ]
+    ) {
+      assert.isFalse(Object.hasOwn(helixKeyMappings, key));
+    }
   });
 
   should("leave Space-d unbound", () => {

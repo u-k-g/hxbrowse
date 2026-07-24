@@ -205,6 +205,11 @@ context("options page", () => {
 
     assert.equal(["url"], uncheckedModeValues);
     assert.equal(["history"], uncheckedSourceValues);
+    assert.equal(
+      "Actions",
+      document.querySelector('[name="disabledCommandBarModes"][value="actions"]')
+        .parentElement.textContent.trim(),
+    );
   });
 
   should("save unchecked command-bar modes and modeless sources as disabled", async () => {

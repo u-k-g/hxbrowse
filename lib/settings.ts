@@ -247,6 +247,16 @@ const Settings = {
     return settings;
   },
 
+  migrateCommandBarActionsMode(settings) {
+    if (!Array.isArray(settings.disabledCommandBarModes)) return settings;
+    settings.disabledCommandBarModes = Array.from(
+      new Set(
+        settings.disabledCommandBarModes.map((mode) => mode === "commands" ? "actions" : mode),
+      ),
+    );
+    return settings;
+  },
+
   migrateHardReloadCommand(settings) {
     if (typeof settings.keyMappings !== "string") return settings;
     settings.keyMappings = settings.keyMappings.replace(
@@ -274,6 +284,7 @@ const Settings = {
     settings = this.migratePre2_4_1(settings);
     settings = this.migrateAccentColor(settings);
     settings = this.migrateLegacyKeyBindingMode(settings);
+    settings = this.migrateCommandBarActionsMode(settings);
     settings = this.migrateHardReloadCommand(settings);
     settings = this.migrateRemovedCommands(settings);
     return settings;

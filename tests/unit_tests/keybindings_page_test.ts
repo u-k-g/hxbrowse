@@ -62,12 +62,12 @@ context("keybindings page", () => {
     assert.isTrue(document.querySelector(".binding-editor") != null);
   });
 
-  should("distinguish reload and hard-reload defaults without marking them custom", () => {
+  should("bind soft reload by default and leave hard reload unbound", () => {
     const soft = document.querySelector(
       '.binding-row[data-command="reload"][data-key="<space>r"]',
     );
     const hard = document.querySelector(
-      '.binding-row[data-command="hardReload"][data-key="<space>R"]',
+      '.binding-row[data-command="hardReload"][data-key=""]',
     );
 
     assert.isTrue(soft != null);
@@ -75,11 +75,11 @@ context("keybindings page", () => {
     assert.equal("Reload the page", soft.querySelector(".command-description").textContent);
     assert.equal("Hard reload the page", hard.querySelector(".command-description").textContent);
     assert.isFalse(soft.classList.contains("is-custom"));
-    assert.isFalse(hard.classList.contains("is-custom"));
+    assert.isTrue(hard.classList.contains("is-unbound"));
     assert.isTrue(soft.querySelector(".revert-binding").hidden);
     assert.isTrue(hard.querySelector(".revert-binding").hidden);
     assert.isFalse(soft.querySelector(".command-description").classList.contains("command-custom"));
-    assert.isFalse(hard.querySelector(".command-description").classList.contains("command-custom"));
+    assert.equal("None", hard.querySelector(".binding-unbound").textContent);
   });
 
   should("omit the removed alternate navigation and tab bindings", () => {
@@ -149,6 +149,19 @@ context("keybindings page", () => {
     const groups = Array.from(document.querySelectorAll(".binding-group"))
       .map((group) => group.dataset.group);
     assert.equal(["navigation", "commandBar", "find", "history", "tabs", "misc"], groups);
+  });
+
+  should("place unbound commands at the bottom of every group", () => {
+    for (const group of document.querySelectorAll(".binding-group")) {
+      let reachedUnboundCommands = false;
+      for (const row of group.querySelectorAll(".binding-row")) {
+        if (row.classList.contains("is-unbound")) {
+          reachedUnboundCommands = true;
+        } else {
+          assert.isFalse(reachedUnboundCommands);
+        }
+      }
+    }
   });
 
   should("filter by command descriptions, names, groups, and keys", () => {

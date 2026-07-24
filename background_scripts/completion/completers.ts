@@ -346,7 +346,8 @@ export class CommandCompleter {
 
     const matchingCommands = allCommands.filter((c) => ranking.matches(queryTerms, c.desc));
 
-    const suggestions = [];
+    const boundSuggestions = [];
+    const unboundSuggestions = [];
     for (const commandInfo of matchingCommands) {
       const variations = commandToOptionsToKeys[commandInfo.name] || {};
 
@@ -356,10 +357,10 @@ export class CommandCompleter {
       // If the default action is not bound, add the entry explicitly to the suggestions.
       // This makes unbound commands accessible from the CommandBar.
       if (!isDefaultBound) {
-        suggestions.push(
+        unboundSuggestions.push(
           new Suggestion({
             queryTerms,
-            description: "command",
+            description: "action",
             title: commandInfo.desc,
             deDuplicate: false,
             command: {
@@ -373,10 +374,10 @@ export class CommandCompleter {
 
       // Add all bound/mapped command variations to the suggestions.
       for (const [options, keys] of Object.entries(variations)) {
-        suggestions.push(
+        boundSuggestions.push(
           new Suggestion({
             queryTerms,
-            description: "command",
+            description: "action",
             title: commandInfo.desc + (options ? ` (${options})` : ""),
             deDuplicate: false,
             command: {
@@ -388,7 +389,7 @@ export class CommandCompleter {
         );
       }
     }
-    return suggestions;
+    return [...boundSuggestions, ...unboundSuggestions];
   }
 }
 

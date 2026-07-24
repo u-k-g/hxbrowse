@@ -262,6 +262,7 @@ function renderBindings() {
   );
 
   for (const [group, groupRows] of groups) {
+    groupRows.sort((a, b) => Number(a.isUnbound) - Number(b.isUnbound));
     const groupNode = groupTemplate.cloneNode(true);
     const groupElement = groupNode.querySelector(".binding-group");
     groupElement.dataset.group = group;

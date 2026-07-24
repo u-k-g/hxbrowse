@@ -275,9 +275,9 @@ const commandBarModes: CommandBarMode[] = [
     bindingCommands: ["CommandBar.activateEditUrl"],
   },
   {
-    name: "commands",
-    description: "Search and run extension commands",
-    aliases: "palette actions",
+    name: "actions",
+    description: "Search and run Suda actions",
+    aliases: "commands command palette",
     completer: "commands",
     selectFirst: true,
     icon: "command",
@@ -908,7 +908,7 @@ class CommandBarUI {
       query,
       seenTabToOpenCompletionList: this.seenTabToOpenCompletionList ||
         this.completerName === "history",
-      showAllOnEmpty: this.mode === "" || ["bookmarks", "commands"].includes(this.mode),
+      showAllOnEmpty: this.mode === "" || ["bookmarks", "actions"].includes(this.mode),
       disabledModelessCommandBarSources: this.mode === ""
         ? Settings.get("disabledModelessCommandBarSources")
         : [],

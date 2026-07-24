@@ -55,30 +55,6 @@ const allCommands = [
   },
 
   {
-    name: "scrollPageDown",
-    desc: "Scroll a half page down",
-    group: "navigation",
-  },
-
-  {
-    name: "scrollPageUp",
-    desc: "Scroll a half page up",
-    group: "navigation",
-  },
-
-  {
-    name: "scrollFullPageDown",
-    desc: "Scroll a full page down",
-    group: "navigation",
-  },
-
-  {
-    name: "scrollFullPageUp",
-    desc: "Scroll a full page up",
-    group: "navigation",
-  },
-
-  {
     name: "scrollLeft",
     desc: "Scroll left",
     group: "navigation",
@@ -291,7 +267,7 @@ const allCommands = [
 
   {
     name: "CommandBar.activateAll",
-    desc: "Open the modeless command bar",
+    desc: "Open the command bar",
     group: "commandBar",
     topFrame: true,
     noRepeat: true,
@@ -371,7 +347,7 @@ const allCommands = [
 
   {
     name: "CommandBar.activateCommandSelection",
-    desc: "Execute a Suda command",
+    desc: "Execute a Suda action",
     group: "commandBar",
     topFrame: true,
     noRepeat: true,
@@ -407,7 +383,7 @@ const allCommands = [
 
   {
     name: "enterFindMode",
-    desc: "Enter find mode.",
+    desc: "Find selected text or enter find mode",
     group: "find",
     noRepeat: true,
   },
@@ -422,20 +398,6 @@ const allCommands = [
     name: "performBackwardsFind",
     desc: "Cycle backward to the previous find match",
     group: "find",
-  },
-
-  {
-    name: "findSelected",
-    desc: "Find the selected text",
-    group: "find",
-    advanced: true,
-  },
-
-  {
-    name: "findSelectedBackwards",
-    desc: "Find the selected text, searching backwards",
-    group: "find",
-    advanced: true,
   },
 
   //

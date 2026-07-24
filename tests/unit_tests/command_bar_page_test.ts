@@ -122,6 +122,19 @@ context("commandBar page", () => {
     assert.equal([], ui.completions);
   });
 
+  should("call the command-running mode actions", async () => {
+    await commandBarPage.activate({ mode: "modes", completer: "modes" });
+    ui.setQuery("actions");
+    await ui.update();
+
+    assert.equal("actions", ui.completions[0].commandBarMode);
+    await ui.onKeyEvent(newKeyEvent({ type: "keypress", key: "Enter" }));
+
+    assert.equal("actions", ui.mode);
+    assert.equal("commands", ui.completerName);
+    assert.equal("actions", ui.modeIndicator.textContent);
+  });
+
   should("show link actions for one selected link", async () => {
     await commandBarPage.activate({
       mode: "link-actions",

@@ -523,12 +523,33 @@ context("command completer", () => {
     const suggestions = await filterCompleter(multiCompleter, ["mute", "tab"]);
     assert.equal(
       [
-        "Mute or unmute current tab",
         "Mute or unmute current tab (all)",
         "Mute or unmute current tab (other)",
+        "Mute or unmute current tab",
       ],
       suggestions.map((s) => s.title),
     );
+  });
+
+  should("place unbound actions after bound actions", async () => {
+    stub(chrome.storage.session, "get", async () => ({
+      commandToOptionsToKeys: {
+        "reload": {
+          "": ["r"],
+        },
+      },
+    }));
+    stub(Commands, "keyToRegistryEntry", {
+      "r": new RegistryEntry({ command: "reload", options: {} }),
+    });
+
+    const suggestions = await filterCompleter(multiCompleter, ["reload"]);
+
+    assert.equal(
+      ["Reload the page", "Hard reload the page"],
+      suggestions.map((suggestion) => suggestion.title),
+    );
+    assert.equal([["r"], []], suggestions.map((suggestion) => suggestion.command.keys));
   });
 
   should("include the exclude-all-keys command", async () => {

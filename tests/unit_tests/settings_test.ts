@@ -43,6 +43,23 @@ context("settings", () => {
     });
   });
 
+  context("command-bar actions mode migration", () => {
+    teardown(async () => {
+      await Settings.clear();
+    });
+
+    should("rename the commands mode in saved settings", async () => {
+      await chrome.storage.sync.set({
+        settingsVersion: "2.4.1",
+        disabledCommandBarModes: ["commands", "tabs", "actions"],
+      });
+
+      await Settings.load();
+
+      assert.equal(["actions", "tabs"], Settings.get("disabledCommandBarModes"));
+    });
+  });
+
   context("hard reload command migration", () => {
     teardown(async () => {
       await Settings.clear();

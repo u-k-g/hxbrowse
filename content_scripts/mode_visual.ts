@@ -259,29 +259,6 @@ class VisualMode extends KeyHandlerMode {
       "B": keyMapping.b,
       "W": keyMapping.w,
     });
-    Object.assign(keyMapping, {
-      "<c-d>": {
-        command(count) {
-          return Scroller.scrollBy("y", "viewSize", count / 2);
-        },
-      },
-      "<c-u>": {
-        command(count) {
-          return Scroller.scrollBy("y", "viewSize", -count / 2);
-        },
-      },
-      "<c-f>": {
-        command(count) {
-          return Scroller.scrollBy("y", "viewSize", count);
-        },
-      },
-      "<c-b>": {
-        command(count) {
-          return Scroller.scrollBy("y", "viewSize", -count);
-        },
-      },
-    });
-
     super.init(Object.assign(options, {
       name: options.name != null ? options.name : "visual",
       indicator: options.indicator != null ? options.indicator : "Select mode",
@@ -457,8 +434,13 @@ VisualMode.prototype.movements = {
     return this.find(count, true);
   },
   "/"() {
+    const selection = this.selection.toString();
     this.exit();
-    return new FindMode({ returnToViewport: true }).onExit(() => new VisualMode().init());
+    const result = FindMode.findSelectionOrEnter(selection, { returnToViewport: true });
+    if (result instanceof FindMode) {
+      result.onExit(() => new VisualMode().init());
+    }
+    return result;
   },
   "x"(count) {
     return this.movement.selectLine(count);

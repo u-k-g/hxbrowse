@@ -293,6 +293,14 @@ class FindMode extends Mode {
     FindModeHistory.saveQuery(this.query.rawQuery);
   }
 
+  static findSelectionOrEnter(selection, options) {
+    Marks.setPreviousPosition();
+    if (!selection) return new FindMode(options);
+    this.updateQuery(selection);
+    this.saveQuery();
+    return this.findNext(false);
+  }
+
   // :options is an optional dict. valid parameters are 'caseSensitive' and 'backwards'.
   static execute(query, options) {
     let result = null;

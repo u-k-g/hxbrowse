@@ -418,10 +418,6 @@ const helixKeyMappings = {
   "J": "scrollFastDown",
   "K": "scrollFastUp",
   "l": "scrollRight",
-  "<c-d>": "scrollPageDown",
-  "<c-u>": "scrollPageUp",
-  "<c-f>": "scrollFullPageDown",
-  "<c-b>": "scrollFullPageUp",
   "zi": "zoomIn",
   "zo": "zoomOut",
   "z0": "zoomReset",
@@ -429,15 +425,9 @@ const helixKeyMappings = {
   // Goto mode
   "gg": "scrollToTop",
   "ge": "scrollToBottom",
-  "gh": "scrollToLeft",
-  "gl": "scrollToRight",
   "gi": "focusInput",
   "gn": "nextTab",
   "gp": "previousTab",
-  "gu": "goUp",
-  "gU": "goToRoot",
-  "[[": "goPrevious",
-  "]]": "goNext",
 
   // Modes and selection-first actions
   "i": "enterInsertMode",
@@ -445,7 +435,6 @@ const helixKeyMappings = {
   "v": "enterSelectMode",
   "x": "selectLine",
   "y": "copyCurrentUrl",
-  "p": "openCopiedUrlInCurrentTab",
   "P": "openCopiedUrlInNewTab",
   "r": "cycleRecentTabs",
   "u": "goBack",
@@ -455,8 +444,6 @@ const helixKeyMappings = {
   "/": "enterFindMode",
   "n": "performFind",
   "N": "performBackwardsFind",
-  "*": "findSelected",
-  "<a-*>": "findSelectedBackwards",
 
   // Space mode: browser pickers and actions.
   "<space>f": "LinkHints.activateMode",
@@ -469,18 +456,15 @@ const helixKeyMappings = {
   "<space>m": "Marks.activateCreateMode",
   "<space>'": "CommandBar.activateMarks",
   "<space>r": "reload",
-  "<space>R": "hardReload",
   "<space>,": "openOptionsPage",
   ":": "CommandBar.activateModeSelection",
 
   // Window mode: tabs are the browser equivalent of editor windows.
   "<c-w>q": "removeTab",
   "<c-w>n": "CommandBar.activateInNewTab",
-  "<c-w>d": "duplicateTab",
   "<c-w>u": "restoreTab",
   "<c-w>H": "moveTabLeft",
   "<c-w>L": "moveTabRight",
-  "<c-w>v": "moveTabToNewWindow",
   "<c-w>p": "togglePinTab",
   "<c-w>m": "toggleMuteTab",
 };

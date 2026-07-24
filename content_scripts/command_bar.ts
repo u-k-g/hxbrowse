@@ -111,7 +111,7 @@ const CommandBar = {
   activateCommandSelection(sourceFrameId, registryEntry) {
     const options = Object.assign({}, registryEntry.options, {
       completer: "commands",
-      mode: "commands",
+      mode: "actions",
       selectFirst: true,
     });
     this.open(sourceFrameId, options);

@@ -93,14 +93,6 @@ const enterNormalMode = function (count) {
   return mode;
 };
 
-function findSelectedHelper(backwards) {
-  const selection = window.getSelection().toString();
-  if (!selection) return;
-  FindMode.updateQuery(selection);
-  FindMode.saveQuery();
-  FindMode.findNext(backwards);
-}
-
 function scrollVertically(count, direction, fast) {
   const unshifted = direction * Settings.get("scrollStepSize") * count;
   const shifted = direction * Settings.get("fastScrollStepSize") * count;
@@ -134,18 +126,6 @@ const NormalModeCommands = {
   },
   scrollFastDown(count) {
     scrollVertically(count, 1, true);
-  },
-  scrollPageUp(count) {
-    Scroller.scrollBy("y", "viewSize", (-1 / 2) * count);
-  },
-  scrollPageDown(count) {
-    Scroller.scrollBy("y", "viewSize", (1 / 2) * count);
-  },
-  scrollFullPageUp(count) {
-    Scroller.scrollBy("y", "viewSize", -1 * count);
-  },
-  scrollFullPageDown(count) {
-    Scroller.scrollBy("y", "viewSize", 1 * count);
   },
   scrollLeft(count) {
     Scroller.scrollBy("x", -1 * Settings.get("scrollStepSize") * count);
@@ -235,8 +215,7 @@ const NormalModeCommands = {
   },
 
   enterFindMode() {
-    Marks.setPreviousPosition();
-    return new FindMode();
+    return FindMode.findSelectionOrEnter(window.getSelection().toString());
   },
 
   // Find.
@@ -250,14 +229,6 @@ const NormalModeCommands = {
     for (let i = 0, end = count; i < end; i++) {
       FindMode.findNext(true);
     }
-  },
-
-  findSelected() {
-    findSelectedHelper(false);
-  },
-
-  findSelectedBackwards() {
-    findSelectedHelper(true);
   },
 
   // Misc.

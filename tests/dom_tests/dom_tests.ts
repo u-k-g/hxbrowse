@@ -705,6 +705,35 @@ context("Filtered link hints", () => {
 });
 
 context("Helix normal-mode commands", () => {
+  should("find selected text with the find command", () => {
+    let updatedQuery = null;
+    let savedQuery = false;
+    let backwards = null;
+    stub(window, "getSelection", () => ({ toString: () => "selected text" }));
+    stub(Marks, "setPreviousPosition", () => {});
+    stub(FindMode, "updateQuery", (query) => updatedQuery = query);
+    stub(FindMode, "saveQuery", () => savedQuery = true);
+    stub(FindMode, "findNext", (value) => backwards = value);
+
+    NormalModeCommands.enterFindMode();
+
+    assert.equal("selected text", updatedQuery);
+    assert.isTrue(savedQuery);
+    assert.isFalse(backwards);
+  });
+
+  should("enter find mode when no text is selected", () => {
+    initializeModeState();
+    getSelection().removeAllRanges();
+    stub(Marks, "setPreviousPosition", () => {});
+    stub(HUD, "showFindMode", () => {});
+
+    const mode = NormalModeCommands.enterFindMode();
+
+    assert.isTrue(mode instanceof FindMode);
+    mode.exit();
+  });
+
   should("enter caret mode directly", () => {
     let initOptions = null;
     stub(CaretMode.prototype, "init", (options) => initOptions = options);
